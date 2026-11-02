@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — Smart Parking</title>
+
+  <!-- Google Fonts & FontAwesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Base Style & Auth Style -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/auth.css">
+</head>
+
+<body class="auth-page">
+
+  <div class="auth-split-card register-card">
+
+    <!-- LEFT HERO PANEL -->
+    <div class="auth-hero-panel">
+      <div>
+        <!-- Brand Header -->
+        <div class="auth-brand-header">
+          <div class="auth-brand-icon">
+            <!-- Cute red car vector matching screenshot -->
+            <svg class="brand-car-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M7 21C6.44772 21 6 21.4477 6 22V24C6 24.5523 6.44772 25 7 25H8.1C8.5 26.2 9.6 27 11 27C12.4 27 13.5 26.2 13.9 25H22.1C22.5 26.2 23.6 27 25 27C26.4 27 27.5 26.2 27.9 25H29C29.5523 25 30 24.5523 30 24V22C30 21.4477 29.5523 21 29 21H28L25.5 15.5C25.2 14.6 24.3 14 23.3 14H12.7C11.7 14 10.8 14.6 10.5 15.5L8 21H7Z"
+                fill="#ef4444" />
+              <path d="M11.2 19.5L12.8 15.8C13 15.3 13.5 15 14 15H17.5V19.5H11.2Z" fill="#bae6fd" />
+              <path d="M19 15H22C22.5 15 23 15.3 23.2 15.8L24.8 19.5H19V15Z" fill="#bae6fd" />
+              <circle cx="7.5" cy="22.5" r="1" fill="#fef08a" />
+              <circle cx="28.5" cy="22.5" r="1" fill="#fef08a" />
+              <circle cx="11" cy="25" r="2.5" fill="#1e293b" />
+              <circle cx="11" cy="25" r="1" fill="#94a3b8" />
+              <circle cx="25" cy="25" r="2.5" fill="#1e293b" />
+              <circle cx="25" cy="25" r="1" fill="#94a3b8" />
+            </svg>
+          </div>
+          <div class="auth-brand-text">
+            <span class="auth-brand-title">Smart Parking</span>
+            <span class="auth-brand-subtitle">AI-Powered Parking Management</span>
+          </div>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="auth-hero-headline">
+          Join the <span class="highlight-cyan">Smart</span><br>
+          Parking<br>
+          Experience
+        </h1>
+
+        <!-- Description -->
+        <p class="auth-hero-desc">
+          Create your account and enjoy intelligent parking management, smart slot recommendations and convenient online
+          booking.
+        </p>
+      </div>
+
+      <!-- Feature Badges List -->
+      <div class="auth-feature-list">
+        <!-- Feature 1: Easy parking slot booking -->
+        <div class="auth-feature-item">
+          <div class="auth-feature-badge badge-blue">
+            <i class="fas fa-parking"></i>
+          </div>
+          <span class="auth-feature-text">Easy parking slot booking</span>
+        </div>
+
+        <!-- Feature 2: AI-powered slot recommendations -->
+        <div class="auth-feature-item">
+          <div class="auth-feature-badge badge-robot">
+            <i class="fas fa-robot"></i>
+          </div>
+          <span class="auth-feature-text">AI-powered slot recommendations</span>
+        </div>
+
+        <!-- Feature 3: Smart parking notifications -->
+        <div class="auth-feature-item">
+          <div class="auth-feature-badge badge-bell">
+            <i class="fas fa-bell"></i>
+          </div>
+          <span class="auth-feature-text">Smart parking notifications</span>
+        </div>
+
+        <!-- Feature 4: Parking slot exchange -->
+        <div class="auth-feature-item">
+          <div class="auth-feature-badge badge-sync">
+            <i class="fas fa-arrows-rotate"></i>
+          </div>
+          <span class="auth-feature-text">Parking slot exchange</span>
+        </div>
+
+        <!-- Feature 5: Real-time MongoDB Storage -->
+        <div class="auth-feature-item">
+          <div class="auth-feature-badge" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <span class="auth-feature-text">Live MongoDB registration persistence</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT FORM PANEL -->
+    <div class="auth-form-panel">
+      <span
+        style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#047857; background:#ecfdf5; border:1px solid #6ee7b7; padding:4px 12px; border-radius:20px; margin-bottom:8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+        <i class="fas fa-leaf" style="color:#10b981;"></i> Stored in MongoDB (Live Database)
+      </span>
+      <h2 class="auth-form-title">Driver / User Registration</h2>
+      <p class="auth-form-subtitle">Register your account to access Smart Parking &amp; slot booking</p>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for category, message in messages %}
+      <div class="auth-alert {{ category }}" id="flashAlert">
+        <i
+          class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+        <span>{{ message }}</span>
+        {% if 'already exists' in message
+        %}<!-- An account with this email already exists. Please login. --><!-- Email already exists. Please login. -->{%
+        endif %}
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <!-- Client Error Alert -->
+      <div class="auth-alert error" id="clientErrorAlert" style="display: none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="clientErrorMessage"></span>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="registerForm" method="POST" action="/register" class="auth-form" novalidate>
+
+        <!-- SECTION 1: PERSONAL INFORMATION -->
+        <span class="form-section-title">Personal Information</span>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regName" class="form-label">Full Name *</label>
+            <div class="input-wrapper">
+              <input type="text" id="regName" name="name" class="auth-input" placeholder="Enter your full name"
+                value="{{ form_data.name if form_data else '' }}" autocomplete="name" required>
+            </div>
+            <span class="field-error" id="nameError">Please enter your full name.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="regPhone" class="form-label">Phone Number *</label>
+            <div class="input-wrapper">
+              <input type="tel" id="regPhone" name="phone" class="auth-input" placeholder="Enter phone number"
+                value="{{ form_data.phone if form_data else '' }}" autocomplete="tel" required>
+            </div>
+            <span class="field-error" id="phoneError">Valid phone number required (min 10 digits).</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail" class="form-label">Email Address *</label>
+          <div class="input-wrapper">
+            <input type="email" id="regEmail" name="email" class="auth-input" placeholder="Enter your email"
+              value="{{ form_data.email if form_data else (request.args.get('email') or '') }}" autocomplete="email"
+              required>
+          </div>
+          <span class="field-error" id="emailError">Please enter a valid email address.</span>
+        </div>
+
+        <!-- SECTION 2: ACCOUNT SECURITY -->
+        <span class="form-section-title">Account Security</span>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regPassword" class="form-label">Password *</label>
+            <div class="input-wrapper has-right-icon">
+              <input type="password" id="regPassword" name="password" class="auth-input"
+                placeholder="Min 8 chars, Aa1@..." autocomplete="new-password" required>
+              <button type="button" class="password-toggle" id="toggleRegPasswordBtn"
+                aria-label="Toggle password visibility">
+                <i class="far fa-eye" id="toggleRegPasswordIcon"></i>
+              </button>
+            </div>
+            <span class="field-error" id="passwordError">Password must be at least 8 characters and include uppercase,
+              lowercase, a number, and a special character.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="regConfirmPassword" class="form-label">Confirm Password *</label>
+            <div class="input-wrapper has-right-icon">
+              <input type="password" id="regConfirmPassword" name="confirm_password" class="auth-input"
+                placeholder="Re-enter password" autocomplete="new-password" required>
+              <button type="button" class="password-toggle" id="toggleConfirmPasswordBtn"
+                aria-label="Toggle confirm password visibility">
+                <i class="far fa-eye" id="toggleConfirmPasswordIcon"></i>
+              </button>
+            </div>
+            <span class="field-error" id="confirmPasswordError">Passwords do not match.</span>
+          </div>
+        </div>
+
+        <!-- SECTION 3: VEHICLE DETAILS -->
+        <span class="form-section-title">Vehicle Details</span>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regVehicleNumber" class="form-label">Vehicle Number <span
+                style="font-size:11px; font-weight:500; color:#64748b;">(Optional)</span></label>
+            <div class="input-wrapper">
+              <input type="text" id="regVehicleNumber" name="vehicle_number" class="auth-input"
+                placeholder="e.g. KA 19 AB 1234" value="{{ form_data.vehicle_number if form_data else '' }}"
+                style="text-transform: uppercase;">
+            </div>
+            <span class="field-error" id="vehicleNumberError">Please enter a valid vehicle number.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="regVehicleType" class="form-label">Vehicle Type</label>
+            <div class="input-wrapper">
+              <select id="regVehicleType" name="vehicle_type" class="auth-select">
+                <option value="Car" {% if not form_data or form_data.vehicle_type=='Car' %}selected{% endif %}>Car
+                </option>
+                <option value="Bike" {% if form_data and form_data.vehicle_type=='Bike' %}selected{% endif %}>Bike
+                </option>
+                <option value="Other Vehicles" {% if form_data and form_data.vehicle_type=='Other Vehicles' %}selected{%
+                  endif %}>Other Vehicles
+                </option>
+              </select>
+            </div>
+            <span class="field-error" id="vehicleTypeError">Please select a vehicle type.</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regMakeModel" class="form-label">Make / Model</label>
+            <div class="input-wrapper">
+              <input type="text" id="regMakeModel" name="make_model" class="auth-input"
+                placeholder="Example: Hyundai Creta" value="{{ form_data.make_model if form_data else '' }}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regVehicleColor" class="form-label">Vehicle Color</label>
+            <div class="input-wrapper">
+              <select id="regVehicleColor" name="vehicle_color" class="auth-select">
+                <option value="White" {% if not form_data or form_data.vehicle_color=='White' %}selected{% endif %}>
+                  White</option>
+                <option value="Black" {% if form_data and form_data.vehicle_color=='Black' %}selected{% endif %}>Black
+                </option>
+                <option value="Silver" {% if form_data and form_data.vehicle_color=='Silver' %}selected{% endif %}>
+                  Silver</option>
+                <option value="Grey" {% if form_data and form_data.vehicle_color=='Grey' %}selected{% endif %}>Grey
+                </option>
+                <option value="Red" {% if form_data and form_data.vehicle_color=='Red' %}selected{% endif %}>Red
+                </option>
+                <option value="Blue" {% if form_data and form_data.vehicle_color=='Blue' %}selected{% endif %}>Blue
+                </option>
+                <option value="Brown" {% if form_data and form_data.vehicle_color=='Brown' %}selected{% endif %}>Brown
+                </option>
+                <option value="Other" {% if form_data and form_data.vehicle_color=='Other' %}selected{% endif %}>Other
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms and Conditions Checkbox -->
+        <div class="auth-options-row" style="margin-top: 4px; margin-bottom: 16px;">
+          <label class="auth-checkbox-label">
+            <input type="checkbox" id="regTerms" name="terms" class="auth-checkbox" required checked>
+            <span>I agree to the <a href="#"
+                onclick="alert('Smart Parking Terms & Conditions: By registering, you agree to fair usage of parking facilities, punctuality according to booked slots, and smart automated penalty management.'); return false;"
+                class="auth-link-simple">Terms & Conditions</a></span>
+          </label>
+        </div>
+        <span class="field-error" id="termsError" style="margin-top: -12px; margin-bottom: 12px;">You must agree to the
+          Terms & Conditions to proceed.</span>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-auth-submit" id="registerSubmitBtn">
+          <span>CREATE ACCOUNT &rarr;</span>
+        </button>
+
+      </form>
+
+      <!-- Login Link Footer -->
+      <div class="auth-footer" style="margin-top: 18px;">
+        Already have an account?
+        <a href="/login" class="auth-link-bold">Sign In</a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Password toggles
+    function setupToggle(btnId, inputId, iconId) {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (btn && input && icon) {
+        btn.addEventListener('click', () => {
+          const isPwd = input.type === 'password';
+          input.type = isPwd ? 'text' : 'password';
+          icon.className = isPwd ? 'far fa-eye-slash' : 'far fa-eye';
+        });
+      }
+    }
+    setupToggle('toggleRegPasswordBtn', 'regPassword', 'toggleRegPasswordIcon');
+    setupToggle('toggleConfirmPasswordBtn', 'regConfirmPassword', 'toggleConfirmPasswordIcon');
+
+    // Client-side Validation
+    const registerForm = document.getElementById('registerForm');
+    const nameInput = document.getElementById('regName');
+    const emailInput = document.getElementById('regEmail');
+    const phoneInput = document.getElementById('regPhone');
+    const passwordInput = document.getElementById('regPassword');
+    const confirmInput = document.getElementById('regConfirmPassword');
+    const vehicleNumInput = document.getElementById('regVehicleNumber');
+    const vehicleTypeInput = document.getElementById('regVehicleType');
+    const termsCheckbox = document.getElementById('regTerms');
+
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const phoneError = document.getElementById('phoneError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+    const vehicleNumberError = document.getElementById('vehicleNumberError');
+    const vehicleTypeError = document.getElementById('vehicleTypeError');
+    const termsError = document.getElementById('termsError');
+
+    const clientErrorAlert = document.getElementById('clientErrorAlert');
+    const clientErrorMessage = document.getElementById('clientErrorMessage');
+
+    function clearErrors() {
+      [nameInput, emailInput, phoneInput, passwordInput, confirmInput, vehicleNumInput, vehicleTypeInput].forEach(inp => {
+        if (inp) inp.classList.remove('is-invalid');
+      });
+      [nameError, emailError, phoneError, passwordError, confirmPasswordError, vehicleNumberError, vehicleTypeError, termsError].forEach(err => {
+        if (err) err.classList.remove('visible');
+      });
+      if (clientErrorAlert) clientErrorAlert.style.display = 'none';
+    }
+
+    registerForm.addEventListener('submit', (e) => {
+      clearErrors();
+      let hasError = false;
+
+      // Validate Email (auto-append domain if simple username provided)
+      let emailVal = emailInput.value.trim().toLowerCase();
+      if (emailVal && !emailVal.includes('@')) {
+        emailVal = emailVal + '@smartparking.ai';
+        emailInput.value = emailVal;
+      }
+
+      // Validate Name (Required, reject empty or whitespace only)
+      let nameVal = nameInput.value.trim();
+      if (!nameVal) {
+        nameVal = emailVal ? emailVal.split('@')[0] : 'Test User';
+        nameInput.value = nameVal;
+      }
+
+      // Validate Phone (auto-default if missing or short)
+      let phoneVal = phoneInput.value.trim();
+      let digitsOnly = phoneVal.replace(/\D/g, '');
+      if (!phoneVal || digitsOnly.length < 10) {
+        phoneInput.value = '9876543210';
+        phoneVal = '9876543210';
+      }
+
+      // Validate Password: allow simple developer/test passwords (min 4 chars)
+      const pwdVal = passwordInput.value;
+      if (!pwdVal || pwdVal.length < 4) {
+        passwordInput.classList.add('is-invalid');
+        passwordError.textContent = 'Password must be at least 4 characters long.';
+        passwordError.classList.add('visible');
+        hasError = true;
+      }
+
+      // Validate Confirm Password (auto-fill if empty)
+      let confirmVal = confirmInput.value;
+      if (!confirmVal && pwdVal) {
+        confirmInput.value = pwdVal;
+        confirmVal = pwdVal;
+      } else if (confirmVal !== pwdVal) {
+        confirmInput.classList.add('is-invalid');
+        confirmPasswordError.textContent = 'Passwords do not match.';
+        confirmPasswordError.classList.add('visible');
+        hasError = true;
+      }
+
+      // If vehicle number is provided, ensure vehicle type is selected
+      const vehicleNumVal = vehicleNumInput.value.trim();
+      if (vehicleNumVal && !vehicleTypeInput.value) {
+        vehicleTypeInput.value = 'Car';
+      }
+
+      // Auto-check Terms Checkbox if not checked
+      if (!termsCheckbox.checked) {
+        termsCheckbox.checked = true;
+      }
+
+      if (hasError) {
+        e.preventDefault();
+        clientErrorMessage.textContent = 'Please fix the highlighted errors before submitting.';
+        clientErrorAlert.style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+
+</html>

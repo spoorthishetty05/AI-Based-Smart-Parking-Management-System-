@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Parking — My Bookings & Parking Passes</title>
+
+  <!-- Google Fonts & FontAwesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Core User Panel Stylesheet -->
+  <link rel="stylesheet" href="/static/css/user_panel.css">
+
+  <style>
+    .badge-confirmed {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .badge-cancelled {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .badge-completed {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .pass-modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body class="user-body">
+
+  <div class="user-layout">
+
+    <!-- USER SIDEBAR -->
+    <aside class="user-sidebar">
+      <div class="user-brand">
+        <div class="user-brand-icon">
+          <i class="fas fa-parking"></i>
+        </div>
+        <div>
+          <div class="user-brand-title">Smart Parking</div>
+          <span class="user-brand-badge">DRIVER PORTAL</span>
+        </div>
+      </div>
+
+      <nav class="user-nav">
+        <a href="/" class="user-nav-item">
+          <i class="fas fa-house"></i>
+          <span>User Dashboard</span>
+        </a>
+        <a href="/#find" class="user-nav-item">
+          <i class="fas fa-magnifying-glass-location"></i>
+          <span>Find Parking</span>
+        </a>
+        <a href="/booking" class="user-nav-item">
+          <i class="fas fa-calendar-plus"></i>
+          <span>Book a Slot</span>
+        </a>
+        <a href="/booking/my-bookings" class="user-nav-item active">
+          <i class="fas fa-ticket"></i>
+          <span>My Bookings</span>
+        </a>
+        <a href="/#profile" class="user-nav-item">
+          <i class="fas fa-user"></i>
+          <span>My Profile & Vehicles</span>
+        </a>
+      </nav>
+
+      <div class="user-sidebar-footer">
+        <div class="user-profile-pill">
+          <div class="user-avatar-circle">
+            {{ session.get('user_name', 'Driver')[0] | upper }}
+          </div>
+          <div class="user-profile-meta">
+            <h4>{{ session.get('user_name', 'Driver') }}</h4>
+            <p>{{ session.get('user_email', 'driver@example.com') }}</p>
+          </div>
+        </div>
+        <a href="/logout" class="btn-user-signout" title="Logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="user-main">
+      <header class="user-topbar">
+        <div class="user-topbar-title">
+          <i class="fas fa-ticket" style="color:#2563eb;"></i> My Parking Reservations
+        </div>
+        <div>
+          <a href="/booking" class="btn-user btn-user-primary">
+            <i class="fas fa-plus"></i> Reserve New Slot
+          </a>
+        </div>
+      </header>
+
+      <div class="user-content" style="max-width:1100px; margin:0 auto; padding:24px 20px;">
+        
+        <!-- Flash or Info Notice -->
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <i class="fas fa-circle-check fa-lg" style="color:#16a34a;"></i>
+            <div>
+              <strong style="color:#166534; font-size:14px;">MongoDB Real-Time Synchronization Active</strong>
+              <div style="color:#15803d; font-size:12.5px;">All reservations, cancellations, and barrier passes are saved directly to your MongoDB database collections.</div>
+            </div>
+          </div>
+          <button class="btn-user btn-user-secondary btn-user-sm" onclick="location.reload()" style="background:#ffffff;">
+            <i class="fas fa-rotate"></i> Refresh
+          </button>
+        </div>
+
+        <!-- SECTION 1: UPCOMING / ACTIVE BOOKINGS -->
+        <div class="user-card" style="margin-bottom:28px;">
+          <div class="user-card-header">
+            <div>
+              <h3><i class="fas fa-calendar-check" style="color:#10b981;"></i> Upcoming & Active Reservations</h3>
+              <p style="font-size:13px; color:#64748b; margin-top:2px;">
+                Active parking passes ready for barrier scanning. You can cancel at any time prior to arrival.
+              </p>
+            </div>
+            <span class="badge" style="background:#dbeafe; color:#1e40af; font-weight:800; padding:6px 12px; border-radius:12px;">
+              {{ upcoming|length }} Active
+            </span>
+          </div>
+
+          {% if upcoming and upcoming|length > 0 %}
+          <div class="table-responsive">
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Facility & Slot</th>
+                  <th>Date & Time</th>
+                  <th>Vehicle Plate</th>
+                  <th>Total Fare</th>
+                  <th>Status</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for b in upcoming %}
+                <tr id="booking-row-{{ b.booking_id }}">
+                  <td>
+                    <strong style="font-family:var(--font-mono); color:#2563eb;">{{ b.booking_id }}</strong>
+                  </td>
+                  <td>
+                    <div style="font-weight:700; color:#0f172a;">Slot {{ b.slot_number }}</div>
+                    <div style="font-size:12px; color:#64748b;">{{ b.lot_name or 'Parking Facility' }} ({{ b.floor or 'Ground' }})</div>
+                  </td>
+                  <td>
+                    <div style="font-weight:600;">{{ b.booking_date }}</div>
+                    <div style="font-size:12px; color:#64748b;">{{ b.start_time or '10:00' }} &bull; {{ b.duration or '2 Hours' }}</div>
+                  </td>
+                  <td>
+                    <span style="font-family:var(--font-mono); font-weight:700; background:#f1f5f9; padding:3px 8px; border-radius:4px;">
+                      {{ b.vehicle_plate or 'NOT-ASSIGNED' }}
+                    </span>
+                  </td>
+                  <td>
+                    <strong style="color:#0f172a;">₹{{ "%.2f"|format(b.total_amount or 80.0) }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge-confirmed">
+                      <i class="fas fa-circle-check"></i> Confirmed
+                    </span>
+                  </td>
+                  <td style="text-align:right;">
+                    <div style="display:inline-flex; gap:6px;">
+                      <button class="btn-user btn-user-danger btn-user-sm" style="background:#fee2e2; color:#be123c; border:1px solid #fecdd3; font-weight:700;" onclick="openExitModal('{{ b.booking_id }}')">
+                        <i class="fas fa-arrow-right-from-bracket"></i> Exit
+                      </button>
+                      <button class="btn-user btn-user-primary btn-user-sm" onclick="openPassModal('{{ b.booking_id }}', '{{ b.slot_number }}', '{{ b.lot_name or 'Parking Facility' }}', '{{ b.vehicle_plate }}', '{{ b.booking_date }}', '{{ b.start_time or '10:00' }}', '{{ b.duration or '2 Hours' }}')">
+                        <i class="fas fa-qrcode"></i> Pass
+                      </button>
+                      <button class="btn-user btn-user-secondary btn-user-sm" style="color:#ef4444; border-color:#fca5a5;" onclick="confirmCancelBooking('{{ b.booking_id }}', '{{ b.slot_number }}')">
+                        <i class="fas fa-times"></i> Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div style="text-align:center; padding:40px 20px;">
+            <div style="width:64px; height:64px; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:#94a3b8; font-size:24px;">
+              <i class="fas fa-calendar-xmark"></i>
+            </div>
+            <h4 style="font-size:16px; font-weight:700; color:#1e293b;">No Upcoming Bookings</h4>
+            <p style="font-size:13px; color:#64748b; max-width:380px; margin:4px auto 16px;">
+              You have no active parking reservations. Choose a slot in any monitored facility to reserve your spot.
+            </p>
+            <a href="/booking" class="btn-user btn-user-primary">
+              <i class="fas fa-calendar-plus"></i> Book a Parking Slot Now
+            </a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- SECTION 2: BOOKING HISTORY -->
+        <div class="user-card">
+          <div class="user-card-header">
+            <div>
+              <h3><i class="fas fa-clock-rotate-left" style="color:#64748b;"></i> Reservation History</h3>
+              <p style="font-size:13px; color:#64748b; margin-top:2px;">Completed and cancelled parking sessions.</p>
+            </div>
+            <span class="badge" style="background:#f1f5f9; color:#475569; font-weight:800; padding:6px 12px; border-radius:12px;">
+              {{ history|length }} Records
+            </span>
+          </div>
+
+          {% if history and history|length > 0 %}
+          <div class="table-responsive">
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Facility & Slot</th>
+                  <th>Date & Time</th>
+                  <th>Vehicle Plate</th>
+                  <th>Total Fee</th>
+                  <th>Final Status</th>
+                  <th>Created At</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                {% for b in history %}
+                <tr>
+                  <td>
+                    <span style="font-family:var(--font-mono); font-size:13px; color:#64748b;">{{ b.booking_id }}</span>
+                  </td>
+                  <td>
+                    <div style="font-weight:600;">Slot {{ b.slot_number }}</div>
+                    <div style="font-size:12px; color:#64748b;">{{ b.lot_name or 'Facility' }}</div>
+                  </td>
+                  <td>
+                    <div>{{ b.booking_date }}</div>
+                    <div style="font-size:12px; color:#64748b;">{{ b.start_time or '10:00' }}</div>
+                  </td>
+                  <td>
+                    <span style="font-family:var(--font-mono); font-size:12.5px;">{{ b.vehicle_plate or '—' }}</span>
+                  </td>
+                  <td>₹{{ "%.2f"|format(b.total_amount or 0.0) }}</td>
+                  <td>
+                    {% if b.status == 'cancelled' %}
+                    <span class="badge-cancelled"><i class="fas fa-ban"></i> Cancelled</span>
+                    {% else %}
+                    <span class="badge-completed"><i class="fas fa-check"></i> Completed</span>
+                    {% endif %}
+                  </td>
+                  <td style="font-size:12px; color:#94a3b8;">{{ b.created_at[:10] if b.created_at else '—' }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div style="text-align:center; padding:30px; color:#94a3b8; font-size:13px;">
+            No past parking history recorded yet.
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- QR PASS MODAL -->
+  <div id="passModal" class="pass-modal-backdrop">
+    <div class="user-modal-content" style="max-width:440px; text-align:center; padding:0; overflow:hidden;">
+      <div style="background:linear-gradient(135deg, #1d4ed8, #0ea5e9); padding:24px; color:#ffffff;">
+        <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;">SMART PARKING PASS</div>
+        <h2 style="font-size:26px; font-weight:800; margin:4px 0;" id="modalSlotTitle">Slot A01</h2>
+        <div style="font-size:13.5px; color:#e0f2fe;" id="modalLotTitle">City Parking – Mangaluru</div>
+      </div>
+      <div style="padding:24px;">
+        <div style="width:160px; height:160px; margin:0 auto 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px;">
+          <div id="modalPassQrContainer" style="width:110px; height:110px; display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-qrcode fa-5x" style="color:#0f172a;"></i>
+          </div>
+          <span style="font-size:10px; font-family:var(--font-mono); color:#64748b; margin-top:8px;" id="modalPassCode">PASS-BK-0001</span>
+        </div>
+
+        <div style="background:#f1f5f9; border-radius:8px; padding:12px; font-size:13px; text-align:left; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:#64748b;">Vehicle:</span>
+            <strong style="font-family:var(--font-mono);" id="modalPlate">KA01AB1234</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:#64748b;">Time Window:</span>
+            <strong id="modalTime">2026-09-10 (10:00 - 12:00)</strong>
+          </div>
+        </div>
+
+        <p style="font-size:12px; color:#64748b; margin-bottom:16px;">
+          Present this barcode at the barrier optical scanner to lift the gate.
+        </p>
+
+        <div style="display:flex; gap:10px; justify-content:center;">
+          <button class="btn-user btn-user-primary" onclick="closePassModal()">Close</button>
+          <button class="btn-user btn-user-secondary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VEHICLE EXIT / CHECKOUT MODAL -->
+  <div id="exitModal" class="pass-modal-backdrop">
+    <div class="user-modal-content" style="max-width:520px; border-radius:14px; overflow:hidden; box-shadow:0 20px 45px rgba(0,0,0,0.35);">
+      <div style="background:linear-gradient(135deg, #0f172a, #1e293b); padding:20px 24px; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #38bdf8;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:rgba(56,189,248,0.15); border:1px solid #38bdf8; display:flex; align-items:center; justify-content:center; color:#38bdf8; font-size:18px;">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:#38bdf8; text-transform:uppercase;">PARKING CHECKOUT</div>
+            <h3 style="font-size:18px; font-weight:800; margin:2px 0 0; color:#ffffff;">Confirm Vehicle Exit</h3>
+          </div>
+        </div>
+        <button onclick="closeExitModal()" style="border:none; background:transparent; font-size:22px; color:#94a3b8; cursor:pointer; padding:4px;" title="Close">&times;</button>
+      </div>
+
+      <div class="user-modal-body" style="padding:22px; max-height:75vh; overflow-y:auto; text-align:left;">
+        <div id="mOverstayBanner" style="display:none; background:#fff1f2; border:1.5px solid #f43f5e; border-radius:10px; padding:14px; margin-bottom:16px;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <i class="fas fa-triangle-exclamation" style="color:#e11d48; font-size:20px; margin-top:2px;"></i>
+            <div>
+              <strong style="color:#be123c; font-size:14px; display:block;">⚠️ Overstay Detected</strong>
+              <div style="font-size:12.5px; color:#9f1239; margin-top:3px;" id="mOverstayDesc">
+                Exceeded booked window and grace period by <strong id="mOverstayMins">0 minutes</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Slot</span>
+              <div style="font-size:20px; font-weight:800; color:#0284c7; font-family:var(--font-mono);" id="mSlotDisplay">Slot A-12</div>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Status</span>
+              <div id="mStatusBadge"><span class="badge-confirmed">OCCUPIED</span></div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:13px;">
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Vehicle Number</span>
+              <strong style="font-family:var(--font-mono); color:#0f172a;" id="mPlateDisplay">KA 19 AB 1234</strong>
+            </div>
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Vehicle Type</span>
+              <strong style="color:#0f172a;" id="mTypeDisplay">Car</strong>
+            </div>
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Parking Lot</span>
+              <strong style="color:#0f172a;" id="mLotDisplay">City Parking</strong>
+            </div>
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Booking Date</span>
+              <strong style="color:#0f172a;" id="mDateDisplay">2026-09-22</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:16px;">
+          <h4 style="font-size:12.5px; text-transform:uppercase; letter-spacing:0.06em; color:#475569; margin:0 0 12px; font-weight:800;">
+            <i class="fas fa-clock" style="color:#0284c7;"></i> Timings & Duration
+          </h4>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12.5px;">
+            <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
+              <span style="color:#64748b; font-size:11px; display:block;">Booked Window</span>
+              <strong id="mWindowDisplay">10:00 AM – 12:00 PM</strong>
+            </div>
+            <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
+              <span style="color:#64748b; font-size:11px; display:block;">Actual Entry</span>
+              <strong style="color:#10b981;" id="mEntryDisplay">10:05 AM</strong>
+            </div>
+            <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
+              <span style="color:#64748b; font-size:11px; display:block;">Current / Exit Time</span>
+              <strong style="color:#0284c7;" id="mExitDisplay">Current time</strong>
+            </div>
+            <div style="background:#e0f2fe; padding:10px; border-radius:6px; border:1px solid #bae6fd;">
+              <span style="color:#0369a1; font-size:11px; display:block; font-weight:700;">Total Duration</span>
+              <strong style="color:#0c4a6e; font-size:14px;" id="mDurationDisplay">2h 30m</strong>
+            </div>
+          </div>
+        </div>
+
+        <input type="hidden" id="mExitTargetId">
+      </div>
+
+      <div class="user-modal-footer" style="background:#f8fafc; padding:14px 20px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn-user btn-user-secondary" onclick="closeExitModal()">Cancel</button>
+        <button type="button" class="btn-user btn-user-danger" id="mBtnConfirmExit" onclick="executeExitParking()" style="background:#e11d48; color:#ffffff; border:none; box-shadow:0 4px 12px rgba(225, 29, 72, 0.35);">
+          <i class="fas fa-arrow-right-from-bracket"></i> Confirm Exit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANCEL CONFIRMATION MODAL -->
+  <div id="cancelModal" class="pass-modal-backdrop">
+    <div class="user-modal-content" style="max-width:420px; padding:24px; text-align:center;">
+      <div style="width:50px; height:50px; border-radius:50%; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:22px;">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+      <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:8px;">Cancel This Reservation?</h3>
+      <p style="font-size:13px; color:#64748b; margin-bottom:20px;" id="cancelModalMsg">
+        Are you sure you want to cancel booking? Your slot will be instantly released and made available for other drivers.
+      </p>
+      <input type="hidden" id="cancelTargetId">
+
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn-user btn-user-secondary" onclick="closeCancelModal()">Keep Reservation</button>
+        <button class="btn-user btn-user-primary" id="btnExecuteCancel" onclick="executeCancellation()" style="background:#ef4444; border-color:#ef4444;">
+          Yes, Cancel Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="myBookingsToast" class="user-toast" style="position:fixed; bottom:24px; right:24px; z-index:9999; display:none;"></div>
+
+  <script src="/static/js/qrcode.min.js"></script>
+  <script>
+    let myBookingsPassQr = null;
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('myBookingsToast');
+      if (!toast) return;
+      toast.style.display = 'block';
+      toast.className = `user-toast ${type === 'error' ? 'user-toast-error' : 'user-toast-success'}`;
+      toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i> <span>${msg}</span>`;
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    function openPassModal(bookingId, slotNum, lotName, plate, date, time, duration) {
+      document.getElementById('modalSlotTitle').textContent = `Slot ${slotNum}`;
+      document.getElementById('modalLotTitle').textContent = lotName;
+      document.getElementById('modalPassCode').textContent = `PASS-${bookingId}`;
+      document.getElementById('modalPlate').textContent = plate || 'Not Assigned';
+      document.getElementById('modalTime').textContent = `${date} (${time} - ${duration})`;
+      document.getElementById('passModal').style.display = 'flex';
+
+      const qrBox = document.getElementById('modalPassQrContainer');
+      if (qrBox) {
+        qrBox.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+          myBookingsPassQr = new QRCode(qrBox, {
+            text: bookingId || `PASS-${bookingId}`,
+            width: 110,
+            height: 110,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        }
+      }
+    }
+
+    function closePassModal() {
+      document.getElementById('passModal').style.display = 'none';
+    }
+
+    function confirmCancelBooking(bookingId, slotNum) {
+      document.getElementById('cancelTargetId').value = bookingId;
+      document.getElementById('cancelModalMsg').textContent = `Are you sure you want to cancel reservation ${bookingId} for Slot ${slotNum}? The slot will be restored in MongoDB to available status.`;
+      document.getElementById('cancelModal').style.display = 'flex';
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancelModal').style.display = 'none';
+    }
+
+    async function executeCancellation() {
+      const bookingId = document.getElementById('cancelTargetId').value;
+      const btn = document.getElementById('btnExecuteCancel');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelling...';
+
+      try {
+        const res = await fetch(`/booking/${bookingId}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          closeCancelModal();
+          showToast(data.message || 'Booking cancelled successfully.', 'success');
+          // Reload page after brief delay to reflect updated upcoming and history tables
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showToast(data.message || 'Failed to cancel booking.', 'error');
+        }
+      } catch (err) {
+        showToast('Network error while cancelling reservation.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Yes, Cancel Booking';
+      }
+    }
+
+    async function openExitModal(bookingId) {
+      document.getElementById('mExitTargetId').value = bookingId;
+      document.getElementById('exitModal').style.display = 'flex';
+
+      try {
+        const res = await fetch(`/booking/${bookingId}/checkout-preview`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          const p = data.preview;
+          document.getElementById('mSlotDisplay').textContent = `Slot ${p.slot_number}`;
+          document.getElementById('mPlateDisplay').textContent = p.vehicle_number;
+          document.getElementById('mTypeDisplay').textContent = p.vehicle_type;
+          document.getElementById('mLotDisplay').textContent = p.parking_lot;
+          document.getElementById('mDateDisplay').textContent = p.booking_date;
+          document.getElementById('mWindowDisplay').textContent = `${p.booked_start_time} – ${p.booked_end_time}`;
+          document.getElementById('mEntryDisplay').textContent = p.actual_entry_time;
+          document.getElementById('mExitDisplay').textContent = p.current_exit_time;
+          document.getElementById('mDurationDisplay').textContent = p.parking_duration;
+
+          const ov = document.getElementById('mOverstayBanner');
+          if (p.is_overstay) {
+            ov.style.display = 'block';
+            document.getElementById('mOverstayMins').textContent = `${p.overstay_duration_minutes} minutes`;
+            document.getElementById('mOverstayDesc').innerHTML = `Exceeded booked window and ${p.grace_period_mins}-minute grace period by <strong>${p.overstay_duration_minutes} minutes</strong>. Accrued penalty: ₹${p.overstay_penalty.toFixed(2)}.`;
+          } else {
+            ov.style.display = 'none';
+          }
+        } else {
+          showToast(data.message || 'Failed to load checkout preview.', 'error');
+          closeExitModal();
+        }
+      } catch (err) {
+        showToast('Error loading checkout preview.', 'error');
+        closeExitModal();
+      }
+    }
+
+    function closeExitModal() {
+      document.getElementById('exitModal').style.display = 'none';
+    }
+
+    async function executeExitParking() {
+      const bookingId = document.getElementById('mExitTargetId').value;
+      const btn = document.getElementById('mBtnConfirmExit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+      try {
+        const res = await fetch(`/booking/${bookingId}/exit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          closeExitModal();
+          showToast(data.message || 'Vehicle exited successfully.', 'success');
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showToast(data.message || 'Failed to exit parking.', 'error');
+        }
+      } catch (err) {
+        showToast('Error processing checkout.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-arrow-right-from-bracket"></i> Confirm Exit';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Portal — AI-Based Smart Parking System</title>
+
+  <!-- Google Fonts & FontAwesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- User Panel Stylesheet -->
+  <link rel="stylesheet" href="/static/css/user_panel.css">
+</head>
+
+<body class="user-body">
+
+  <div class="user-layout">
+
+    <!-- ====================================================================
+         USER SIDEBAR
+         ==================================================================== -->
+    <aside class="user-sidebar">
+      <div class="user-brand">
+        <div class="user-brand-icon">
+          <i class="fas fa-parking"></i>
+        </div>
+        <div>
+          <div class="user-brand-title">Smart Parking</div>
+          <span class="user-brand-badge">DRIVER PORTAL</span>
+        </div>
+      </div>
+
+      <nav class="user-nav">
+        <!-- User Dashboard -->
+        <a href="#dashboard" class="user-nav-item active" data-tab="dashboard">
+          <i class="fas fa-house"></i>
+          <span>User Dashboard</span>
+        </a>
+
+        <!-- Module 3: Find Parking -->
+        <a href="#find" class="user-nav-item" data-tab="find">
+          <i class="fas fa-magnifying-glass-location"></i>
+          <span>Find Parking</span>
+        </a>
+
+        <!-- Module 4: AI Parking Recommendation -->
+        <a href="#recommendation" class="user-nav-item" data-tab="recommendation">
+          <i class="fas fa-robot"></i>
+          <span>AI Recommendation </span>
+        </a>
+
+        <!-- Module 6: Live 2D Parking Layout -->
+        <a href="#layout" class="user-nav-item" data-tab="layout">
+          <i class="fas fa-table-cells"></i>
+          <span>Live 2D Layout</span>
+        </a>
+
+        <!-- Module 5: Parking Slot Booking -->
+        <a href="#booking" class="user-nav-item" data-tab="booking">
+          <i class="fas fa-calendar-plus"></i>
+          <span>Book a Slot</span>
+        </a>
+
+        <!-- Module: Overstay Monitoring & Dashboard -->
+        <a href="#overstay-dashboard" class="user-nav-item" data-tab="overstay-dashboard">
+          <i class="fas fa-hourglass-half"></i>
+          <span>Overstay Radar </span>
+        </a>
+
+        <!-- Module 7: Slot Exchange -->
+        <a href="#exchange" class="user-nav-item" data-tab="exchange">
+          <i class="fas fa-arrow-right-arrow-left"></i>
+          <span>Slot Exchange</span>
+        </a>
+
+        <!-- Module 8: My Bookings -->
+        <a href="#bookings" class="user-nav-item" data-tab="bookings">
+          <i class="fas fa-ticket"></i>
+          <span>My Bookings</span>
+        </a>
+
+        <!-- Module 9: Parking History -->
+        <a href="#history" class="user-nav-item" data-tab="history">
+          <i class="fas fa-clock-rotate-left"></i>
+          <span>Parking History</span>
+        </a>
+
+        <!-- Module 2: User Profile & Vehicles -->
+        <a href="#profile" class="user-nav-item" data-tab="profile">
+          <i class="fas fa-user"></i>
+          <span>My Profile & Vehicles</span>
+        </a>
+
+        <!-- Module 10: Notifications -->
+        <a href="#notifications" class="user-nav-item" data-tab="notifications">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+          <span class="nav-notif-pill" id="sidebarNotifBadge" style="display:none;">0</span>
+        </a>
+      </nav>
+
+      <div class="user-sidebar-footer">
+        <div class="user-profile-pill">
+          <div class="user-avatar-circle">
+            {{ session.get('user_name', 'Driver')[0] | upper }}
+          </div>
+          <div class="user-profile-meta">
+            <h4>{{ session.get('user_name', 'Driver') }}</h4>
+            <p>{{ session.get('user_email', 'driver@example.com') }}</p>
+          </div>
+        </div>
+        <a href="/logout" class="btn-user-signout" id="logoutBtn" title="Logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         USER MAIN CONTENT
+         ==================================================================== -->
+    <main class="user-main">
+
+      <!-- Topbar -->
+      <header class="user-topbar">
+        <div class="user-topbar-title" id="userTopHeaderTitle">
+          <i class="fas fa-home"></i> Driver Dashboard
+        </div>
+        <div style="display:flex; align-items:center; gap:16px;">
+
+          <a href="#notifications" class="user-topbar-bell" onclick="switchUserTab('notifications')"
+            title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="user-topbar-badge" id="topbarNotifBadge" style="display:none;">0</span>
+          </a>
+          {% if session.get('user_role') == 'admin' %}
+          <a href="/admin" class="admin-return-badge" title="Return to Administrator Console">
+            <i class="fas fa-shield-halved"></i> Administrator Session: Return to Admin Panel &rarr;
+          </a>
+          {% else %}
+          <div style="font-size:12.5px; color:#64748b; font-weight:600;">
+            <i class="fas fa-satellite-dish" style="color:#10b981;"></i> Connected to Smart Parking AI
+          </div>
+          {% endif %}
+        </div>
+      </header>
+
+      <div class="user-content">
+
+        <!-- ================================================================
+             TAB 1: USER DASHBOARD
+             ================================================================ -->
+        <div class="tab-pane active" id="tab-dashboard">
+
+          <!-- Welcome Banner -->
+          <div class="user-welcome-banner">
+            <div class="user-welcome-text">
+              <h2>Welcome back, <span id="dashWelcomeName">{{ session.get('user_name', 'Driver') }}</span> 👋</h2>
+              <p>Find nearby parking, view real-time available slots, and book in seconds with AI assistance.</p>
+            </div>
+            <div>
+              <button class="btn-user btn-user-primary" onclick="switchUserTab('find')"
+                style="background:#ffffff; color:#0284c7; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+                <i class="fas fa-search-location"></i> Find Parking Now &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Stats Cards Grid -->
+          <div class="user-dash-grid">
+
+            <!-- Nearby Lots Card -->
+            <div class="user-card">
+              <div class="user-card-header">
+                <h3><i class="fas fa-warehouse"></i> Nearby Facilities</h3>
+                <span
+                  style="font-size:11px; background:#dbeafe; color:#1e40af; font-weight:700; padding:2px 8px; border-radius:12px;"
+                  id="dashNearbyLotsCount">0</span>
+              </div>
+              <div id="dashNearbyLotsList">
+                <div style="color:#94a3b8; font-size:13px;">Loading facilities...</div>
+              </div>
+              <button class="btn-user btn-user-secondary btn-user-sm"
+                style="width:100%; margin-top:10px; justify-content:center;" onclick="switchUserTab('find')">
+                View All Lots &rarr;
+              </button>
+            </div>
+
+            <!-- Available Slots Card -->
+            <div class="user-card">
+              <div class="user-card-header">
+                <h3><i class="fas fa-circle-check" style="color:#10b981;"></i> Vacant Slots</h3>
+                <span style="font-size:11px; color:#64748b;">Live Count</span>
+              </div>
+              <div style="font-family:var(--font-mono); font-size:36px; font-weight:800; color:#10b981;"
+                id="dashAvailableSlotsCount">—</div>
+              <p style="font-size:12.5px; color:#64748b; margin-top:4px;">Available for immediate reservation across all
+                monitored parking lots.</p>
+              <button class="btn-user btn-user-primary btn-user-sm"
+                style="width:100%; margin-top:10px; justify-content:center;" onclick="switchUserTab('layout')">
+                <i class="fas fa-th"></i> View 2D Slot Matrix
+              </button>
+            </div>
+
+            <!-- Registered Vehicle Card -->
+            <div class="user-card">
+              <div class="user-card-header">
+                <h3><i class="fas fa-car" style="color:#6366f1;"></i> Primary Vehicle</h3>
+                <a href="#profile" onclick="switchUserTab('profile')"
+                  style="font-size:12px; color:#2563eb; font-weight:700; text-decoration:none;">Manage</a>
+              </div>
+              <div style="font-family:var(--font-mono); font-size:22px; font-weight:800; color:#0f172a;"
+                id="dashVehiclePlate">Loading...</div>
+              <p style="font-size:12px; color:#64748b; margin-top:4px;">Used automatically for booking passes and
+                barrier scanning.</p>
+              <button class="btn-user btn-user-secondary btn-user-sm"
+                style="width:100%; margin-top:10px; justify-content:center;" onclick="openAddVehicleModal()">
+                <i class="fas fa-plus"></i> Add Another Vehicle
+              </button>
+            </div>
+
+            <!-- Slot Exchange Card -->
+            <div class="user-card">
+              <div class="user-card-header">
+                <h3><i class="fas fa-handshake" style="color:#ec4899;"></i> Slot Exchange</h3>
+                <span id="dashExchangeCount" style="font-size:11px; font-weight:700; color:#ec4899;">None Listed</span>
+              </div>
+              <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Swap your current booking slot with another
+                driver who wants your spot.</p>
+              <button class="btn-user btn-user-secondary btn-user-sm" style="width:100%; justify-content:center;"
+                onclick="switchUserTab('exchange')">
+                <i class="fas fa-repeat"></i> Open Exchange Marketplace
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Real-Time Active Overstay Banner / Card (Shown dynamically when overstay detected) -->
+          <div id="userActiveOverstayCardContainer" style="display:none; margin-bottom:20px;">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- Active Booking Highlights Section -->
+          <div class="user-card">
+            <div class="user-card-header">
+              <h3><i class="fas fa-receipt"></i> Current Parking Reservation</h3>
+              <a href="#bookings" onclick="switchUserTab('bookings')"
+                style="font-size:12.5px; color:#2563eb; font-weight:700; text-decoration:none;">All Bookings &rarr;</a>
+            </div>
+            <div id="dashActiveBookingContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             TAB 2: MODULE 2 — USER PROFILE & VEHICLES
+             ================================================================ -->
+        <div class="tab-pane" id="tab-profile">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+
+            <!-- Profile Info Form -->
+            <div class="user-card">
+              <div class="user-card-header">
+                <h3><i class="fas fa-id-card"></i> Personal Profile</h3>
+              </div>
+              <form onsubmit="submitUpdateProfile(event)">
+                <div class="user-form-group">
+                  <label class="user-form-label">Full Name</label>
+                  <input type="text" id="profileName" class="user-form-input" required>
+                </div>
+                <div class="user-form-group">
+                  <label class="user-form-label">Email Address</label>
+                  <input type="email" id="profileEmail" class="user-form-input" required>
+                </div>
+                <div class="user-form-group">
+                  <label class="user-form-label">Phone Number</label>
+                  <input type="tel" id="profilePhone" class="user-form-input" required>
+                </div>
+                <button type="submit" class="btn-user btn-user-primary" style="margin-top:8px;">
+                  <i class="fas fa-floppy-disk"></i> Update Profile
+                </button>
+              </form>
+            </div>
+
+            <!-- Vehicles Management -->
+            <div class="user-card">
+              <div class="user-card-header">
+                <h3><i class="fas fa-car-side"></i> Registered Vehicles</h3>
+                <button class="btn-user btn-user-primary btn-user-sm" onclick="openAddVehicleModal()">
+                  <i class="fas fa-plus"></i> Add Vehicle
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="user-table">
+                  <thead>
+                    <tr>
+                      <th>Plate</th>
+                      <th>Type</th>
+                      <th>Model</th>
+                      <th>Color</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="userVehiclesTbody">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 3: MODULE 3 — FIND PARKING
+             ================================================================ -->
+        <div class="tab-pane" id="tab-find">
+          <div class="user-card">
+            <div class="user-card-header">
+              <h3><i class="fas fa-search-location"></i> Search Available Parking Facilities</h3>
+            </div>
+            <div style="display:flex; gap:12px; margin-bottom:20px;">
+              <input type="text" id="lotSearchInput" class="user-form-input"
+                placeholder="Search by parking facility category (e.g. Institutions, Mall)..." oninput="searchParkingLots()">
+              <button class="btn-user btn-user-primary" onclick="searchParkingLots()">
+                <i class="fas fa-search"></i> Search
+              </button>
+            </div>
+            <div id="findParkingLotsContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 4: MODULE 4 — AI PARKING RECOMMENDATION
+             ================================================================ -->
+        <div class="tab-pane" id="tab-recommendation">
+          <div class="user-card">
+            <div class="user-card-header">
+              <h3><i class="fas fa-wand-magic-sparkles"></i> AI Intelligent Parking Slot Recommender</h3>
+            </div>
+            <p style="font-size:13.5px; color:#64748b; margin-bottom:20px;">
+              Our AI engine evaluates real-time slot occupancy, walking distance to entrance/elevators, expected
+              departure churn, and personal preferences to recommend the single best spot for you.
+            </p>
+
+            <form onsubmit="getAIRecommendation(event)"
+              style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; align-items:end; margin-bottom:24px;">
+              <div class="user-form-group" style="margin:0;">
+                <label class="user-form-label">Vehicle Type</label>
+                <select id="aiVehicleType" class="user-form-select">
+                  <option value="Car">🚗 Car</option>
+                  <option value="Bike">🏍️ Bike</option>
+                </select>
+              </div>
+              <div class="user-form-group" style="margin:0;">
+                <label class="user-form-label">Preferred Floor</label>
+                <select id="aiPreferredFloor" class="user-form-select">
+                  <option value="Any">Any Floor (Optimal)</option>
+                  <option value="Ground Floor">Ground Floor</option>
+                  <option value="Upper Floor">Upper Floor</option>
+                </select>
+              </div>
+              <div class="user-form-group" style="margin:0;">
+                <label class="user-form-label">Duration (Hours)</label>
+                <input type="number" id="aiDuration" class="user-form-input" value="2" min="1" max="24">
+              </div>
+              <div class="user-form-group" style="margin:0; display:flex; flex-direction:column; gap:6px;">
+                <label
+                  style="font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="aiNeedsEV"> EV Charging Station Required
+                </label>
+                <label
+                  style="font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="aiNeedsAccessible"> Accessible Parking (Disability)
+                </label>
+              </div>
+              <button type="submit" class="btn-user btn-user-primary" style="height:42px; justify-content:center;">
+                <i class="fas fa-brain"></i> Generate Recommendation
+              </button>
+            </form>
+
+            <div id="aiRecResultContainer">
+              <!-- AI recommendation card rendered here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 5: MODULE 5 — PARKING SLOT BOOKING (5-STEP GUIDED WIZARD & QUICK BOOKING)
+             ================================================================ -->
+        <div class="tab-pane" id="tab-booking">
+
+          <!-- Booking Mode Selector Bar -->
+          <div class="booking-mode-bar" style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:24px;">
+            <button type="button" class="btn-user btn-user-primary booking-mode-pill" id="modeBtnWizard" onclick="switchBookingMode('wizard')" style="border-radius:24px; padding:10px 22px; font-weight:700; font-size:13.5px; box-shadow:0 3px 10px rgba(37,99,235,0.25);">
+              <i class="fas fa-wand-magic-sparkles"></i> 5-Step Guided Wizard
+            </button>
+            <button type="button" class="btn-user btn-user-secondary booking-mode-pill" id="modeBtnQuick" onclick="switchBookingMode('quick')" style="border-radius:24px; padding:10px 22px; font-weight:700; font-size:13.5px;">
+              <i class="fas fa-bolt" style="color:#f59e0b;"></i> Quick Booking
+            </button>
+          </div>
+
+          <!-- ============================================================
+               MODE 1: 5-STEP GUIDED BOOKING WIZARD VIEW
+               ============================================================ -->
+          <div id="bookingWizardView" style="display:block;">
+            <div class="booking-wizard-container">
+
+              <!-- 5-Step Progress Indicator -->
+              <div class="guided-stepper" id="userWizardStepper">
+                <div class="guided-step active" id="wizardStepIndicator1" onclick="userWizardGoToStep(1)">
+                  <div class="guided-step-circle" id="circleStep1">1</div>
+                  <span class="guided-step-label">① Facility</span>
+                </div>
+                <div class="guided-step" id="wizardStepIndicator2" onclick="userWizardGoToStep(2)">
+                  <div class="guided-step-circle" id="circleStep2">2</div>
+                  <span class="guided-step-label">② Vehicle</span>
+                </div>
+                <div class="guided-step" id="wizardStepIndicator3" onclick="userWizardGoToStep(3)">
+                  <div class="guided-step-circle" id="circleStep3">3</div>
+                  <span class="guided-step-label">③ Date &amp; Time</span>
+                </div>
+                <div class="guided-step" id="wizardStepIndicator4" onclick="userWizardGoToStep(4)">
+                  <div class="guided-step-circle" id="circleStep4">4</div>
+                  <span class="guided-step-label">④ Slot</span>
+                </div>
+                <div class="guided-step" id="wizardStepIndicator5" onclick="userWizardGoToStep(5)">
+                  <div class="guided-step-circle" id="circleStep5">5</div>
+                  <span class="guided-step-label">⑤ Confirm</span>
+                </div>
+              </div>
+
+            <!-- ============================================================
+                 STEP 1: SELECT PARKING FACILITY
+                 "Where do you want to park?"
+                 ============================================================ -->
+            <div class="guided-panel active" id="wizardStepPanel1">
+              <div class="user-card">
+                <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
+                  <div>
+                    <h3 style="font-size:20px; font-weight:800; color:#0f172a; margin:0;">
+                      <i class="fas fa-warehouse" style="color:#2563eb;"></i> Step 1: Where do you want to park?
+                    </h3>
+                    <p style="font-size:13.5px; color:#64748b; margin:4px 0 0;">
+                      Select your preferred parking facility. View real-time tariff rates and live vacancy.
+                    </p>
+                  </div>
+                  <span class="badge"
+                    style="background:#e0f2fe; color:#0369a1; padding:6px 14px; border-radius:20px; font-weight:700; font-size:12px;">
+                    Select Facility &amp; Schedule
+                  </span>
+                </div>
+
+                <!-- Clean Facility Cards Grid -->
+                <div class="facility-grid" id="wizardFacilityGrid">
+                  {% for lot in lots %}
+                  <div class="facility-card-pick {% if loop.first %}selected{% endif %}" data-lot-id="{{ lot.lot_id }}"
+                    data-lot-name="{{ lot.lot_name }}" data-lot-loc=""
+                    data-rate="{{ lot.hourly_rate or 40.0 }}"
+                    onclick="userWizardSelectFacility(this, {{ lot.lot_id }}, '{{ lot.lot_name }}', '', {{ lot.hourly_rate or 40.0 }})">
+                    <div>
+                      <div class="facility-pick-header">
+                        <div class="facility-pick-icon">
+                          <i
+                            class="fas {% if 'mall' in lot.lot_name|lower %}fa-bag-shopping{% elif 'campus' in lot.lot_name|lower or 'institution' in lot.lot_name|lower %}fa-graduation-cap{% elif 'metro' in lot.lot_name|lower or 'station' in lot.lot_name|lower or 'public' in lot.lot_name|lower %}fa-train-subway{% else %}fa-square-parking{% endif %}"></i>
+                        </div>
+                        <div class="facility-radio-mark"><i class="fas fa-check"></i></div>
+                      </div>
+                      <div class="facility-pick-name" style="margin-bottom:8px;">{{ lot.lot_name }}</div>
+                      <div
+                        style="font-size:12px; color:#64748b; margin-bottom:14px; display:flex; align-items:center; gap:6px;">
+                        <i class="fas fa-clock" style="color:#0ea5e9;"></i>
+                        <span>{{ lot.operating_hours or '24/7 (Open Daily)' }}</span>
+                      </div>
+                    </div>
+                    <div class="facility-pick-meta">
+                      <div class="facility-rate-tag">₹{{ lot.hourly_rate or 40 }}/hr</div>
+                      <div class="facility-slots-badge">
+                        <i class="fas fa-circle-check"></i>
+                        <span>{{ lot.total_slots or 40 }}+ Total Slots</span>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <div class="wizard-footer-nav">
+                  <div style="font-size:13.5px; color:#64748b;">
+                    Selected Facility: <strong id="wizardStep1SelectedName" style="color:#2563eb;">{{ lots[0].lot_name
+                      if lots else 'City Parking' }}</strong>
+                  </div>
+                  <button type="button" class="btn-user btn-user-primary" id="btnWizardStep1Next"
+                    onclick="userWizardGoToStep(2)" style="padding:11px 26px; font-weight:700;">
+                    <span>Continue to Vehicle &rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============================================================
+                 STEP 2: SELECT VEHICLE
+                 "Which vehicle are you using?"
+                 ============================================================ -->
+            <div class="guided-panel" id="wizardStepPanel2">
+              <div class="user-card">
+                <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
+                  <div>
+                    <h3 style="font-size:20px; font-weight:800; color:#0f172a; margin:0;">
+                      <i class="fas fa-car-side" style="color:#2563eb;"></i> Step 2: Which vehicle are you using?
+                    </h3>
+                    <p style="font-size:13.5px; color:#64748b; margin:4px 0 0;">
+                      Choose from your registered vehicles or enter a vehicle license plate for this parking pass.
+                    </p>
+                  </div>
+                  <button type="button" class="btn-user btn-user-secondary btn-user-sm" onclick="openAddVehicleModal()">
+                    <i class="fas fa-plus"></i> Add New Vehicle
+                  </button>
+                </div>
+
+                <!-- Vehicles Grid -->
+                <div class="vehicle-grid" id="wizardVehicleGrid">
+                  {% for v in vehicles %}
+                  <div class="vehicle-card-pick {% if loop.first %}selected{% endif %}"
+                    data-plate="{{ v.license_plate }}" data-type="{{ v.vehicle_type or 'Car' }}"
+                    onclick="userWizardSelectVehicle(this, '{{ v.license_plate }}', '{{ v.vehicle_type or 'Car' }}')">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                      <div style="font-size:24px;">
+                        {% if (v.vehicle_type or '')|lower == 'bike' %}🏍️{% elif (v.vehicle_type or '')|lower == 'ev'
+                        %}⚡{% elif (v.vehicle_type or '')|lower == 'suv' %}🚙{% else %}🚗{% endif %}
+                      </div>
+                      <div class="facility-radio-mark"><i class="fas fa-check"></i></div>
+                    </div>
+                    <div>
+                      <div class="vehicle-card-plate">{{ v.license_plate }}</div>
+                      <div class="vehicle-card-sub">{{ v.make_model or v.vehicle_type or 'Personal Vehicle' }} &bull; {{
+                        v.color or 'Standard' }}</div>
+                    </div>
+                  </div>
+                  {% endfor %}
+
+                  <!-- Manual Plate Option Card -->
+                  <div class="vehicle-card-pick" id="manualVehicleCard" onclick="userWizardSelectManualVehicle(this)">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                      <div style="font-size:24px;">✏️</div>
+                      <div class="facility-radio-mark"><i class="fas fa-check"></i></div>
+                    </div>
+                    <div>
+                      <div class="vehicle-card-plate" style="font-size:16px;">Manual Plate</div>
+                      <div class="vehicle-card-sub">Enter another vehicle plate manually</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Manual Plate Input Form -->
+                <div id="wizardManualPlateBox"
+                  style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:18px; margin-top:16px;">
+                  <h4 style="font-size:14px; font-weight:700; color:#1e293b; margin-bottom:10px;">
+                    <i class="fas fa-pen"></i> Enter Vehicle Information
+                  </h4>
+                  <div style="display:grid; grid-template-columns: 2fr 1fr; gap:14px;">
+                    <div>
+                      <label class="user-form-label">License Plate Number <span style="color:#ef4444;">*</span></label>
+                      <input type="text" id="wizardInputManualPlate" class="user-form-input"
+                        placeholder="e.g. KA01AB1234" style="text-transform:uppercase;"
+                        oninput="userWizardOnManualPlateChange()">
+                    </div>
+                    <div>
+                      <label class="user-form-label">Vehicle Category</label>
+                      <select id="wizardInputManualType" class="user-form-select"
+                        onchange="userWizardOnManualPlateChange()">
+                        <option value="Car">🚗 Car</option>
+                        <option value="SUV">🚙 SUV</option>
+                        <option value="EV">⚡ Electric Vehicle</option>
+                        <option value="Bike">🏍️ Two-Wheeler</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="wizard-footer-nav">
+                  <button type="button" class="btn-user btn-user-secondary" onclick="userWizardGoToStep(1)">
+                    <i class="fas fa-arrow-left"></i> &larr; Back
+                  </button>
+                  <button type="button" class="btn-user btn-user-primary" id="btnWizardStep2Next"
+                    onclick="userWizardGoToStep(3)" style="padding:11px 26px; font-weight:700;">
+                    <span>Continue to Schedule &rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============================================================
+                 STEP 3: SELECT DATE, TIME AND DURATION
+                 "When do you want to park?"
+                 ============================================================ -->
+            <div class="guided-panel" id="wizardStepPanel3">
+              <div class="user-card" style="max-width:1060px; margin:0 auto; background:#ffffff; border:1px solid #eef2f6; border-radius:20px; padding:32px 36px; box-shadow:0 4px 25px -4px rgba(0,0,0,0.05);">
+                
+                <style>
+                  .institution-card-pick {
+                    background: #ffffff;
+                    border: 1.5px solid #e2e8f0;
+                    border-radius: 14px;
+                    padding: 16px;
+                    cursor: pointer;
+                    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    position: relative;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+                  }
+                  .institution-card-pick:hover {
+                    border-color: #93c5fd;
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.08);
+                  }
+                  .institution-card-pick.selected {
+                    border: 2px solid #2563eb !important;
+                    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.12) !important;
+                  }
+                  .institution-card-pick .inst-radio-indicator {
+                    width: 22px;
+                    height: 22px;
+                    border-radius: 50%;
+                    border: 1.5px solid #cbd5e1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                    color: transparent;
+                    transition: all 0.2s ease;
+                    font-size: 11px;
+                  }
+                  .institution-card-pick.selected .inst-radio-indicator {
+                    background: #2563eb;
+                    border-color: #2563eb;
+                    color: #ffffff;
+                  }
+                </style>
+
+                <!-- Card Header matching Screenshot -->
+                <div style="margin-bottom:26px;">
+                  <h3 style="font-size:24px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:12px;">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#0284c7" style="flex-shrink:0;">
+                      <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/>
+                      <circle cx="7.5" cy="14.5" r="1.5"/>
+                      <circle cx="16.5" cy="14.5" r="1.5"/>
+                    </svg>
+                    Step 3: When do you want to park?
+                  </h3>
+                  <p style="font-size:14.5px; color:#64748b; margin:6px 0 0 0; font-weight:500;">
+                    Specify your expected arrival date, parking start time, and reservation duration.
+                  </p>
+                </div>
+
+                <!-- Booking Date, Start Time and Parking Duration inputs (3-column row) -->
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:26px;">
+                  <div class="user-form-group" style="margin:0;">
+                    <label class="user-form-label" style="font-size:13.5px; font-weight:700; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+                      <i class="fa-solid fa-calendar-days" style="color:#0284c7; font-size:15px;"></i> Booking Date <span style="color:#ef4444; font-weight:700;">*</span>
+                    </label>
+                    <input type="date" id="wizardBookingDate" class="modern-picker-input" min="{{ today }}" value="{{ today }}" onchange="userWizardOnScheduleChange()" required>
+                  </div>
+                  <div class="user-form-group" style="margin:0;">
+                    <label class="user-form-label" style="font-size:13.5px; font-weight:700; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+                      <i class="fa-solid fa-clock" style="color:#f59e0b; font-size:15px;"></i> Start Time <span style="color:#ef4444; font-weight:700;">*</span>
+                    </label>
+                    <input type="time" id="wizardStartTime" class="modern-picker-input" value="{{ current_hour or '12:00' }}" onchange="userWizardOnScheduleChange()" required>
+                  </div>
+                  <div class="user-form-group" style="margin:0;">
+                    <label class="user-form-label" style="font-size:13.5px; font-weight:700; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+                      <i class="fa-solid fa-hourglass-half" style="color:#0284c7; font-size:15px;"></i> Parking Duration <span style="color:#ef4444; font-weight:700;">*</span>
+                    </label>
+                    <select id="wizardDurationSelect" class="modern-picker-input" onchange="userWizardOnDurationSelectChange(this)" style="cursor:pointer;">
+                      <option value="1" selected>1 Hour</option>
+                      <option value="2">2 Hours</option>
+                      <option value="3">3 Hours</option>
+                      <option value="4">4 Hours</option>
+                      <option value="6">6 Hours</option>
+                      <option value="8">8 Hours</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Hidden duration pills to maintain full backwards-compatibility with tests -->
+                <div id="wizardDurationPills" style="display:none;">
+                  <div class="duration-pill active" data-hours="1"><div class="duration-pill-title">1 Hour</div></div>
+                  <div class="duration-pill" data-hours="2"><div class="duration-pill-title">2 Hours</div></div>
+                  <div class="duration-pill" data-hours="3"><div class="duration-pill-title">3 Hours</div></div>
+                  <div class="duration-pill" data-hours="4"><div class="duration-pill-title">4 Hours</div></div>
+                  <div class="duration-pill" data-hours="6"><div class="duration-pill-title">6 Hours</div></div>
+                  <div class="duration-pill" data-hours="8"><div class="duration-pill-title">8 Hours</div></div>
+                </div>
+
+                <!-- Section Title: Select Your Institution (Dynamic per Category) -->
+                <div style="margin-bottom:18px;">
+                  <h4 id="wizardStep3PlaceSectionTitle" style="font-size:18px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:10px;">
+                    <i id="wizardStep3PlaceSectionIcon" class="fa-solid fa-building-columns" style="color:#0284c7; font-size:18px;"></i>
+                    <span id="wizardStep3PlaceSectionHeading">Select Your Institution</span>
+                  </h4>
+                  <p id="wizardStep3PlaceSectionSubheading" style="font-size:13.5px; color:#64748b; margin:4px 0 0; font-weight:500;">
+                    Choose from the available institutions near your destination.
+                  </p>
+                </div>
+
+                <!-- Three Selectable Institution Cards Grid (Dynamic by Category & Vehicle) -->
+                <div class="institution-cards-grid" id="wizardStep3PlacesGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:18px; margin-bottom:26px;">
+                  {% for p in places %}
+                  <div class="institution-card-pick {% if loop.first %}selected{% endif %}"
+                       id="instCard_{{ p.place_id }}"
+                       data-place-id="{{ p.place_id }}"
+                       data-place-name="{{ p.place_name }}"
+                       data-category="{{ p.category }}"
+                       data-category-id="{{ p.category | lower | replace(' ', '_') }}"
+                       data-address="{{ p.address }}"
+                       data-rate="{{ p.hourly_rate }}"
+                       data-lot-id="{{ p.lot_id }}"
+                       data-total="{{ p.total_slots }}"
+                       data-avail="{{ p.available_slots }}"
+                       data-supported-vehicles="{{ (p.supported_vehicles or ['Car', 'Bike']) | join(',') }}"
+                       onclick="userWizardSelectPlace(this, '{{ p.place_id }}', '{{ p.place_name }}', '{{ p.address }}', {{ p.hourly_rate }}, {{ p.lot_id }}, '{{ p.category }}')">
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;">
+                      <!-- Image Thumbnail -->
+                      <div style="width:72px; height:68px; border-radius:10px; overflow:hidden; flex-shrink:0; background:#f1f5f9; border:1px solid #e2e8f0;">
+                        <img src="{{ p.image_url or ('/static/images/aj_management.jpg' if 'management' in p.place_name|lower else ('/static/images/aj_engineering.jpg' if 'engineering' in p.place_name|lower else ('/static/images/aj_medical.jpg' if 'medical' in p.place_name|lower else '/static/images/city_parking_mangaluru.jpg'))) }}"
+                             alt="{{ p.place_name }}"
+                             style="width:100%; height:100%; object-fit:cover;"
+                             onerror="this.src='/static/images/city_parking_mangaluru.jpg';">
+                      </div>
+                      
+                      <!-- Name, Address & Radio Checkmark -->
+                      <div style="flex:1; min-width:0;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                          <div class="inst-card-title" style="font-size:14.5px; font-weight:800; color:#0f172a; line-height:1.25; margin-bottom:4px;">
+                            {{ p.place_name }}
+                          </div>
+                          <div class="inst-radio-indicator">
+                            <i class="fas fa-check"></i>
+                          </div>
+                        </div>
+                        <div style="font-size:11.5px; color:#64748b; line-height:1.35; display:flex; align-items:flex-start; gap:4px;">
+                          <i class="fas fa-location-dot" style="color:#ef4444; font-size:11px; margin-top:2px; flex-shrink:0;"></i>
+                          <span style="overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                            {{ p.address }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Supported Vehicle Types -->
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; font-size:12px; color:#475569; font-weight:600;">
+                      <span style="display:flex; align-items:center; gap:5px;"><i class="fas fa-car" style="color:#0284c7;"></i> Car</span>
+                      <span style="display:flex; align-items:center; gap:5px;"><i class="fas fa-motorcycle" style="color:#0284c7;"></i> Bike</span>
+                    </div>
+
+                    <!-- Available Slots & Parking Fee Row -->
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; border-top:1px solid #f1f5f9; padding-top:12px;">
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:26px; height:26px; border-radius:6px; background:#0284c7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; font-family:var(--font-mono); flex-shrink:0;">
+                          P
+                        </div>
+                        <div>
+                          <div style="font-size:10.5px; color:#64748b; font-weight:600; text-transform:uppercase;">Available Slots</div>
+                          <div class="place-avail-count" style="font-size:15px; font-weight:800; color:#0f172a;">{{ p.available_slots }}</div>
+                        </div>
+                      </div>
+
+                      <div style="display:flex; align-items:center; gap:8px; border-left:1px solid #f1f5f9; padding-left:8px;">
+                        <div style="width:26px; height:26px; border-radius:50%; background:#0284c7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">
+                          ₹
+                        </div>
+                        <div>
+                          <div style="font-size:10.5px; color:#64748b; font-weight:600; text-transform:uppercase;">Parking Fee</div>
+                          <div style="font-size:14.5px; font-weight:800; color:#0f172a;">₹{{ p.hourly_rate | int }}/hr</div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Empty state when no places match -->
+                <div id="wizardStep3NoPlacesMessage" style="display:none; text-align:center; padding:36px 20px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:14px; color:#64748b; margin-bottom:26px;">
+                  <i class="fas fa-circle-info" style="font-size:24px; color:#0284c7; margin-bottom:8px;"></i>
+                  <h4 style="font-size:15px; font-weight:700; color:#1e293b; margin:0 0 4px;">No Parking Facilities Available</h4>
+                  <p style="font-size:13px; margin:0;">There are currently no parking facilities matching this category and vehicle type near your destination.</p>
+                </div>
+
+                <!-- Estimated Parking Fee Box matching Screenshot -->
+                <div style="background:#f0f7ff; border:1px solid #dbeafe; border-radius:16px; padding:20px 26px; display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+                  <div style="display:flex; align-items:center; gap:20px;">
+                    
+                    <!-- Car with Parking Sign Graphic -->
+                    <div style="flex-shrink:0;">
+                      <svg width="68" height="50" viewBox="0 0 68 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="26" cy="46" rx="20" ry="3.5" fill="#e2e8f0"/>
+                        <ellipse cx="54" cy="46" rx="6" ry="2" fill="#cbd5e1"/>
+                        <rect x="52.5" y="20" width="3" height="26" rx="1.5" fill="#94a3b8"/>
+                        <circle cx="54" cy="18" r="9" fill="#0284c7"/>
+                        <text x="54" y="22" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="800" fill="#ffffff" text-anchor="middle">P</text>
+                        <rect x="9" y="38" width="5" height="8" rx="2.5" fill="#1e293b"/>
+                        <rect x="34" y="38" width="5" height="8" rx="2.5" fill="#1e293b"/>
+                        <rect x="10" y="28" width="28" height="15" rx="5" fill="#2563eb"/>
+                        <path d="M13 28L16 19C16.5 17.8 17.8 17 19 17H29C30.2 17 31.5 17.8 32 19L35 28H13Z" fill="#3b82f6"/>
+                        <path d="M16.5 27L18.5 20H29.5L31.5 27H16.5Z" fill="#e0f2fe"/>
+                        <circle cx="14" cy="33" r="2.5" fill="#ffffff"/>
+                        <circle cx="34" cy="33" r="2.5" fill="#ffffff"/>
+                        <rect x="20" y="36" width="8" height="4" rx="2" fill="#1d4ed8"/>
+                      </svg>
+                    </div>
+
+                    <!-- Vertical divider -->
+                    <div style="width:1.5px; height:46px; background:#cbd5e1; flex-shrink:0;"></div>
+
+                    <!-- Breakdown text -->
+                    <div>
+                      <div style="font-size:11.5px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">ESTIMATED PARKING FEE</div>
+                      <div style="font-size:15px; font-weight:700; color:#334155; margin-top:3px;" id="wizardTariffBreakdown">Institutions (₹30/hr) × 1 Hour</div>
+                      <div style="font-size:13px; font-weight:600; color:#10b981; margin-top:4px; display:flex; align-items:center; gap:6px;">
+                        <i class="fas fa-check-circle" style="color:#10b981;"></i> Includes 15-minute grace period on exit
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Live Price Display -->
+                  <div style="font-family:'Plus Jakarta Sans', sans-serif; font-size:36px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;" id="wizardEstimatedFeeDisplay">₹30.00</div>
+                </div>
+
+                <!-- Footer Navigation -->
+                <div class="wizard-footer-nav" style="display:flex; justify-content:space-between; align-items:center;">
+                  <button type="button" class="btn-user btn-user-secondary" onclick="userWizardGoToStep(2)" style="background:#f1f5f9; color:#0f172a; border:1.5px solid #e2e8f0; border-radius:12px; padding:12px 24px; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease;">
+                    <i class="fas fa-arrow-left"></i> Back
+                  </button>
+                  <button type="button" class="btn-user btn-user-primary" id="btnWizardStep3Next" onclick="userWizardGoToStep(4)" style="background:#2563eb; color:#ffffff; border:none; border-radius:12px; padding:12px 28px; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(37,99,235,0.28); cursor:pointer; transition:all 0.2s ease;">
+                    <span>Continue to Slot Selection &rarr;</span>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ============================================================
+                 STEP 4: SELECT PARKING SLOT
+                 "Which slot do you want?" (Live 2D Matrix)
+                 ============================================================ -->
+            <div class="guided-panel" id="wizardStepPanel4">
+              <div class="user-card" style="background:#0a1128; color:#ffffff; border:1px solid #1e293b; padding:24px;">
+                <!-- Header with Title, Section Filter & Refresh matching Image 1 -->
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px; border-bottom:1px solid #1e293b; padding-bottom:16px;">
+                  <div>
+                    <div style="font-size:11px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.08em;">
+                      LIVE 2D SLOT LAYOUT &bull; LIVE SLOT LAYOUT
+                    </div>
+                    <h3 style="font-size:20px; font-weight:800; color:#ffffff; margin:2px 0 0;">
+                      <i class="fas fa-table-cells" style="color:#38bdf8;"></i> Interactive 2D Parking Matrix
+                    </h3>
+                    <p style="font-size:13px; color:#94a3b8; margin:4px 0 0;" id="wizardSlotMatrixSubtitle">
+                      Visual slot reservation and interactive slot swapping engine.
+                    </p>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <label style="font-size:12px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.04em;">SECTION:</label>
+                      <select id="wizardSectionFilter" class="user-form-select" onchange="userWizardFilterSlotsBySection()" style="width:auto; min-width:145px; background:#1e293b; color:#ffffff; border-color:#334155; padding:6px 14px; font-size:13px; font-weight:700; border-radius:8px;">
+                        <option value="ALL" selected>All Slots</option>
+                        <option value="R">R-Bay (R1-R32)</option>
+                        <option value="S">S-Bay (S1-S11)</option>
+                        <option value="A">Row A (A1-A12)</option>
+                        <option value="B">Row B (B1-B12)</option>
+                      </select>
+                    </div>
+                    <button type="button" class="btn-user btn-user-secondary btn-user-sm" onclick="userWizardFetchLiveSlots()" style="background:#1e293b; color:#ffffff; border-color:#334155;">
+                      <i class="fas fa-rotate"></i> Refresh Matrix
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Dark 2D Container matching Image 1 -->
+                <div class="layout-2d-container" style="background:#081226; border:1px solid #1e293b; border-radius:16px; padding:24px 16px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
+                  <div class="layout-lot-title" id="wizard2DLotTitle" style="color:#38bdf8; text-align:center; font-family:var(--font-mono); font-weight:800; font-size:18px; letter-spacing:0.08em; margin-bottom:24px;">
+                    INSTITUTIONS
+                  </div>
+
+                  <!-- 4-column Grid exactly like Image 1 -->
+                  <div class="grid-2d-box" id="wizardSlotGridContainer">
+                    <div style="grid-column: 1/-1; text-align:center; padding:40px; color:#94a3b8;">
+                      <i class="fas fa-spinner fa-spin fa-2x"></i>
+                      <p style="margin-top:10px;">Loading live slot layout from MongoDB...</p>
+                    </div>
+                  </div>
+
+                  <!-- Legend Bar Matching Image 1 -->
+                  <div class="layout-legend-bar" style="margin-top:24px; border-top:1px solid #1e293b; padding-top:16px; display:flex; justify-content:center; flex-wrap:wrap; gap:16px;">
+                    <span style="color:#10b981; font-weight:700;"><i class="fas fa-circle"></i> 🟢 Available / Eligible (Click to Select)</span>
+                    <span style="color:#38bdf8; font-weight:700;"><i class="fas fa-circle-check"></i> 🔵 Selected Slot</span>
+                    <span style="color:#f59e0b; font-weight:700;"><i class="fas fa-circle"></i> 🟡 Reserved</span>
+                    <span style="color:#ef4444; font-weight:700;"><i class="fas fa-circle"></i> 🔴 Occupied</span>
+                    <span style="color:#f43f5e; font-weight:700;"><i class="fas fa-circle"></i> 🚨 Overstayed</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Selected Slot Feedback Bar -->
+              <div class="user-card" style="margin-top:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                  <div>
+                    <span style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase;">Selected
+                      Parking Slot</span>
+                    <div style="font-size:17px; font-weight:800; color:#0f172a; margin-top:2px;"
+                      id="wizardSelectedSlotDisplay">
+                      None Selected &mdash; <span style="font-size:14px; font-weight:600; color:#64748b;">Click any
+                        green (🟢 Available) slot above</span>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:12px;">
+                    <button type="button" class="btn-user btn-user-secondary" onclick="userWizardGoToStep(3)">
+                      <i class="fas fa-arrow-left"></i> &larr; Back
+                    </button>
+                    <button type="button" class="btn-user btn-user-primary" id="btnWizardStep4Next"
+                      onclick="userWizardGoToStep(5)" style="padding:11px 26px; font-weight:700;" disabled>
+                      <span>Continue to Review Booking &rarr;</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============================================================
+                 STEP 5: REVIEW AND CONFIRM
+                 "Review and confirm"
+                 ============================================================ -->
+            <div class="guided-panel" id="wizardStepPanel5">
+              <span style="display:none;">Step 4: Review Booking Details</span>
+              <div class="user-card step5-review-card" id="wizardReviewContainer">
+                <!-- Top Step Header matching screenshot -->
+                <div class="step5-header-bar">
+                  <div class="step5-header-left">
+                    <div class="step5-badge-num">5</div>
+                    <div class="step5-header-text">
+                      <h3 class="step5-title">Review Booking Details</h3>
+                      <p class="step5-subtitle">Please review your parking reservation details before final confirmation.</p>
+                    </div>
+                  </div>
+                  <div class="step5-status-pill">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Pending Confirmation</span>
+                  </div>
+                </div>
+
+                <!-- Card 1: Booking Details (2 Columns) -->
+                <div class="step5-section-card">
+                  <div class="step5-section-head">
+                    <i class="fa-regular fa-file-lines head-icon-blue"></i>
+                    <span class="step5-section-title">Booking Details</span>
+                  </div>
+                  <div class="step5-section-body">
+                    <div class="step5-booking-grid">
+                      <!-- Left Column -->
+                      <div class="step5-col">
+                        <!-- Parking Facility -->
+                        <div class="step5-item">
+                          <div class="step5-item-icon"><i class="fa-regular fa-building"></i></div>
+                          <div class="step5-item-content">
+                            <span class="step5-label">Parking Facility <span id="wizardRevFacilityCategory">Institutions</span></span>
+                            <span class="step5-val" id="wizardRevFacility">Institutions</span>
+                          </div>
+                        </div>
+                        <!-- Vehicle -->
+                        <div class="step5-item">
+                          <div class="step5-item-icon"><i class="fa-solid fa-car-side"></i></div>
+                          <div class="step5-item-content">
+                            <span class="step5-label">Vehicle</span>
+                            <span class="step5-val" id="wizardRevVehicle" style="font-family:var(--font-mono);">KA91MKU987 (Car)</span>
+                          </div>
+                        </div>
+                        <!-- Date -->
+                        <div class="step5-item">
+                          <div class="step5-item-icon"><i class="fa-regular fa-calendar"></i></div>
+                          <div class="step5-item-content">
+                            <span class="step5-label">Date</span>
+                            <span class="step5-val" id="wizardRevDate">2026-10-13</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Right Column -->
+                      <div class="step5-col">
+                        <!-- Start Time -->
+                        <div class="step5-item">
+                          <div class="step5-item-icon"><i class="fa-regular fa-clock"></i></div>
+                          <div class="step5-item-content">
+                            <span class="step5-label">Start Time</span>
+                            <span class="step5-val" id="wizardRevStartTime">12:00</span>
+                          </div>
+                        </div>
+                        <!-- Duration -->
+                        <div class="step5-item">
+                          <div class="step5-item-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                          <div class="step5-item-content">
+                            <span class="step5-label">Duration</span>
+                            <span class="step5-val" id="wizardRevDuration">2 Hours</span>
+                          </div>
+                        </div>
+                        <!-- Selected Slot -->
+                        <div class="step5-item">
+                          <div class="step5-item-icon"><i class="fa-solid fa-square-parking"></i></div>
+                          <div class="step5-item-content">
+                            <span class="step5-label">Selected Slot</span>
+                            <span class="step5-val" id="wizardRevSlot" style="color:#0f172a; font-weight:700;">R01 (R1)</span>
+                          </div>
+                        </div>
+                        <!-- Floor & Zone -->
+                        <div class="step5-item">
+                          <div class="step5-item-icon"><i class="fa-solid fa-location-dot"></i></div>
+                          <div class="step5-item-content">
+                            <span class="step5-label">Floor &amp; Zone</span>
+                            <span class="step5-val" id="wizardRevFloor">Ground Floor (Long Term Parking)</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card 2: Fee Summary (Horizontal Layout) -->
+                <div class="step5-section-card">
+                  <div class="step5-section-head">
+                    <i class="fa-solid fa-coins head-icon-blue"></i>
+                    <span class="step5-section-title">Fee Summary</span>
+                  </div>
+                  <div class="step5-section-body">
+                    <div class="step5-fee-flex">
+                      <div class="step5-fee-item">
+                        <div class="step5-fee-icon"><i class="fa-solid fa-tag"></i></div>
+                        <div class="step5-fee-content">
+                          <span class="step5-label">Hourly Tariff</span>
+                          <span class="step5-val" id="wizardRevHourlyRate">₹30.00 / hr</span>
+                        </div>
+                      </div>
+
+                      <div class="step5-fee-item">
+                        <div class="step5-fee-icon"><i class="fa-regular fa-clock"></i></div>
+                        <div class="step5-fee-content">
+                          <span class="step5-label">Duration</span>
+                          <span class="step5-val" id="wizardRevDurationText">2 Hours</span>
+                        </div>
+                      </div>
+
+                      <div class="step5-fee-item">
+                        <div class="step5-fee-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                        <div class="step5-fee-content">
+                          <span class="step5-label">Overstay Grace</span>
+                          <span class="step5-val grace-val">15 Mins Included</span>
+                        </div>
+                      </div>
+
+                      <div class="step5-fee-divider"></div>
+
+                      <div class="step5-fee-total">
+                        <span class="step5-label">Estimated Total Fee</span>
+                        <span class="step5-total-val" id="wizardRevTotalFee">₹60.00</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Info Banner -->
+                <div class="step5-info-banner">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <span>Slot is reserved in MongoDB ONLY when you click "Confirm Booking".</span>
+                </div>
+
+                <!-- Actions Bar -->
+                <div class="step5-actions-bar">
+                  <button type="button" class="btn-step5-back" onclick="userWizardGoToStep(4)">
+                    <i class="fas fa-arrow-left"></i> Back
+                  </button>
+                  <button type="button" class="btn-step5-confirm" id="btnWizardFinalConfirm" onclick="userWizardSubmitBooking()">
+                    <i class="fas fa-check-circle"></i> Confirm Booking
+                  </button>
+                </div>
+              </div>
+
+              <!-- Post-Confirmation Success View (Reference Image Redesign) -->
+              <div id="wizardSuccessCard" style="display:none; max-width:540px; margin:0 auto;">
+                <div class="parking-pass-card">
+                  <!-- Header -->
+                  <div class="pass-header">
+                    <div class="pass-brand-left">
+                      <div class="pass-brand-logo">
+                        <span>P</span>
+                      </div>
+                      <div>
+                        <div class="pass-brand-title">Smart Parking</div>
+                        <div class="pass-brand-subtitle">AI-BASED SMART PARKING SYSTEM</div>
+                      </div>
+                    </div>
+                    <div class="pass-badge-success">
+                      <span class="pass-badge-check-icon"><i class="fa-solid fa-check"></i></span>
+                      <span>BOOKING SUCCESSFUL</span>
+                    </div>
+                  </div>
+
+                  <!-- Top Section: Slot/Facility (Left) & QR Code (Right) -->
+                  <div class="pass-top-grid">
+                    <div class="pass-slot-facility">
+                      <div class="pass-slot-label">
+                        <span class="pass-p-pin-icon"><i class="fa-solid fa-square-parking"></i></span>
+                        <span>PARKING SLOT</span>
+                      </div>
+                      <div class="pass-slot-box">
+                        <div class="pass-slot-car-icon">
+                          <svg width="34" height="34" viewBox="0 0 24 24" fill="#2563eb">
+                            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/>
+                            <circle cx="7.5" cy="14.5" r="1.5"/>
+                            <circle cx="16.5" cy="14.5" r="1.5"/>
+                          </svg>
+                        </div>
+                        <div class="pass-slot-number" id="wizardSuccessSlot">R12</div>
+                      </div>
+                      <div class="pass-facility-row">
+                        <span class="pass-facility-pin"><i class="fa-solid fa-location-dot"></i></span>
+                        <div>
+                          <div class="pass-facility-name" id="wizardSuccessFacility">AJ Institute of Medical Sciences</div>
+                          <div class="pass-facility-sub">Parking Facility</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Genuine QR Code & Pass Code Box -->
+                    <div class="pass-qr-card">
+                      <div class="pass-qr-canvas-box" id="wizardSuccessQrContainer">
+                        <!-- Canvas / Img injected dynamically by QRCode -->
+                      </div>
+                      <div class="pass-code-label">PASS CODE</div>
+                      <div class="pass-code-badge" id="wizardSuccessPassCode">BK-2026-0011</div>
+                    </div>
+                  </div>
+
+                  <!-- Booking Details Section -->
+                  <div class="pass-section-header">
+                    <div class="pass-section-icon-badge">
+                      <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <span>BOOKING DETAILS</span>
+                  </div>
+
+                  <div class="pass-details-container">
+                    <!-- Row 1: 3 Columns -->
+                    <div class="pass-details-row pass-details-row-top">
+                      <div class="pass-detail-cell">
+                        <div class="pass-cell-icon"><i class="fa-solid fa-id-card"></i></div>
+                        <div>
+                          <div class="pass-cell-label">BOOKING ID</div>
+                          <div class="pass-cell-val" id="wizardSuccessBookingId">BK-2026-0011</div>
+                        </div>
+                      </div>
+                      <div class="pass-detail-cell">
+                        <div class="pass-cell-icon"><i class="fa-solid fa-car"></i></div>
+                        <div>
+                          <div class="pass-cell-label">VEHICLE NUMBER</div>
+                          <div class="pass-cell-val" id="wizardSuccessVehicle">KA10A4614</div>
+                        </div>
+                      </div>
+                      <div class="pass-detail-cell">
+                        <div class="pass-cell-icon"><i class="fa-regular fa-calendar-days"></i></div>
+                        <div>
+                          <div class="pass-cell-label">BOOKING DATE</div>
+                          <div class="pass-cell-val" id="wizardSuccessDate">29 Oct 2026</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="pass-details-sep"></div>
+
+                    <!-- Row 2: 2 Columns -->
+                    <div class="pass-details-row pass-details-row-bottom">
+                      <div class="pass-detail-cell">
+                        <div class="pass-cell-icon"><i class="fa-regular fa-clock"></i></div>
+                        <div>
+                          <div class="pass-cell-label">TIME (SELECTED)</div>
+                          <div class="pass-cell-val" id="wizardSuccessTime">10:30 AM – 11:30 AM</div>
+                        </div>
+                      </div>
+                      <div class="pass-detail-cell">
+                        <div class="pass-rupee-circle"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                        <div>
+                          <div class="pass-cell-label">ESTIMATED FEE</div>
+                          <div class="pass-cell-val" id="wizardSuccessFee">₹35.00</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Backwards-compatibility hidden element for legacy checks -->
+                  <div id="wizardSuccessDateTime" style="display:none;"></div>
+
+                  <!-- Entry Instructions -->
+                  <div class="pass-instructions-box">
+                    <div class="pass-instruction-icon">
+                      <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div class="pass-instruction-msg">
+                      Scan this pass at the entrance boom barrier. Your reservation has been recorded in the system.
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="pass-actions-group">
+                    <a href="#bookings" onclick="if(typeof switchUserTab === 'function'){ switchUserTab('bookings'); return false; }" class="pass-btn-primary" id="wizardBtnViewBookings">
+                      <i class="fa-solid fa-ticket"></i> View in My Bookings
+                    </a>
+                    <button type="button" class="pass-btn-secondary" onclick="window.print()">
+                      <i class="fa-solid fa-print"></i> Print / Save Pass
+                    </button>
+                    <button type="button" class="pass-btn-tertiary" onclick="userWizardReset()">
+                      <i class="fa-solid fa-plus"></i> Book Another Slot
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- ends .booking-wizard-container -->
+        </div> <!-- ends #bookingWizardView -->
+
+        <!-- ============================================================
+             MODE 2: QUICK BOOKING VIEW (Instant 1-Screen Reservation)
+             ============================================================ -->
+        <div id="bookingQuickView" style="display:none; max-width:760px; margin:0 auto 30px;">
+          <div class="user-card" style="box-shadow:var(--user-shadow-md); border-radius:16px;">
+            <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
+              <div>
+                <h3 style="font-size:20px; font-weight:800; color:#0f172a; margin:0;">
+                  <i class="fas fa-bolt" style="color:#f59e0b;"></i> Quick Reserve Slot
+                </h3>
+                <p style="font-size:13px; color:#64748b; margin:3px 0 0;">
+                  Single-screen reservation. Pick your facility, slot, and vehicle for instant booking.
+                </p>
+              </div>
+              <button type="button" class="btn-user btn-user-secondary btn-user-sm" onclick="switchBookingMode('wizard')">
+                <i class="fas fa-wand-magic-sparkles" style="color:#2563eb;"></i> Switch to 5-Step Wizard
+              </button>
+            </div>
+
+            <form onsubmit="if(typeof submitSlotBooking === 'function'){ submitSlotBooking(event); } else { userSubmitQuickBooking(event); }">
+              <div class="user-form-group">
+                <label class="user-form-label" style="font-weight:700;"><i class="fas fa-warehouse" style="color:#2563eb;"></i> Select Parking Facility</label>
+                <select id="bookingLotSelect" class="user-form-select" onchange="if(typeof loadAvailableSlotsForBooking === 'function') loadAvailableSlotsForBooking(); else if(typeof loadAvailableSlotsForQuickBooking === 'function') loadAvailableSlotsForQuickBooking();" required>
+                  {% for lot in lots %}
+                  <option value="{{ lot.lot_id }}" data-rate="{{ lot.hourly_rate or 40.0 }}" {% if loop.first %}selected{% endif %}>{{ lot.lot_name }} (₹{{ lot.hourly_rate or 40 }}/hr)</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="user-form-group">
+                <label class="user-form-label" style="font-weight:700;"><i class="fas fa-table-cells" style="color:#10b981;"></i> Select Available Slot</label>
+                <select id="bookingSlotSelect" class="user-form-select" required>
+                  <option value="">Loading available slots...</option>
+                </select>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+                <div class="user-form-group">
+                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-calendar-day" style="color:#6366f1;"></i> Date</label>
+                  <input type="date" id="bookingDate" class="user-form-input" min="{{ today }}" value="{{ today or '2026-10-07' }}" required>
+                </div>
+                <div class="user-form-group">
+                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-clock" style="color:#0ea5e9;"></i> Start Time</label>
+                  <input type="time" id="bookingStartTime" class="user-form-input" value="10:00" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare();" required>
+                </div>
+                <div class="user-form-group">
+                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-hourglass-end" style="color:#0ea5e9;"></i> End Time</label>
+                  <input type="time" id="bookingEndTime" class="user-form-input" value="12:00" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare();" required>
+                </div>
+              </div>
+
+              <div class="user-form-group">
+                <label class="user-form-label" style="font-weight:700;"><i class="fas fa-car" style="color:#8b5cf6;"></i> Vehicle License Plate</label>
+                <select id="bookingVehicleSelect" class="user-form-select">
+                  {% for v in vehicles %}
+                  <option value="{{ v.license_plate }}" {% if loop.first %}selected{% endif %}>{{ v.license_plate }} &bull; {{ v.vehicle_type }} ({{ v.make_model or 'Default' }})</option>
+                  {% endfor %}
+                  <option value="__custom__">+ Enter Plate Manually</option>
+                </select>
+              </div>
+
+              <!-- Estimated Fare Display -->
+              <div style="background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:10px; padding:16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div>
+                  <span style="font-size:12px; color:#64748b; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">Estimated Total Fare</span>
+                  <div style="font-size:12.5px; color:#64748b; margin-top:2px;" id="bookingRateSubtext">Standard tariff: ₹40/hr &bull; 15-min grace included</div>
+                </div>
+                <div style="font-family:var(--font-mono); font-size:26px; font-weight:800; color:#10b981;" id="bookingEstimatedFare">₹80.00</div>
+              </div>
+
+              <div style="display:flex; gap:12px;">
+                <button type="submit" class="btn-user btn-user-primary" style="flex:1; padding:12px; justify-content:center; font-size:15px; font-weight:700; box-shadow:0 4px 14px rgba(37,99,235,0.35);">
+                  <i class="fas fa-bolt"></i> Instant Confirm Reservation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div> <!-- ends #tab-booking -->
+
+        <!-- ================================================================
+             TAB 6: MODULE 6 — LIVE 2D PARKING LAYOUT
+             ================================================================ -->
+        <div class="tab-pane" id="tab-layout">
+          <div class="user-card">
+            <div class="user-card-header">
+              <div>
+                <h3><i class="fas fa-table-cells"></i> Interactive 2D Parking Matrix</h3>
+                <p style="font-size:12.5px; color:#64748b; margin:2px 0 0;">Visual slot reservation and interactive slot
+                  swapping engine.</p>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <label style="font-size:12px; font-weight:700; color:#64748b;">FACILITY:</label>
+                <select id="layoutLotSelect" class="user-form-select" style="width:230px;"
+                  onchange="onFacilityChange2D()">
+                  {% for lot in lots %}
+                  <option value="{{ lot.lot_id }}">{{ lot.lot_name }}</option>
+                  {% else %}
+                  <option value="1">Institutions</option>
+                  <option value="2">Mall</option>
+                  <option value="3">Public places</option>
+                  <option value="4" selected>City Parking</option>
+                  {% endfor %}
+                </select>
+
+                <label style="font-size:12px; font-weight:700; color:#64748b; margin-left:6px;">SECTION:</label>
+                <select id="layoutRowFilter" class="user-form-select" style="width:145px;"
+                  onchange="filter2DSlotsByRow()">
+                  <option value="ALL" selected>All Slots</option>
+                  <option value="R">R-Bay (R1-R32)</option>
+                  <option value="S">S-Bay (S1-S11)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Active User Booking / Swap Header Indicator -->
+            <div id="layoutSwapHeaderBar" class="layout-swap-header-bar" style="display:none;">
+              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <span class="user-slot-pill-badge" id="layoutSwapUserBadge">
+                  <i class="fas fa-car-side" id="layoutSwapUserIcon"></i> <span id="layoutSwapUserLabel">YOUR
+                    SLOT:</span> <strong id="swapUserSlotDisplay">--</strong>
+                </span>
+                <span style="font-size:12.5px; color:#94a3b8;" id="swapUserSlotSubtext">
+                  Click your slot or drag it toward any eligible slot (🟢/✨) to swap.
+                </span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-user btn-user-secondary btn-user-sm" onclick="load2DLayout()">
+                  <i class="fas fa-rotate"></i> Refresh
+                </button>
+              </div>
+            </div>
+
+            <!-- Exact 2D Layout Display Matching Specification -->
+            <div class="layout-2d-container" id="layout2DContainer">
+              <div class="layout-lot-title" id="layoutLotTitleDisplay">PARKING LOT A</div>
+
+              <!-- SVG Layer for visual swap connecting lines / arrows -->
+              <svg id="swapSvgOverlay" class="swap-svg-overlay"
+                style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;"></svg>
+
+              <!-- 4x4 / Multi-row Grid of Slots -->
+              <div class="grid-2d-box" id="interactive2DGrid">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <!-- Floating Visual Swap Preview & Confirmation Card -->
+              <div id="visualSwapCardContainer" class="visual-swap-card-container" style="display:none;">
+                <!-- Rendered dynamically during swap preview -->
+              </div>
+
+              <!-- Legend Matching Specification -->
+              <div class="layout-legend-bar">
+                <span><img src="/static/images/car-top.svg" style="height:15px; width:9px; vertical-align:middle; margin-right:4px;" alt="Car"> Car Parked</span>
+                <span><img src="/static/images/bike-top.svg" style="height:15px; width:9px; vertical-align:middle; margin-right:4px;" alt="Bike"> Bike/Scooter Parked</span>
+                <span>🟢 Available</span>
+                <span><span class="legend-dot-you">YOU</span> Your Slot</span>
+                <span style="color:#38bdf8;"><i class="fas fa-arrow-right-arrow-left"></i> Eligible Swap</span>
+                <span style="color:#ec4899;"><i class="fas fa-handshake"></i> Marketplace Listed</span>
+                <span>🔴 Occupied (Locked)</span>
+                <span>🟡 Reserved</span>
+                <span style="color:#e11d48; font-weight:700;">🚨 Overstayed</span>
+              </div>
+            </div>
+
+            <p style="text-align:center; font-size:13px; color:#64748b; margin-top:16px;" id="layoutTipText">
+              💡 <strong>Tip:</strong> Click your assigned slot <strong>[YOU]</strong> and click an eligible slot, or
+              drag your slot to initiate a visual swap!
+            </p>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 7: MODULE 7 — SLOT EXCHANGE
+             ================================================================ -->
+        <div class="tab-pane" id="tab-exchange">
+
+          <div class="user-card" style="margin-bottom:20px;">
+            <div class="user-card-header">
+              <h3><i class="fas fa-repeat"></i> Slot Exchange Marketplace</h3>
+              <button class="btn-user btn-user-secondary btn-user-sm" onclick="loadSlotExchangeTab()">
+                <i class="fas fa-rotate"></i> Refresh
+              </button>
+            </div>
+            <p style="font-size:13.5px; color:#64748b; margin-bottom:14px;">
+              Need a slot closer to the lift, or arriving at a different hour? Exchange your reserved slot directly with
+              other drivers.
+            </p>
+
+            <!-- User Active Listing Card -->
+            <div id="userActiveListingBox">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Incoming Exchange Requests (User B receiving proposal from User A) -->
+          <div class="user-card" style="margin-bottom:20px;">
+            <div class="user-card-header">
+              <h3><i class="fas fa-inbox"></i> Incoming Exchange Requests</h3>
+            </div>
+            <div id="userExchangeRequestsContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- My Sent Exchange Proposals (Outgoing requests from current user) -->
+          <div class="user-card" style="margin-bottom:20px;">
+            <div class="user-card-header">
+              <h3><i class="fas fa-paper-plane"></i> My Sent Exchange Proposals</h3>
+            </div>
+            <div id="userSentExchangeRequestsContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Browse Available Offered Slots on Marketplace -->
+          <div class="user-card">
+            <div class="user-card-header">
+              <h3><i class="fas fa-shop"></i> Browse Available Offered Slots</h3>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-user btn-user-primary btn-user-sm" onclick="seedDemoExchangeSlot()"
+                  title="Generate a slot offered by another driver">
+                  <i class="fas fa-wand-magic-sparkles"></i> Generate Swap Offer
+                </button>
+              </div>
+            </div>
+            <div id="browseExchangeMarketplace">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             TAB 8: MODULE 8 — MY BOOKINGS
+             ================================================================ -->
+        <div class="tab-pane" id="tab-bookings">
+          <div class="user-card">
+            <div class="user-card-header">
+              <h3><i class="fas fa-ticket-simple"></i> My Parking Reservations</h3>
+              <button class="btn-user btn-user-primary btn-user-sm" onclick="switchUserTab('find')">
+                <i class="fas fa-plus"></i> New Reservation
+              </button>
+            </div>
+
+            <!-- Tab Filters -->
+            <div style="display:flex; gap:8px; margin-bottom:18px;">
+              <button class="btn-user btn-user-secondary btn-user-sm my-booking-tab-btn active" data-tab="all"
+                onclick="filterMyBookings('all')">All</button>
+              <button class="btn-user btn-user-secondary btn-user-sm my-booking-tab-btn" data-tab="active"
+                onclick="filterMyBookings('active')">Active / Upcoming</button>
+              <button class="btn-user btn-user-secondary btn-user-sm my-booking-tab-btn" data-tab="completed"
+                onclick="filterMyBookings('completed')">Completed</button>
+              <button class="btn-user btn-user-secondary btn-user-sm my-booking-tab-btn" data-tab="cancelled"
+                onclick="filterMyBookings('cancelled')">Cancelled</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>Slot & Floor</th>
+                    <th>Date & Time</th>
+                    <th>Vehicle Plate</th>
+                    <th>Status</th>
+                    <th>Total Fee</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="myBookingsTbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 9: MODULE 9 — PARKING HISTORY
+             ================================================================ -->
+        <div class="tab-pane" id="tab-history">
+          <div class="user-card">
+            <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
+              <div>
+                <h3><i class="fas fa-clock-rotate-left"></i> Parking Sessions History</h3>
+                <p style="font-size:12.5px; color:#64748b; margin:2px 0 0;">View all confirmed, active, and past parking
+                  sessions.</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-user btn-user-primary btn-user-sm history-scope-btn active" id="historyScopeMyBtn"
+                  onclick="filterParkingHistoryScope('my')">
+                  <i class="fas fa-user"></i> My Booked Slots
+                </button>
+                <button class="btn-user btn-user-secondary btn-user-sm history-scope-btn" id="historyScopeAllBtn"
+                  onclick="filterParkingHistoryScope('all')">
+                  <i class="fas fa-users"></i> All Facility Bookings
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>Session ID</th>
+                    <th>Vehicle</th>
+                    <th>Facility</th>
+                    <th>Slot</th>
+                    <th>Date</th>
+                    <th>Entry Time</th>
+                    <th>Exit Time</th>
+                    <th>Duration</th>
+                    <th>Overstay</th>
+                    <th>Final Status</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="parkingHistoryTbody">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             MODULE: OVERSTAY MONITORING & DASHBOARD (Requirement 4)
+             ================================================================ -->
+        <div class="tab-pane" id="tab-overstay-dashboard">
+
+          <!-- Overstay Header Row -->
+          <div class="ov-header-row">
+            <div class="ov-header-left">
+              <div class="ov-header-icon-title">
+                <i class="fas fa-hourglass-half ov-header-icon"></i>
+                <h2 class="ov-page-title">Overstay Monitoring</h2>
+              </div>
+              <p class="ov-page-subtitle">Track vehicles that have exceeded their allotted parking duration.</p>
+            </div>
+            <div class="ov-header-right">
+              <div class="ov-notif-bell-btn" onclick="switchUserTab('notifications')" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="ov-bell-badge" id="ovTopBellBadge">1</span>
+              </div>
+              <div class="ov-ai-status">
+                <span class="ov-status-dot"></span>
+                <span>Connected to Smart Parking AI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Stat Summary Cards -->
+          <div class="ov-stats-grid">
+            <!-- Card 1: Total Overstays -->
+            <div class="ov-stat-card ov-card-blue">
+              <div class="ov-card-top">
+                <div class="ov-icon-circle ov-icon-blue">
+                  <i class="far fa-clock"></i>
+                </div>
+                <span class="ov-card-label">Total Overstays</span>
+              </div>
+              <div class="ov-card-value" id="ovSummaryTotalOverstays">3</div>
+              <div class="ov-card-subtitle">Past 10 minutes</div>
+            </div>
+
+            <!-- Card 2: Expiring Soon -->
+            <div class="ov-stat-card ov-card-yellow">
+              <div class="ov-card-top">
+                <div class="ov-icon-circle ov-icon-yellow">
+                  <i class="far fa-clock"></i>
+                </div>
+                <span class="ov-card-label">Expiring Soon</span>
+              </div>
+              <div class="ov-card-value" id="ovSummaryExpiringSoon">1</div>
+              <div class="ov-card-subtitle">Within 30 minutes</div>
+            </div>
+
+            <!-- Card 3: Overstayed -->
+            <div class="ov-stat-card ov-card-red">
+              <div class="ov-card-top">
+                <div class="ov-icon-circle ov-icon-red">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <span class="ov-card-label">Overstayed</span>
+              </div>
+              <div class="ov-card-value" id="ovSummaryOverstayed">2</div>
+              <div class="ov-card-subtitle">Beyond grace period</div>
+            </div>
+
+            <!-- Card 4: Resolved -->
+            <div class="ov-stat-card ov-card-green">
+              <div class="ov-card-top">
+                <div class="ov-icon-circle ov-icon-green">
+                  <i class="far fa-check-circle"></i>
+                </div>
+                <span class="ov-card-label">Resolved</span>
+              </div>
+              <div class="ov-card-value" id="ovSummaryResolved">4</div>
+              <div class="ov-card-subtitle">Cleared today</div>
+            </div>
+          </div>
+
+          <!-- Overstay Details Card -->
+          <div class="ov-table-card">
+            <div class="ov-table-header">
+              <div class="ov-table-title-wrap">
+                <i class="fas fa-list-ul ov-table-icon"></i>
+                <h3 class="ov-table-title">Overstay Details</h3>
+              </div>
+              <div class="ov-table-actions">
+                <div class="ov-filter-dropdown-wrap">
+                  <i class="fas fa-filter ov-filter-funnel"></i>
+                  <select id="overstayFilterDropdown" class="ov-filter-select" onchange="onOverstayFilterDropdownChange(this.value)">
+                    <option value="all">All</option>
+                    <option value="penalty_applicable">Penalty Applicable</option>
+                    <option value="grace_period">Grace Period</option>
+                    <option value="within_booking">Within Booking Time</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                  <i class="fas fa-chevron-down ov-chevron"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="ov-table-responsive">
+              <table class="ov-data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>User Name</th>
+                    <th>Vehicle Type</th>
+                    <th>Parking Lot</th>
+                    <th>Slot No.</th>
+                    <th>Start Time</th>
+                    <th>Booked End</th>
+                    <th>Duration</th>
+                    <th>Grace Period</th>
+                    <th>Grace End</th>
+                    <th>Overstay Duration</th>
+                    <th>Status</th>
+                    <th>Penalty</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="overstayDashboardTableBody">
+                  <tr>
+                    <td colspan="14" style="text-align:center; padding:36px; color:#94a3b8;">
+                      <i class="fas fa-spinner fa-spin"></i> Loading overstay radar data...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 10: NOTIFICATIONS MODULE
+             ================================================================ -->
+        <div class="tab-pane" id="tab-notifications">
+          <div class="user-card">
+            <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
+              <div>
+                <h3><i class="fas fa-bell" style="color:#0ea5e9;"></i> Notifications & Activity Alerts</h3>
+                <p style="font-size:12.5px; color:#64748b; margin:2px 0 0;">Live notifications for bookings, slot
+                  exchange requests, and system alerts.</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-user btn-user-secondary btn-user-sm" onclick="markAllNotificationsAsRead()">
+                  <i class="fas fa-check-double"></i> Mark All as Read
+                </button>
+                <button class="btn-user btn-user-secondary btn-user-sm" onclick="clearUserNotifications()">
+                  <i class="fas fa-trash-can"></i> Clear All
+                </button>
+                <button class="btn-user btn-user-primary btn-user-sm" onclick="loadUserNotifications()">
+                  <i class="fas fa-rotate"></i> Refresh
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div style="display:flex; gap:8px; margin:16px 0; overflow-x:auto;">
+              <button class="btn-user btn-user-secondary btn-user-sm notif-filter-btn active" data-filter="all"
+                onclick="filterNotifications('all')">All (<span id="notifTotalCount">0</span>)</button>
+              <button class="btn-user btn-user-secondary btn-user-sm notif-filter-btn" data-filter="unread"
+                onclick="filterNotifications('unread')">Unread (<span id="notifUnreadFilterCount">0</span>)</button>
+              <button class="btn-user btn-user-secondary btn-user-sm notif-filter-btn" data-filter="exchange"
+                onclick="filterNotifications('exchange')">Slot Exchange</button>
+              <button class="btn-user btn-user-secondary btn-user-sm notif-filter-btn" data-filter="booking"
+                onclick="filterNotifications('booking')">Bookings</button>
+            </div>
+
+            <!-- Notifications List Container -->
+            <div id="userNotificationsList" style="display:flex; flex-direction:column; gap:10px;">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ====================================================================
+       MODALS: ADD VEHICLE & DIGITAL QR PARKING PASS
+       ==================================================================== -->
+
+  <!-- ADD VEHICLE MODAL -->
+  <div id="addVehicleModal" class="user-modal-backdrop">
+    <div class="user-modal-content">
+      <div class="user-modal-header">
+        <h3><i class="fas fa-car-side"></i> Register New Vehicle</h3>
+        <button onclick="closeAddVehicleModal()"
+          style="border:none; background:transparent; font-size:20px; cursor:pointer;">&times;</button>
+      </div>
+      <form id="addVehicleForm" onsubmit="submitAddVehicle(event)">
+        <div class="user-modal-body">
+          <div class="user-form-group">
+            <label class="user-form-label">License Plate Number</label>
+            <input type="text" id="newVehiclePlate" class="user-form-input" placeholder="e.g. KA01AB1234" required>
+          </div>
+          <div class="user-form-group">
+            <label class="user-form-label">Vehicle Category</label>
+            <select id="newVehicleType" class="user-form-select">
+              <option value="Car">🚗 Car</option>
+              <option value="Bike">🏍️ Bike</option>
+            </select>
+          </div>
+          <div class="user-form-group">
+            <label class="user-form-label">Make & Model</label>
+            <input type="text" id="newVehicleModel" class="user-form-input" placeholder="e.g. Tata Nexon">
+          </div>
+          <div class="user-form-group">
+            <label class="user-form-label">Color</label>
+            <input type="text" id="newVehicleColor" class="user-form-input" placeholder="e.g. White">
+          </div>
+        </div>
+        <div class="user-modal-footer">
+          <button type="button" class="btn-user btn-user-secondary" onclick="closeAddVehicleModal()">Cancel</button>
+          <button type="submit" class="btn-user btn-user-primary">Register Vehicle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DIGITAL QR PARKING PASS MODAL -->
+  <div id="qrPassModal" class="user-modal-backdrop">
+    <div class="user-modal-content" style="max-width:440px; text-align:center;">
+      <div style="background:linear-gradient(135deg, #1d4ed8, #0ea5e9); padding:24px; color:#ffffff;">
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.08em;">SMART PARKING
+          PASS</div>
+        <h2 style="font-size:26px; font-weight:800; margin:6px 0;" id="passSlotDisplay">Slot A01</h2>
+        <div style="font-size:14px; color:#e0f2fe;" id="passLotDisplay">City Parking – Mangaluru</div>
+      </div>
+      <div class="user-modal-body" style="padding:24px;">
+
+        <!-- QR Code Simulation Box -->
+        <div
+          style="width:160px; height:160px; margin:0 auto 16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px;">
+          <div id="modalQrCodeBox" style="width:110px; height:110px; display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-qrcode fa-5x" style="color:#0f172a;"></i>
+          </div>
+          <span style="font-size:10px; font-family:var(--font-mono); color:#64748b; margin-top:6px;"
+            id="passCodeDisplay">PK-00001-A01</span>
+        </div>
+
+        <div style="background:#f1f5f9; border-radius:8px; padding:12px; font-size:13px; text-align:left;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:#64748b;">Vehicle:</span>
+            <strong style="font-family:var(--font-mono);" id="passPlateDisplay">KA01AB1234</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:#64748b;">Time Window:</span>
+            <strong id="passDateDisplay">2026-09-10 (10:00 – 12:00)</strong>
+          </div>
+        </div>
+
+        <p style="font-size:12px; color:#64748b; margin-top:14px;">
+          Present this digital QR pass at the boom barrier scanner for automated gate entry & exit.
+        </p>
+      </div>
+      <div class="user-modal-footer" style="justify-content:center;">
+        <button class="btn-user btn-user-primary" onclick="closeQRPassModal()">Close Pass</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VEHICLE EXIT / CHECKOUT CONFIRMATION MODAL -->
+  <div id="exitParkingModal" class="user-modal-backdrop">
+    <div class="user-modal-content"
+      style="max-width:540px; border-radius:14px; overflow:hidden; box-shadow:0 20px 45px rgba(0,0,0,0.35);">
+      <div
+        style="background:linear-gradient(135deg, #0f172a, #1e293b); padding:20px 24px; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #38bdf8;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div
+            style="width:40px; height:40px; border-radius:10px; background:rgba(56,189,248,0.15); border:1px solid #38bdf8; display:flex; align-items:center; justify-content:center; color:#38bdf8; font-size:18px;">
+            <i class="fas fa-arrow-right-from-bracket"></i>
+          </div>
+          <div>
+            <div
+              style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:#38bdf8; text-transform:uppercase;">
+              PARKING CHECKOUT</div>
+            <h3 style="font-size:18px; font-weight:800; margin:2px 0 0; color:#ffffff;">Confirm Vehicle Exit</h3>
+          </div>
+        </div>
+        <button onclick="closeExitParkingModal()"
+          style="border:none; background:transparent; font-size:22px; color:#94a3b8; cursor:pointer; padding:4px;"
+          title="Close">&times;</button>
+      </div>
+
+      <div class="user-modal-body" style="padding:22px; max-height:75vh; overflow-y:auto;">
+
+        <!-- Overstay Alert Banner (Shown dynamically when overstay detected) -->
+        <div id="checkoutOverstayBanner"
+          style="display:none; background:#fff1f2; border:1.5px solid #f43f5e; border-radius:10px; padding:14px; margin-bottom:16px;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <i class="fas fa-triangle-exclamation" style="color:#e11d48; font-size:20px; margin-top:2px;"></i>
+            <div>
+              <strong style="color:#be123c; font-size:14px; display:block;">⚠️ Overstay Detected</strong>
+              <div style="font-size:12.5px; color:#9f1239; margin-top:3px;" id="checkoutOverstayDesc">
+                Exceeded booked window and grace period by <strong id="checkoutOverstayDurationMins">20
+                  minutes</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Session Overview Card -->
+        <div
+          style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:16px;">
+          <div
+            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Assigned
+                Slot</span>
+              <div style="font-size:20px; font-weight:800; color:#0284c7; font-family:var(--font-mono);"
+                id="checkoutSlotDisplay">A-12</div>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Current
+                Status</span>
+              <div id="checkoutStatusBadge" style="margin-top:2px;"><span class="status-badge occupied">OCCUPIED</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:13px;">
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Vehicle Number</span>
+              <strong style="font-family:var(--font-mono); color:#0f172a; font-size:14px;" id="checkoutPlateDisplay">KA
+                19 AB 1234</strong>
+            </div>
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Vehicle Type</span>
+              <strong style="color:#0f172a;" id="checkoutTypeDisplay">Car</strong>
+            </div>
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Parking Facility</span>
+              <strong style="color:#0f172a;" id="checkoutLotDisplay">City Parking</strong>
+            </div>
+            <div>
+              <span style="color:#64748b; font-size:11.5px; display:block;">Booking Date</span>
+              <strong style="color:#0f172a;" id="checkoutDateDisplay">2026-09-22</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timing & Duration Details Card -->
+        <div
+          style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:16px;">
+          <h4
+            style="font-size:12.5px; text-transform:uppercase; letter-spacing:0.06em; color:#475569; margin:0 0 12px; font-weight:800;">
+            <i class="fas fa-clock" style="color:#0284c7;"></i> Session Timings & Duration
+          </h4>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12.5px;">
+            <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
+              <span style="color:#64748b; font-size:11px; display:block;">Booked Window</span>
+              <strong style="color:#1e293b;" id="checkoutBookedWindowDisplay">10:00 AM – 12:00 PM</strong>
+            </div>
+            <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
+              <span style="color:#64748b; font-size:11px; display:block;">Actual Entry Time</span>
+              <strong style="color:#10b981;" id="checkoutActualEntryDisplay">10:05 AM</strong>
+            </div>
+            <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
+              <span style="color:#64748b; font-size:11px; display:block;">Current / Exit Time</span>
+              <strong style="color:#0284c7;" id="checkoutExitTimeDisplay">Current time</strong>
+            </div>
+            <div style="background:#e0f2fe; padding:10px; border-radius:6px; border:1px solid #bae6fd;">
+              <span style="color:#0369a1; font-size:11px; display:block; font-weight:700;">Total Duration</span>
+              <strong style="color:#0c4a6e; font-size:14px;" id="checkoutDurationDisplay">2h 30m</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notice -->
+        <div
+          style="font-size:12px; color:#64748b; background:#f8fafc; border-radius:6px; padding:10px; display:flex; align-items:center; gap:8px;">
+          <i class="fas fa-info-circle" style="color:#0284c7;"></i>
+          <span>Confirming exit will immediately release <strong>Slot <span id="checkoutNoticeSlot">A-12</span></strong>
+            back to <span style="color:#10b981; font-weight:700;">Available (🟢)</span>.</span>
+        </div>
+
+      </div>
+
+      <div class="user-modal-footer"
+        style="background:#f8fafc; padding:14px 20px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn-user btn-user-secondary" onclick="closeExitParkingModal()">
+          Cancel / Keep Parking
+        </button>
+        <button type="button" class="btn-user btn-user-danger" id="confirmExitBtn" onclick="confirmExitParking()"
+          style="padding:10px 20px; font-size:13.5px; font-weight:700; background:#e11d48; color:#ffffff; border:none; box-shadow:0 4px 12px rgba(225, 29, 72, 0.35);">
+          <i class="fas fa-arrow-right-from-bracket"></i> Confirm Exit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="userToast" class="user-toast"></div>
+
+  <!-- Active User Context -->
+  <script>
+    window.ACTIVE_USER_ID = {{ session.get('user_id', 0) }};
+    window.ACTIVE_USER_EMAIL = "{{ session.get('user_email', '') }}";
+    window.ACTIVE_USER_NAME = "{{ session.get('user_name', '') }}";
+  </script>
+
+  <!-- User Panel Scripts -->
+  <script src="/static/js/qrcode.min.js"></script>
+  <script src="/static/js/user_panel.js"></script>
+  <script src="/static/js/guided_booking_wizard.js"></script>
+</body>
+
+</html>

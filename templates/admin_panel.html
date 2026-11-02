@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Command Center — AI-Based Smart Parking System</title>
+
+  <!-- Google Fonts & FontAwesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Admin Panel Stylesheet -->
+  <link rel="stylesheet" href="/static/css/admin_panel.css">
+</head>
+
+<body class="admin-body">
+
+  <div class="admin-layout">
+
+    <!-- ====================================================================
+         ADMIN SIDEBAR
+         ==================================================================== -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <div class="admin-brand-icon">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <div>
+          <div class="admin-brand-title">Smart Parking</div>
+          <span class="admin-brand-badge">ADMIN CONSOLE</span>
+        </div>
+      </div>
+
+      <nav class="admin-nav">
+        <!-- Admin Dashboard -->
+        <a href="#dashboard" class="admin-nav-item active" data-tab="dashboard">
+          <i class="fas fa-chart-pie"></i>
+          <span>Admin Dashboard</span>
+        </a>
+
+        <!-- Module 1: User Management -->
+        <a href="#users" class="admin-nav-item" data-tab="users">
+          <i class="fas fa-users-gear"></i>
+          <span>User Management</span>
+        </a>
+
+        <!-- Module 2: Parking Lot Management -->
+        <a href="#lots" class="admin-nav-item" data-tab="lots">
+          <i class="fas fa-warehouse"></i>
+          <span>Parking Lots</span>
+        </a>
+
+        <!-- Module 3: Parking Slot Management -->
+        <a href="#slots" class="admin-nav-item" data-tab="slots">
+          <i class="fas fa-border-all"></i>
+          <span>Parking Slots & 2D</span>
+        </a>
+
+        <!-- Module 4: Booking Management -->
+        <a href="#bookings" class="admin-nav-item" data-tab="bookings">
+          <i class="fas fa-calendar-check"></i>
+          <span>Booking Control</span>
+        </a>
+
+        <!-- Module 5: AI-Based Parking Management -->
+        <a href="#ai" class="admin-nav-item" data-tab="ai">
+          <i class="fas fa-brain"></i>
+          <span>AI & Forecasting </span>
+        </a>
+
+        <!-- Module 6: Slot Exchange Management -->
+        <a href="#exchange" class="admin-nav-item" data-tab="exchange">
+          <i class="fas fa-arrow-right-arrow-left"></i>
+          <span>Slot Exchanges</span>
+        </a>
+
+        <!-- Module: Overstay Management -->
+        <a href="#overstay" class="admin-nav-item" data-tab="overstay">
+          <i class="fas fa-hourglass-half"></i>
+          <span>Overstay Radar </span>
+        </a>
+
+        <!-- Module 7: Reports & Analytics -->
+        <a href="#reports" class="admin-nav-item" data-tab="reports">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span>Reports & Analytics</span>
+        </a>
+      </nav>
+
+      <div class="admin-sidebar-footer">
+        <div class="admin-user-pill">
+          <div class="admin-user-avatar">
+            {{ session.get('user_name', 'Admin')[0] | upper }}
+          </div>
+          <div class="admin-user-meta">
+            <h4>{{ session.get('user_name', 'Administrator') }}</h4>
+            <p>{{ session.get('user_email', 'admin@smartparking.ai') }}</p>
+          </div>
+        </div>
+        <a href="/logout" class="btn-sidebar-signout" id="adminLogoutBtn" title="Logout">
+          <i class="fas fa-power-off"></i> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         ADMIN MAIN CONTENT
+         ==================================================================== -->
+    <main class="admin-main">
+
+      <!-- Top Navigation Bar -->
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <h1 class="admin-page-title" id="adminPageHeaderTitle">
+            <i class="fas fa-shield-alt"></i> System Overview & Monitoring
+          </h1>
+        </div>
+        <div class="admin-topbar-right">
+          <div class="badge-live-pulse">
+            <div class="pulse-dot"></div>
+            <span>LIVE SYSTEM ACTIVE</span>
+          </div>
+          <a href="/user" class="btn-switch-user-view" title="Preview Driver/User Panel">
+            <i class="fas fa-car-side"></i> Switch to User View &rarr;
+          </a>
+        </div>
+      </header>
+
+      <!-- Main Body Tabs -->
+      <div class="admin-content">
+
+        <!-- ================================================================
+             TAB 1: ADMIN DASHBOARD (9 KPIS + LIVE STREAM)
+             ================================================================ -->
+        <div class="tab-pane active" id="tab-dashboard">
+
+          <!-- 9 KPI METRIC CARDS -->
+          <div class="admin-kpi-grid">
+
+            <!-- 1. Total Parking Lots -->
+            <div class="kpi-card" style="--kpi-color: #3b82f6;">
+              <div class="kpi-data">
+                <h3>Total Parking Lots</h3>
+                <div class="kpi-value" id="kpiTotalLots">—</div>
+                <div class="kpi-sub">Facilities online</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-building"></i></div>
+            </div>
+
+            <!-- 2. Total Parking Slots -->
+            <div class="kpi-card" style="--kpi-color: #6366f1;">
+              <div class="kpi-data">
+                <h3>Total Parking Slots</h3>
+                <div class="kpi-value" id="kpiTotalSlots">—</div>
+                <div class="kpi-sub">Across all floors</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-th"></i></div>
+            </div>
+
+            <!-- 3. Available Slots -->
+            <div class="kpi-card" style="--kpi-color: #10b981;">
+              <div class="kpi-data">
+                <h3>Available Slots</h3>
+                <div class="kpi-value" id="kpiAvailableSlots" style="color: #34d399;">—</div>
+                <div class="kpi-sub">Ready for entry (🟢)</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-circle-check"></i></div>
+            </div>
+
+            <!-- 4. Occupied Slots -->
+            <div class="kpi-card" style="--kpi-color: #ef4444;">
+              <div class="kpi-data">
+                <h3>Occupied Slots</h3>
+                <div class="kpi-value" id="kpiOccupiedSlots" style="color: #f87171;">—</div>
+                <div class="kpi-sub">Parked vehicles (🔴)</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-car"></i></div>
+            </div>
+
+            <!-- 5. Reserved Slots -->
+            <div class="kpi-card" style="--kpi-color: #f59e0b;">
+              <div class="kpi-data">
+                <h3>Reserved Slots</h3>
+                <div class="kpi-value" id="kpiReservedSlots" style="color: #fbbf24;">—</div>
+                <div class="kpi-sub">Future arrivals (🟡)</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+            </div>
+
+            <!-- 6. Active Users -->
+            <div class="kpi-card" style="--kpi-color: #8b5cf6;">
+              <div class="kpi-data">
+                <h3>Active Users</h3>
+                <div class="kpi-value" id="kpiActiveUsers">—</div>
+                <div class="kpi-sub">Drivers registered</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
+            </div>
+
+            <!-- 7. Current Bookings -->
+            <div class="kpi-card" style="--kpi-color: #06b6d4;">
+              <div class="kpi-data">
+                <h3>Current Bookings</h3>
+                <div class="kpi-value" id="kpiCurrentBookings">—</div>
+                <div class="kpi-sub">Active & confirmed</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-receipt"></i></div>
+            </div>
+
+            <!-- 8. Slot Exchange Requests -->
+            <div class="kpi-card" style="--kpi-color: #ec4899;">
+              <div class="kpi-data">
+                <h3>Exchange Requests</h3>
+                <div class="kpi-value" id="kpiExchangeRequests">—</div>
+                <div class="kpi-sub">Pending review</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-handshake"></i></div>
+            </div>
+
+            <!-- 9. AI Parking Predictions -->
+            <div class="kpi-card" style="--kpi-color: #14b8a6;">
+              <div class="kpi-data">
+                <h3>AI Parking Predictions</h3>
+                <div class="kpi-value" id="kpiAIPredictions">—</div>
+                <div class="kpi-sub">ML models trained</div>
+              </div>
+              <div class="kpi-icon"><i class="fas fa-robot"></i></div>
+            </div>
+
+          </div>
+
+          <!-- RECENT ACTIVITY FEED & QUICK CONTROLS -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2><i class="fas fa-bolt"></i> Real-Time System Activity Feed</h2>
+              <button class="btn-admin btn-admin-secondary btn-admin-sm" onclick="loadRecentActivityMini()">
+                <i class="fas fa-rotate"></i> Refresh
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>User / Driver</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody id="adminDashboardActivityTbody">
+                  <tr>
+                    <td colspan="4" style="text-align:center; padding:20px; color:#94a3b8;">Loading activity stream...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             TAB 2: MODULE 1 — USER MANAGEMENT
+             ================================================================ -->
+        <div class="tab-pane" id="tab-users">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2><i class="fas fa-users-gear"></i> User & Driver Management</h2>
+              <button class="btn-admin btn-admin-primary" onclick="openAddUserModal()">
+                <i class="fas fa-user-plus"></i> Add New User
+              </button>
+            </div>
+
+            <!-- Filter Controls -->
+            <div style="display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 250px;">
+                <input type="text" id="userSearchInput" class="admin-form-input"
+                  placeholder="Search by name, email, or phone..." oninput="filterUsers()">
+              </div>
+              <div style="width: 160px;">
+                <select id="userRoleFilter" class="admin-form-select" onchange="filterUsers()">
+                  <option value="all">All Roles</option>
+                  <option value="user">Drivers (Users)</option>
+                  <option value="admin">Administrators</option>
+                </select>
+              </div>
+              <div style="width: 160px;">
+                <select id="userStatusFilter" class="admin-form-select" onchange="filterUsers()">
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="deactivated">Deactivated</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>Name & Date</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <tr>
+                    <td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading user accounts...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 3: MODULE 2 — PARKING LOT MANAGEMENT
+             ================================================================ -->
+        <div class="tab-pane" id="tab-lots">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 800; color: #ffffff;">Managed Parking Facilities</h2>
+              <p style="font-size: 13px; color: #94a3b8;">Create, update rates, and configure physical parking lots</p>
+            </div>
+            <button class="btn-admin btn-admin-primary" onclick="openAddLotModal()">
+              <i class="fas fa-plus-circle"></i> Add Parking Lot
+            </button>
+          </div>
+
+          <div id="adminLotsListContainer">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 4: MODULE 3 — PARKING SLOT MANAGEMENT & LIVE 2D LAYOUT
+             ================================================================ -->
+        <div class="tab-pane" id="tab-slots">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2><i class="fas fa-border-all"></i> Live 2D Slot Layout & State Monitor</h2>
+              <button class="btn-admin btn-admin-primary" onclick="openAddSlotModal()">
+                <i class="fas fa-plus"></i> Create Parking Slot
+              </button>
+            </div>
+
+            <!-- Layout Header Controls -->
+            <div class="layout-header-bar">
+              <div style="display:flex; gap:12px; align-items:center;">
+                <label style="font-size:12px; font-weight:700; color:#94a3b8;">FACILITY:</label>
+                <select id="slotFilterLotSelect" class="admin-form-select" style="width:220px;"
+                  onchange="loadAdminSlots()">
+                  <!-- Options populated dynamically -->
+                </select>
+                <label style="font-size:12px; font-weight:700; color:#94a3b8; margin-left:10px;">FLOOR:</label>
+                <select id="slotFilterFloorSelect" class="admin-form-select" style="width:160px;"
+                  onchange="loadAdminSlots()">
+                  <option value="all">All Floors</option>
+                  <option value="Ground Floor">Ground Floor</option>
+                  <option value="Upper Floor">Upper Floor</option>
+                </select>
+              </div>
+
+              <!-- Color Legend Matching Specs -->
+              <div class="layout-legend">
+                <div class="legend-item">
+                  <div class="legend-dot dot-available"></div>
+                  <span>🟢 Available</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot dot-occupied"></div>
+                  <span>🔴 Occupied</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot dot-reserved"></div>
+                  <span>🟡 Reserved</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot dot-maintenance"></div>
+                  <span>🔧 Maintenance</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2D Slot Interactive Grid -->
+            <div class="live-slots-grid" id="admin2DSlotsGrid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 5: MODULE 4 — BOOKING MANAGEMENT
+             ================================================================ -->
+        <div class="tab-pane" id="tab-bookings">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2><i class="fas fa-calendar-check"></i> Master Booking Control</h2>
+              <button class="btn-admin btn-admin-secondary btn-admin-sm" onclick="loadAdminBookings()">
+                <i class="fas fa-rotate"></i> Refresh
+              </button>
+            </div>
+
+            <!-- Booking Filter Tabs -->
+            <div style="display:flex; gap:8px; margin-bottom:18px;">
+              <button class="btn-admin btn-admin-secondary btn-admin-sm booking-filter-btn active" data-status="all"
+                onclick="filterBookings('all')">All Bookings</button>
+              <button class="btn-admin btn-admin-secondary btn-admin-sm booking-filter-btn" data-status="confirmed"
+                onclick="filterBookings('confirmed')">Confirmed / Active</button>
+              <button class="btn-admin btn-admin-secondary btn-admin-sm booking-filter-btn" data-status="completed"
+                onclick="filterBookings('completed')">Completed</button>
+              <button class="btn-admin btn-admin-secondary btn-admin-sm booking-filter-btn" data-status="cancelled"
+                onclick="filterBookings('cancelled')">Cancelled</button>
+              <button class="btn-admin btn-admin-secondary btn-admin-sm booking-filter-btn" data-status="overstayed"
+                onclick="filterBookings('overstayed')">Overstayed</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>User / Driver</th>
+                    <th>Slot & Vehicle</th>
+                    <th>Date & Duration</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Admin Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminBookingsTableBody">
+                  <tr>
+                    <td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading bookings...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             TAB 6: MODULE 5 — AI-BASED PARKING MANAGEMENT (Screenshot 1)
+             ================================================================ -->
+        <div class="tab-pane" id="tab-ai">
+
+          <!-- 4 TOP KPI CARDS -->
+          <div class="ai-kpi-grid">
+            <!-- 1. Current Occupancy -->
+            <div class="ai-kpi-card ai-kpi-card-blue">
+              <div class="ai-kpi-main">
+                <div class="ai-kpi-icon-wrap ai-icon-blue">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="ai-kpi-content">
+                  <span class="ai-kpi-label">Current Occupancy</span>
+                  <div class="ai-kpi-value" id="aiKpiOccupancy">--%</div>
+                  <span class="ai-kpi-sub" id="aiKpiOccupancySub">Loading...</span>
+                </div>
+              </div>
+              <div class="ai-kpi-bar-track">
+                <div class="ai-kpi-bar-fill ai-bar-blue" id="aiKpiOccupancyBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- 2. Available Slots -->
+            <div class="ai-kpi-card ai-kpi-card-green">
+              <div class="ai-kpi-main">
+                <div class="ai-kpi-icon-wrap ai-icon-green">
+                  <i class="fas fa-car"></i>
+                </div>
+                <div class="ai-kpi-content">
+                  <span class="ai-kpi-label">Available Slots</span>
+                  <div class="ai-kpi-value" id="aiKpiAvailable">--</div>
+                  <span class="ai-kpi-sub" id="aiKpiAvailableSub">Loading...</span>
+                </div>
+              </div>
+              <div class="ai-kpi-bar-track">
+                <div class="ai-kpi-bar-fill ai-bar-green" id="aiKpiAvailableBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- 3. Predicted Peak Hour -->
+            <div class="ai-kpi-card ai-kpi-card-orange">
+              <div class="ai-kpi-main">
+                <div class="ai-kpi-icon-wrap ai-icon-orange">
+                  <i class="fas fa-fire"></i>
+                </div>
+                <div class="ai-kpi-content">
+                  <span class="ai-kpi-label" style="color:#f59e0b;">Predicted Peak Hour</span>
+                  <div class="ai-kpi-value" id="aiKpiPeakHour">--:--</div>
+                  <span class="ai-kpi-sub">Expected occupancy: <strong id="aiKpiPeakOcc" style="color:#f59e0b;">--%</strong></span>
+                </div>
+              </div>
+              <div class="ai-kpi-bar-track">
+                <div class="ai-kpi-bar-fill ai-bar-orange" id="aiKpiPeakBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- 4. Next Busy Period -->
+            <div class="ai-kpi-card ai-kpi-card-purple">
+              <div class="ai-kpi-main">
+                <div class="ai-kpi-icon-wrap ai-icon-purple">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="ai-kpi-content">
+                  <span class="ai-kpi-label" style="color:#c084fc;">Next Busy Period</span>
+                  <div class="ai-kpi-value" id="aiKpiNextBusy">--:--</div>
+                  <span class="ai-kpi-sub">High demand expected</span>
+                </div>
+              </div>
+              <div class="ai-kpi-bar-track">
+                <div class="ai-kpi-bar-fill ai-bar-purple" id="aiKpiBusyBar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MIDDLE SECTION: 24H FORECAST & BUSY PERIODS -->
+          <div class="ai-middle-grid">
+            <!-- 24-Hour Forecast Chart -->
+            <div class="admin-card ai-chart-card">
+              <div class="admin-card-header">
+                <h2><i class="fas fa-chart-line" style="color:#38bdf8;"></i> 24-Hour Future Occupancy Forecast</h2>
+                <div class="ai-date-picker-wrap" style="position:relative; cursor:pointer;" title="Change Forecast Date">
+                  <i class="far fa-calendar"></i>
+                  <span id="aiForecastDateLabel" style="color:#ffffff; font-weight:600; font-size:13px;">Live Today</span>
+                  <input type="date" id="aiForecastDate" value="" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;" onchange="updateAiForecastDate(this.value)">
+                </div>
+              </div>
+              <div class="ai-forecast-container">
+                <canvas id="aiForecastChartCanvas"></canvas>
+              </div>
+            </div>
+
+            <!-- Busy Periods & Alerts -->
+            <div class="admin-card ai-alerts-card">
+              <div class="admin-card-header">
+                <h2><i class="fas fa-triangle-exclamation" style="color:#f59e0b;"></i> Busy Periods & Alerts</h2>
+              </div>
+              <div class="ai-peak-banner">
+                <div class="ai-peak-banner-head">PEAK DEMAND INTERVALS</div>
+                <div class="ai-peak-banner-body">
+                  <span id="aiBusyPeriodsBannerText">Today: 17:00 - 19:00</span>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+              <div class="ai-rec-section">
+                <div class="ai-rec-heading">Recommended Parking Areas</div>
+                <div id="aiRecommendedLotsList" class="ai-rec-list">
+                  <div class="ai-rec-item">
+                    <div class="ai-rec-left">
+                      <div class="ai-rec-pin" style="background:rgba(20,184,166,0.18); color:#14b8a6;">
+                        <i class="fas fa-location-dot"></i>
+                      </div>
+                      <span class="ai-rec-name">Ground Floor</span>
+                    </div>
+                    <div class="ai-rec-right">
+                      <span class="ai-rec-avail" style="color:#14b8a6;">12 / 40 available</span>
+                      <i class="fas fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="ai-rec-item">
+                    <div class="ai-rec-left">
+                      <div class="ai-rec-pin" style="background:rgba(56,189,248,0.18); color:#38bdf8;">
+                        <i class="fas fa-location-dot"></i>
+                      </div>
+                      <span class="ai-rec-name">First Floor</span>
+                    </div>
+                    <div class="ai-rec-right">
+                      <span class="ai-rec-avail" style="color:#38bdf8;">8 / 40 available</span>
+                      <i class="fas fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="ai-rec-item">
+                    <div class="ai-rec-left">
+                      <div class="ai-rec-pin" style="background:rgba(168,85,247,0.18); color:#a855f7;">
+                        <i class="fas fa-location-dot"></i>
+                      </div>
+                      <span class="ai-rec-name">Second Floor</span>
+                    </div>
+                    <div class="ai-rec-right">
+                      <span class="ai-rec-avail" style="color:#a855f7;">6 / 40 available</span>
+                      <i class="fas fa-chevron-right"></i>
+                    </div>
+                  </div>
+                  <div class="ai-rec-item">
+                    <div class="ai-rec-left">
+                      <div class="ai-rec-pin" style="background:rgba(6,182,212,0.18); color:#06b6d4;">
+                        <i class="fas fa-location-dot"></i>
+                      </div>
+                      <span class="ai-rec-name">Third Floor</span>
+                    </div>
+                    <div class="ai-rec-right">
+                      <span class="ai-rec-avail" style="color:#06b6d4;">5 / 30 available</span>
+                      <i class="fas fa-chevron-right"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTTOM SECTION: SIMULATOR & PREDICTION RESULT -->
+          <div class="admin-card ai-simulator-card">
+            <div class="ai-simulator-grid">
+              <!-- Left: Form -->
+              <div class="ai-simulator-form-col">
+                <div class="ai-sim-header">
+                  <div class="ai-sim-title">
+                    <i class="fas fa-wand-magic-sparkles" style="color:#38bdf8;"></i>
+                    <span>AI Availability Predictor Simulator</span>
+                  </div>
+                  <p class="ai-sim-subtitle">Select date, time and floor to predict parking availability using AI model.</p>
+                </div>
+                <form id="aiSimulatorForm" onsubmit="runInteractivePrediction(event); return false;" novalidate class="ai-sim-form">
+                  <div class="ai-sim-input-group">
+                    <label class="ai-sim-label">Target Date</label>
+                    <div class="ai-input-icon-wrap" style="position:relative; cursor:pointer;" onclick="const el = document.getElementById('predFormDate'); if(el.showPicker) el.showPicker(); else el.click();" title="Change Target Date">
+                      <i class="far fa-calendar"></i>
+                      <input type="text" id="predFormDateDisplay" class="ai-sim-input" value="Today" readonly style="cursor:pointer;">
+                      <input type="date" id="predFormDate" value="" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;" onchange="updatePredFormDate(this.value)">
+                    </div>
+                  </div>
+                  <div class="ai-sim-input-group">
+                    <label class="ai-sim-label">Target Time</label>
+                    <div class="ai-input-icon-wrap" style="position:relative; cursor:pointer;" onclick="const el = document.getElementById('predFormTime'); if(el.showPicker) el.showPicker(); else el.click();" title="Change Target Time">
+                      <i class="far fa-clock"></i>
+                      <input type="text" id="predFormTimeDisplay" class="ai-sim-input" value="05:00 PM" readonly style="cursor:pointer;">
+                      <input type="time" id="predFormTime" value="17:00" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;" onchange="updatePredFormTime(this.value)">
+                    </div>
+                  </div>
+                  <div class="ai-sim-input-group">
+                    <label class="ai-sim-label">Floor Area</label>
+                    <div class="ai-input-icon-wrap">
+                      <i class="fas fa-layer-group"></i>
+                      <select id="predFormFloor" class="ai-sim-select">
+                        <option value="All" selected>All Areas (Campus-wide)</option>
+                        <option value="Ground Floor">Ground Floor</option>
+                        <option value="Upper Floor">Upper Floor</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button type="button" class="btn-run-ai" id="btnRunAiModel" onclick="runInteractivePrediction(event)">
+                    <i class="fas fa-play"></i> Run AI Model
+                  </button>
+                </form>
+              </div>
+
+              <!-- Right: Prediction Result Box -->
+              <div class="ai-simulator-result-col">
+                <div class="ai-result-box">
+                  <div class="ai-result-header">
+                    <i class="fas fa-sparkles" style="color:#2dd4bf;"></i>
+                    <span>Prediction Result</span>
+                  </div>
+                  <div class="ai-result-content">
+                    <!-- Radial Conic Gauge -->
+                    <div class="ai-gauge-wrapper">
+                      <div class="ai-conic-gauge" id="aiSimGaugeRing" style="background: conic-gradient(#14b8a6 0% 68%, rgba(255,255,255,0.08) 68% 100%);">
+                        <div class="ai-gauge-hole">
+                          <span class="ai-gauge-value" id="aiSimResultPct">68%</span>
+                          <span class="ai-gauge-label">Estimated Occupancy</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Details List -->
+                    <div class="ai-result-details">
+                      <div class="ai-res-row">
+                        <i class="fas fa-car" style="color:#38bdf8;"></i>
+                        <span class="ai-res-text">Estimated Occupancy</span>
+                        <strong class="ai-res-val" id="aiSimEstimatedOcc">102 / 150 slots</strong>
+                      </div>
+                      <div class="ai-res-row">
+                        <i class="fas fa-square-parking" style="color:#a855f7;"></i>
+                        <span class="ai-res-text">Available Slots</span>
+                        <strong class="ai-res-val" id="aiSimAvailableSlots">48 slots</strong>
+                      </div>
+                      <div class="ai-res-row">
+                        <i class="fas fa-location-dot" style="color:#0ea5e9;"></i>
+                        <span class="ai-res-text">Suggested Parking Area</span>
+                        <strong class="ai-res-val" id="aiSimSuggestedArea">Ground Floor</strong>
+                      </div>
+                      <div class="ai-res-row">
+                        <i class="fas fa-star" style="color:#fbbf24;"></i>
+                        <span class="ai-res-note" id="aiSimCongestionText">Best availability and lower congestion</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             TAB 7: MODULE 6 — SLOT EXCHANGE MANAGEMENT
+             ================================================================ -->
+        <div class="tab-pane" id="tab-exchange">
+
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2><i class="fas fa-handshake"></i> Active Slot Exchange Requests</h2>
+              <button class="btn-admin btn-admin-secondary btn-admin-sm" onclick="loadAdminExchanges()">
+                <i class="fas fa-rotate"></i> Refresh
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Requester (Driver A)</th>
+                    <th>Swap Direction</th>
+                    <th>Target Owner (Driver B)</th>
+                    <th>Status</th>
+                    <th>Admin Moderation</th>
+                  </tr>
+                </thead>
+                <tbody id="adminExchangeRequestsTbody">
+                  <tr>
+                    <td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Loading exchange requests...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Exchange History Audit Ledger -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2><i class="fas fa-clock-rotate-left"></i> Completed Exchange History Audit Ledger</h2>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ledger ID</th>
+                    <th>Participants</th>
+                    <th>Slots Exchanged</th>
+                    <th>Status</th>
+                    <th>Completion Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody id="adminExchangeHistoryTbody">
+                  <tr>
+                    <td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">Loading historical
+                      exchanges...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             TAB: OVERSTAY MANAGEMENT & RADAR
+             ================================================================ -->
+        <div class="tab-pane" id="tab-overstay">
+
+          <!-- Header Bar -->
+          <div class="overstay-header-bar">
+            <div class="overstay-header-title-wrap">
+              <h2>
+                <i class="fas fa-clock" style="color:#38bdf8;"></i> Overstay Records
+              </h2>
+              <p>
+                Monitor and manage vehicles that have exceeded their allotted parking time.
+              </p>
+            </div>
+            <div class="overstay-header-actions">
+              <span class="badge-live-pulse"
+                style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5;">
+                <span class="pulse-dot" style="background:#ef4444;"></span>
+                <span>RADAR ACTIVE</span>
+              </span>
+              <button class="btn-admin btn-admin-secondary" onclick="loadAdminOverstays()"
+                title="Refresh overstay records">
+                <i class="fas fa-sync-alt" id="overstayRefreshIcon"></i> Refresh Radar
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 SUMMARY METRIC CARDS (Requirements 3) -->
+          <div class="overstay-kpi-grid">
+
+            <!-- 1. Active Overstays -->
+            <div class="overstay-kpi-card kpi-card-red">
+              <div class="overstay-kpi-icon">
+                <i class="fas fa-bell"></i>
+              </div>
+              <div class="overstay-kpi-content">
+                <span class="overstay-kpi-title">Active Overstays</span>
+                <div class="overstay-kpi-val" id="kpiActiveOverstays">0</div>
+                <span class="overstay-kpi-sub">Currently exceeding time</span>
+              </div>
+            </div>
+
+            <!-- 2. Pending Penalties -->
+            <div class="overstay-kpi-card kpi-card-amber">
+              <div class="overstay-kpi-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="overstay-kpi-content">
+                <span class="overstay-kpi-title">Pending Penalties</span>
+                <div class="overstay-kpi-val" id="kpiPendingPenalties">0</div>
+                <span class="overstay-kpi-sub" id="kpiPendingPenaltiesSub">Unpaid violations requiring action</span>
+              </div>
+            </div>
+
+            <!-- 3. Resolved Overstays -->
+            <div class="overstay-kpi-card kpi-card-green">
+              <div class="overstay-kpi-icon">
+                <i class="fas fa-circle-check"></i>
+              </div>
+              <div class="overstay-kpi-content">
+                <span class="overstay-kpi-title">Resolved Overstays</span>
+                <div class="overstay-kpi-val" id="kpiResolvedOverstays">0</div>
+                <span class="overstay-kpi-sub">Cleared / Settled</span>
+              </div>
+            </div>
+
+            <!-- 4. Total Penalties -->
+            <div class="overstay-kpi-card kpi-card-purple">
+              <div class="overstay-kpi-icon">
+                <i class="fas fa-indian-rupee-sign"></i>
+              </div>
+              <div class="overstay-kpi-content">
+                <span class="overstay-kpi-title">Total Penalties</span>
+                <div class="overstay-kpi-val" id="kpiTotalPenaltyAmount">₹0</div>
+                <span class="overstay-kpi-sub" id="kpiTotalPenaltyBreakdown">Pending: ₹0 &bull; Paid: ₹0</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SEARCH & FILTER BAR (Requirement 7) -->
+          <div class="overstay-filter-bar">
+            <div class="overstay-filters-group">
+              <!-- Search -->
+              <div class="overstay-search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="overstaySearchInput"
+                  placeholder="Search by booking ID, user name, or vehicle number..."
+                  oninput="handleOverstaySearchFilter()" autocomplete="off">
+              </div>
+
+              <!-- Overstay Status Filter -->
+              <div class="overstay-filter-control">
+                <i class="fas fa-traffic-light"></i>
+                <select id="overstayStatusSelect" onchange="handleOverstaySearchFilter()">
+                  <option value="all">All Overstay Statuses</option>
+                  <option value="active">Active Overstays (Red)</option>
+                  <option value="grace">Grace Period (Amber)</option>
+                  <option value="resolved">Resolved (Green)</option>
+                </select>
+              </div>
+
+              <!-- Payment Status Filter -->
+              <div class="overstay-filter-control">
+                <i class="fas fa-credit-card"></i>
+                <select id="overstayPaymentSelect" onchange="handleOverstaySearchFilter()">
+                  <option value="all">All Payment Statuses</option>
+                  <option value="pending">Pending Payment</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+
+              <!-- Parking Lot Filter -->
+              <div class="overstay-filter-control">
+                <i class="fas fa-map-marker-alt"></i>
+                <select id="overstayLotSelect" onchange="handleOverstaySearchFilter()">
+                  <option value="all">All Parking Lots</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="overstay-filter-actions">
+              <button class="btn-admin btn-admin-secondary btn-admin-sm" onclick="resetOverstayFilters()"
+                title="Reset filters">
+                <i class="fas fa-undo"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- OVERSTAY MANAGEMENT TABLE (Requirement 4) -->
+          <div class="overstay-table-card">
+            <div class="overstay-table-header">
+              <h3 class="overstay-table-title">
+                <i class="fas fa-list-check" style="color:#38bdf8;"></i> Overstay Violation Records
+                <span class="overstay-badge-counter" id="overstayRecordsCount">0 Records</span>
+              </h3>
+              <div style="font-size:12px; color:#64748b;">
+                Grace: <strong>15 mins</strong> &bull; Car: <strong>₹60</strong> &bull; Bike: <strong>₹30</strong> &bull; Other: <strong>₹80</strong>
+              </div>
+            </div>
+
+            <div class="overstay-table-scroll">
+              <table class="overstay-data-table">
+                <thead>
+                  <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Booking ID</th>
+                    <th>User Name</th>
+                    <th>Vehicle Number</th>
+                    <th>Vehicle Type</th>
+                    <th>Parking Lot</th>
+                    <th>Slot Number</th>
+                    <th>Booked End Time</th>
+                    <th>Grace Period End</th>
+                    <th>Actual Exit / Current Status</th>
+                    <th>Overstay Duration</th>
+                    <th>Penalty Amount (₹)</th>
+                    <th>Payment Status</th>
+                    <th>Overstay Status</th>
+                    <th style="text-align:center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminOverstayTableBody">
+                  <tr>
+                    <td colspan="15" style="text-align:center; padding:35px; color:#94a3b8;">
+                      <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i> Loading live overstay records...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="overstay-table-footer">
+              <div id="overstayFooterText">Showing 0 records</div>
+              <div style="font-size:11.5px; color:#64748b;">
+                Auto-refreshed via real-time simulation radar
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================
+             TAB 8: MODULE 7 — REPORTS & ANALYTICS (Screenshot 2)
+             ================================================================ -->
+        <div class="tab-pane" id="tab-reports">
+
+          <!-- Filter & Action Bar (Date Range + Export Report) -->
+          <div class="rep-header-bar">
+            <div class="rep-actions-wrap">
+              <div class="rep-date-range-box" title="Select Report Date Range">
+                <i class="far fa-calendar"></i>
+                <span id="repDateRangeDisplay">Live System Analytics</span>
+                <i class="fas fa-chevron-down" style="font-size:10px;"></i>
+              </div>
+              <button class="btn-export-report" onclick="downloadReportsCSV()" title="Download CSV Report">
+                <i class="fas fa-download"></i> Export Report
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 TOP KPI CARDS (Screenshot 2) -->
+          <div class="rep-kpi-grid">
+            <!-- 1. Total Bookings -->
+            <div class="rep-kpi-card">
+              <div class="rep-kpi-icon-wrap rep-icon-blue">
+                <i class="far fa-calendar"></i>
+              </div>
+              <div class="rep-kpi-content">
+                <span class="rep-kpi-title">Total Bookings</span>
+                <div class="rep-kpi-value" id="repKpiTotalBookings">--</div>
+                <div class="rep-kpi-trend">
+                  <span class="rep-trend-up"><i class="fas fa-circle-check"></i> Live</span>
+                  <span class="rep-trend-sub">All active records</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Current Occupancy -->
+            <div class="rep-kpi-card">
+              <div class="rep-kpi-icon-wrap rep-icon-teal">
+                <i class="fas fa-car"></i>
+              </div>
+              <div class="rep-kpi-content">
+                <span class="rep-kpi-title">Current Occupancy</span>
+                <div class="rep-kpi-value" id="repKpiOccupancy">--%</div>
+                <div class="rep-kpi-trend">
+                  <span class="rep-trend-up"><i class="fas fa-circle-check"></i> Live</span>
+                  <span class="rep-trend-sub">Campus facilities</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Total Revenue -->
+            <div class="rep-kpi-card">
+              <div class="rep-kpi-icon-wrap rep-icon-purple">
+                <i class="fas fa-indian-rupee-sign"></i>
+              </div>
+              <div class="rep-kpi-content">
+                <span class="rep-kpi-title">Total Revenue</span>
+                <div class="rep-kpi-value" id="repKpiRevenue">₹ 0</div>
+                <div class="rep-kpi-trend">
+                  <span class="rep-trend-up"><i class="fas fa-circle-check"></i> Live</span>
+                  <span class="rep-trend-sub">Bookings + penalties</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Overstay Incidents -->
+            <div class="rep-kpi-card">
+              <div class="rep-kpi-icon-wrap rep-icon-amber">
+                <i class="fas fa-triangle-exclamation"></i>
+              </div>
+              <div class="rep-kpi-content">
+                <span class="rep-kpi-title">Overstay Incidents</span>
+                <div class="rep-kpi-value" id="repKpiOverstayCount">0</div>
+                <div class="rep-kpi-trend">
+                  <span class="rep-trend-alert"><i class="fas fa-circle-check"></i> Live</span>
+                  <span class="rep-trend-sub">Logged violations</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MIDDLE SECTION: 3 CHARTS SIDE-BY-SIDE (Screenshot 2) -->
+          <div class="rep-charts-grid">
+            <!-- 1. Booking & Revenue Trend (Dual-line) -->
+            <div class="admin-card rep-chart-card">
+              <div class="admin-card-header">
+                <h2>Booking & Revenue Trend</h2>
+                <div class="rep-legend-wrap">
+                  <span class="rep-legend-item"><span class="rep-dot" style="background:#38bdf8;"></span> Bookings</span>
+                  <span class="rep-legend-item"><span class="rep-dot" style="background:#a855f7;"></span> Revenue (₹)</span>
+                </div>
+              </div>
+              <div class="rep-chart-container">
+                <canvas id="repTrendChartCanvas"></canvas>
+              </div>
+            </div>
+
+            <!-- 2. Floor-wise Occupancy (Bar chart with percentages on top) -->
+            <div class="admin-card rep-chart-card">
+              <div class="admin-card-header">
+                <h2>Floor-wise Occupancy</h2>
+              </div>
+              <div class="rep-chart-container">
+                <canvas id="repFloorChartCanvas"></canvas>
+              </div>
+            </div>
+
+            <!-- 3. Booking Status Breakdown (Donut with center total) -->
+            <div class="admin-card rep-chart-card">
+              <div class="admin-card-header">
+                <h2>Booking Status Breakdown</h2>
+              </div>
+              <div class="rep-donut-layout">
+                <div class="rep-donut-wrap">
+                  <canvas id="repStatusDonutCanvas"></canvas>
+                  <div class="rep-donut-center">
+                    <span class="rep-donut-num" id="repDonutTotal">1,248</span>
+                    <span class="rep-donut-sub">Total Bookings</span>
+                  </div>
+                </div>
+                <div class="rep-donut-legend" id="repDonutLegend">
+                  <div class="rep-donut-leg-row">
+                    <span class="rep-leg-dot" style="background:#10b981;"></span>
+                    <span class="rep-leg-name">Completed</span>
+                    <span class="rep-leg-stat">72% (898)</span>
+                  </div>
+                  <div class="rep-donut-leg-row">
+                    <span class="rep-leg-dot" style="background:#38bdf8;"></span>
+                    <span class="rep-leg-name">Upcoming</span>
+                    <span class="rep-leg-stat">12% (150)</span>
+                  </div>
+                  <div class="rep-donut-leg-row">
+                    <span class="rep-leg-dot" style="background:#f97316;"></span>
+                    <span class="rep-leg-name">Cancelled</span>
+                    <span class="rep-leg-stat">8% (100)</span>
+                  </div>
+                  <div class="rep-donut-leg-row">
+                    <span class="rep-leg-dot" style="background:#a855f7;"></span>
+                    <span class="rep-leg-name">No Show</span>
+                    <span class="rep-leg-stat">5% (62)</span>
+                  </div>
+                  <div class="rep-donut-leg-row">
+                    <span class="rep-leg-dot" style="background:#ef4444;"></span>
+                    <span class="rep-leg-name">Overstay</span>
+                    <span class="rep-leg-stat">3% (38)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTTOM SECTION: 2 COLUMNS (Screenshot 2) -->
+          <div class="rep-bottom-grid">
+            <!-- Left: Overstay Summary -->
+            <div class="admin-card rep-bottom-card">
+              <div class="admin-card-header">
+                <h2><i class="fas fa-hourglass-half" style="color:#38bdf8;"></i> Overstay Summary</h2>
+                <a href="#overstay" class="rep-view-all-link" onclick="switchAdminTab('overstay')">View All &rarr;</a>
+              </div>
+
+              <!-- 3 Mini Metric Cards -->
+              <div class="rep-mini-metric-grid">
+                <div class="rep-mini-metric rep-mini-red">
+                  <div class="rep-mini-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                  <div class="rep-mini-content">
+                    <span class="rep-mini-label">Overstay Incidents</span>
+                    <div class="rep-mini-value">
+                      <span id="repMiniOverstayCnt">37</span>
+                      <span class="rep-mini-sub-alert"><i class="fas fa-arrow-up"></i> 5%</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="rep-mini-metric rep-mini-gold">
+                  <div class="rep-mini-icon"><i class="fas fa-indian-rupee-sign"></i></div>
+                  <div class="rep-mini-content">
+                    <span class="rep-mini-label">Total Penalty</span>
+                    <div class="rep-mini-value" id="repMiniTotalPenalty">₹ 3,000</div>
+                  </div>
+                </div>
+                <div class="rep-mini-metric rep-mini-blue">
+                  <div class="rep-mini-icon"><i class="fas fa-clock"></i></div>
+                  <div class="rep-mini-content">
+                    <span class="rep-mini-label">Avg. Overstay Duration</span>
+                    <div class="rep-mini-value" id="repMiniAvgDuration">2h 36m</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Table: Recent Overstay Records -->
+              <div class="rep-table-wrap">
+                <div class="rep-table-subhead">Recent Overstay Records</div>
+                <table class="rep-data-table">
+                  <thead>
+                    <tr>
+                      <th>Vehicle No.</th>
+                      <th>Slot</th>
+                      <th>Floor</th>
+                      <th>Overstay Duration</th>
+                      <th>Penalty</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="repOverstayRecordsTbody">
+                    <tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:18px;">Loading overstay records...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right: Recent Activity -->
+            <div class="admin-card rep-bottom-card">
+              <div class="admin-card-header">
+                <h2><i class="fas fa-clock-rotate-left" style="color:#38bdf8;"></i> Recent Activity</h2>
+                <a href="#bookings" class="rep-view-all-link" onclick="switchAdminTab('bookings')">View All &rarr;</a>
+              </div>
+
+              <!-- Table: Recent Activity -->
+              <div class="rep-table-wrap" style="margin-top: 10px;">
+                <table class="rep-data-table">
+                  <thead>
+                    <tr>
+                      <th>Date &amp; Time</th>
+                      <th>Vehicle No.</th>
+                      <th>Action</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="repRecentActivityTbody">
+                    <tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:18px;">Loading recent activities...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        </div>
+    </main>
+
+  </div>
+
+  <!-- ====================================================================
+       MODALS: ADD USER / EDIT USER / ADD LOT / EDIT LOT / ADD SLOT
+       ==================================================================== -->
+
+  <!-- ADD USER MODAL -->
+  <div id="addUserModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-user-plus"></i> Add New User Account</h3>
+        <button class="admin-modal-close" onclick="closeAddUserModal()">&times;</button>
+      </div>
+      <form id="addUserForm" onsubmit="submitAddUser(event)">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Full Name</label>
+            <input type="text" id="addUserName" class="admin-form-input" placeholder="e.g. Vikram Sharma" required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Email Address</label>
+            <input type="email" id="addUserEmail" class="admin-form-input" placeholder="vikram@example.com" required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Phone Number</label>
+            <input type="tel" id="addUserPhone" class="admin-form-input" placeholder="+91 9876543210" required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Initial Password</label>
+            <input type="password" id="addUserPassword" class="admin-form-input" value="UserPass123!" required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Account Role</label>
+            <select id="addUserRole" class="admin-form-select">
+              <option value="user">Driver (User)</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+
+          <div style="border-top:1px solid #334155; margin-top:16px; padding-top:16px;">
+            <h4 style="font-size:12px; font-weight:700; color:#38bdf8; text-transform:uppercase; margin-bottom:12px;">
+              Optional: Vehicle Information</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <input type="text" id="addUserVehiclePlate" class="admin-form-input" placeholder="Plate (KA01AB1234)">
+              <select id="addUserVehicleType" class="admin-form-select">
+                <option value="Car">Car</option>
+                <option value="SUV">SUV</option>
+                <option value="EV">Electric Vehicle</option>
+                <option value="Bike">Two-Wheeler</option>
+              </select>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+              <input type="text" id="addUserMakeModel" class="admin-form-input"
+                placeholder="Make / Model (e.g. Nexon EV)">
+              <input type="text" id="addUserColor" class="admin-form-input" placeholder="Color (e.g. White)">
+            </div>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeAddUserModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Create User Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT USER MODAL -->
+  <div id="editUserModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-user-edit"></i> Edit User Information</h3>
+        <button class="admin-modal-close" onclick="closeEditUserModal()">&times;</button>
+      </div>
+      <form id="editUserForm" onsubmit="submitEditUser(event)">
+        <input type="hidden" id="editUserId">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Full Name</label>
+            <input type="text" id="editUserName" class="admin-form-input" required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Email Address</label>
+            <input type="email" id="editUserEmail" class="admin-form-input" required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Phone</label>
+            <input type="tel" id="editUserPhone" class="admin-form-input">
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Role</label>
+            <select id="editUserRole" class="admin-form-select">
+              <option value="user">Driver (User)</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Account Status</label>
+            <select id="editUserStatus" class="admin-form-select">
+              <option value="1">Active</option>
+              <option value="0">Deactivated</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeEditUserModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- USER VEHICLES MODAL -->
+  <div id="userVehiclesModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content" style="max-width:600px;">
+      <div class="admin-modal-header">
+        <h3 id="userVehiclesModalTitle"><i class="fas fa-car"></i> User Registered Vehicles</h3>
+        <button class="admin-modal-close" onclick="closeUserVehiclesModal()">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Plate</th>
+                <th>Type</th>
+                <th>Model</th>
+                <th>Color</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="userVehiclesModalTbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-admin btn-admin-secondary" onclick="closeUserVehiclesModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD PARKING LOT MODAL -->
+  <div id="addLotModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-warehouse"></i> Add Parking Facility</h3>
+        <button class="admin-modal-close" onclick="closeAddLotModal()">&times;</button>
+      </div>
+      <form id="addLotForm" onsubmit="submitAddLot(event)">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Parking Lot Name</label>
+            <input type="text" id="addLotName" class="admin-form-input" placeholder="e.g. City Parking – Mangaluru"
+              required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Physical Location</label>
+            <input type="text" id="addLotLocation" class="admin-form-input"
+              placeholder="e.g. KS Rao Road, Hampankatta, Mangaluru" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Total Floors</label>
+              <input type="number" id="addLotFloors" class="admin-form-input" value="2" min="1" max="10" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Total Capacity (Slots)</label>
+              <input type="number" id="addLotSlots" class="admin-form-input" value="100" min="1" required>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Hourly Rate (₹)</label>
+              <input type="number" id="addLotRate" class="admin-form-input" value="40" step="5" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Overstay Penalty Rate (₹)</label>
+              <input type="number" id="addLotPenalty" class="admin-form-input" value="100" step="10" required>
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Operating Hours</label>
+            <input type="text" id="addLotHours" class="admin-form-input" value="24/7 (Open Daily)">
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeAddLotModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Add Lot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT PARKING LOT MODAL -->
+  <div id="editLotModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-edit"></i> Edit Parking Lot</h3>
+        <button class="admin-modal-close" onclick="closeEditLotModal()">&times;</button>
+      </div>
+      <form id="editLotForm" onsubmit="submitEditLot(event)">
+        <input type="hidden" id="editLotId">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Parking Lot Name</label>
+            <input type="text" id="editLotName" class="admin-form-input" required>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Physical Location</label>
+            <input type="text" id="editLotLocation" class="admin-form-input" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Total Floors</label>
+              <input type="number" id="editLotFloors" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Capacity (Slots)</label>
+              <input type="number" id="editLotSlots" class="admin-form-input" required>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Hourly Rate (₹)</label>
+              <input type="number" id="editLotRate" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Overstay Penalty (₹)</label>
+              <input type="number" id="editLotPenalty" class="admin-form-input" required>
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Operating Hours</label>
+            <input type="text" id="editLotHours" class="admin-form-input">
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeEditLotModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD PARKING SLOT MODAL -->
+  <div id="addSlotModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-plus"></i> Create Parking Slot</h3>
+        <button class="admin-modal-close" onclick="closeAddSlotModal()">&times;</button>
+      </div>
+      <form id="addSlotForm" onsubmit="submitAddSlot(event)">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Target Parking Lot</label>
+            <select id="addSlotLotSelect" class="admin-form-select" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Slot Number</label>
+              <input type="text" id="addSlotNumber" class="admin-form-input" placeholder="e.g. A09" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Floor</label>
+              <select id="addSlotFloor" class="admin-form-select">
+                <option value="Ground Floor">Ground Floor</option>
+                <option value="Upper Floor">Upper Floor</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Slot Type</label>
+            <select id="addSlotType" class="admin-form-select">
+              <option value="Standard">Standard</option>
+              <option value="Regular">Regular</option>
+              <option value="VIP">VIP</option>
+              <option value="EV">EV Charger</option>
+              <option value="Accessible">Accessible</option>
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Distance to Entry (m)</label>
+              <input type="number" id="addSlotDistanceEntry" class="admin-form-input" value="15">
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Distance to Elevator (m)</label>
+              <input type="number" id="addSlotDistanceElevator" class="admin-form-input" value="20">
+            </div>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeAddSlotModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Create Slot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT SLOT STATUS MODAL -->
+  <div id="editSlotModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3>Slot <span id="editSlotNumberDisplay"></span> Management</h3>
+        <button class="admin-modal-close" onclick="closeEditSlotModal()">&times;</button>
+      </div>
+      <form id="editSlotForm" onsubmit="submitUpdateSlot(event)">
+        <input type="hidden" id="editSlotId">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Mark Slot Status</label>
+            <select id="editSlotStatusSelect" class="admin-form-select">
+              <option value="available">🟢 Available</option>
+              <option value="occupied">🔴 Occupied</option>
+              <option value="reserved">🟡 Reserved</option>
+              <option value="maintenance">🔧 Maintenance / Disabled</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Slot Type</label>
+            <select id="editSlotTypeSelect" class="admin-form-select">
+              <option value="Standard">Standard</option>
+              <option value="Regular">Regular</option>
+              <option value="VIP">VIP</option>
+              <option value="EV">EV</option>
+              <option value="Accessible">Accessible</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-danger" style="margin-right:auto;"
+            onclick="deleteSlotFromModal()">
+            <i class="fas fa-trash"></i> Delete Slot
+          </button>
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeEditSlotModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Update Status</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="adminToast" class="admin-toast"></div>
+
+  <!-- Admin Panel Scripts -->
+  <script src="/static/js/admin_panel.js"></script>
+</body>
+
+</html>

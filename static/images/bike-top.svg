@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 120" width="100%" height="100%">
+  <defs>
+    <!-- Bike / Scooter Vibrant Body Gradient (Matching Blue Scooter in System Diagram) -->
+    <linearGradient id="bikeBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="bikeBodyHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="bikeSeatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="headlightBeam" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#e0f2fe" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="bikeShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#bikeShadow)">
+    <!-- Rear Tire (Underneath Body) -->
+    <rect x="27" y="94" width="6" height="20" rx="3" fill="#0f172a"/>
+    <rect x="28.5" y="96" width="3" height="16" rx="1.5" fill="#334155"/>
+
+    <!-- Front Tire (Extending Forward) -->
+    <rect x="27" y="8" width="6" height="22" rx="3" fill="#0f172a"/>
+    <rect x="28.5" y="10" width="3" height="18" rx="1.5" fill="#334155"/>
+
+    <!-- Front Fender / Mudguard -->
+    <path d="M 25 16 C 25 12, 35 12, 35 16 L 36 28 C 36 30, 24 30, 24 28 Z" 
+          fill="url(#bikeBodyGrad)" stroke="#1d4ed8" stroke-width="0.8"/>
+
+    <!-- Footboard / Chassis Base Deck -->
+    <path d="M 20 54 L 40 54 L 42 74 L 18 74 Z" fill="#1e293b" rx="2"/>
+    <!-- Footrest Rubber Ribs -->
+    <line x1="21" y1="58" x2="25" y2="58" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="35" y1="58" x2="39" y2="58" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="64" x2="25" y2="64" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="35" y1="64" x2="40" y2="64" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="19" y1="70" x2="25" y2="70" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="35" y1="70" x2="41" y2="70" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- Rear Body Fairing / Cowl Panels -->
+    <path d="M 18 72 C 16 80, 17 96, 23 104 C 26 108, 34 108, 37 104 C 43 96, 44 80, 42 72 Z"
+          fill="url(#bikeBodyGrad)" stroke="#1d4ed8" stroke-width="1"/>
+
+    <!-- Pillion Grab Rail / Luggage Carrier Bar -->
+    <path d="M 22 98 C 22 107, 38 107, 38 98" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Scooter Ergonomic Dual Saddle / Seat -->
+    <path d="M 23 58 C 24 54, 36 54, 37 58 L 39 74 C 40 84, 38 96, 35 98 C 32 100, 28 100, 25 98 C 22 96, 20 84, 21 74 Z"
+          fill="url(#bikeSeatGrad)" stroke="#334155" stroke-width="1"/>
+    <!-- Seat Stitching Contour Line -->
+    <path d="M 24 73 C 27 72, 33 72, 36 73" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="2 1.5"/>
+
+    <!-- Front Apron / Aerodynamic Fairing -->
+    <path d="M 23 30 C 26 27, 34 27, 37 30 L 41 46 C 42 52, 39 56, 30 56 C 21 56, 18 52, 19 46 Z"
+          fill="url(#bikeBodyGrad)" stroke="#1d4ed8" stroke-width="1"/>
+    <!-- Front Apron Center Highlight Crease -->
+    <path d="M 30 30 L 30 54" stroke="url(#bikeBodyHighlight)" stroke-width="1.2" opacity="0.75"/>
+
+    <!-- Handlebar Stem & Crossbar -->
+    <path d="M 13 32 L 47 32" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+    
+    <!-- Rubber Hand Grips -->
+    <rect x="9" y="30.5" width="7" height="3.5" rx="1.5" fill="#0f172a"/>
+    <rect x="44" y="30.5" width="7" height="3.5" rx="1.5" fill="#0f172a"/>
+    
+    <!-- Brake Levers -->
+    <line x1="12" y1="29" x2="16" y2="30.5" stroke="#94a3b8" stroke-width="1.2"/>
+    <line x1="48" y1="29" x2="44" y2="30.5" stroke="#94a3b8" stroke-width="1.2"/>
+
+    <!-- Rear-View Mirrors -->
+    <path d="M 14 31 L 7 24" stroke="#64748b" stroke-width="1.2"/>
+    <ellipse cx="6" cy="23" rx="3.5" ry="2.2" transform="rotate(-25 6 23)" fill="#1e293b" stroke="#94a3b8" stroke-width="0.8"/>
+    <ellipse cx="6" cy="23" rx="2.5" ry="1.4" transform="rotate(-25 6 23)" fill="#38bdf8" opacity="0.7"/>
+
+    <path d="M 46 31 L 53 24" stroke="#64748b" stroke-width="1.2"/>
+    <ellipse cx="54" cy="23" rx="3.5" ry="2.2" transform="rotate(25 54 23)" fill="#1e293b" stroke="#94a3b8" stroke-width="0.8"/>
+    <ellipse cx="54" cy="23" rx="2.5" ry="1.4" transform="rotate(25 54 23)" fill="#38bdf8" opacity="0.7"/>
+
+    <!-- Digital Instrument Console / Speedometer -->
+    <rect x="25" y="30" width="10" height="6" rx="2" fill="#0f172a" stroke="#475569" stroke-width="0.8"/>
+    <rect x="27" y="32" width="6" height="2" rx="0.5" fill="#38bdf8"/>
+
+    <!-- Aerodynamic LED Headlight Assembly -->
+    <path d="M 25 36 C 28 34, 32 34, 35 36 L 34 41 C 32 43, 28 43, 26 41 Z"
+          fill="url(#headlightBeam)" stroke="#38bdf8" stroke-width="0.8"/>
+
+    <!-- Front Indicator / DRL Strips -->
+    <line x1="21" y1="42" x2="23" y2="45" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="39" y1="42" x2="37" y2="45" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- Rear LED Taillight Strip -->
+    <path d="M 26 104 C 28 106, 32 106, 34 104" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Rear Red Glow -->
+    <circle cx="30" cy="105" r="1.5" fill="#f87171"/>
+  </g>
+</svg>

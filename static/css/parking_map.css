@@ -1,0 +1,268 @@
+/* ==========================================================================
+   Interactive 2D Parking Map Layout Stylesheet
+   High fidelity replication of the physical floor layout
+   ========================================================================== */
+
+.parking-map-container {
+  width: 100%;
+  position: relative;
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  overflow-x: auto;
+  transition: transform 0.2s ease;
+}
+
+.map-floor-header {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0d9488;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.parking-lot-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 720px;
+  padding: 10px;
+  position: relative;
+  background: #fafcfd;
+  border-radius: var(--radius-md);
+  border: 1px dashed #e2e8f0;
+}
+
+/* Slot Row Grids */
+.slots-row-grid {
+  display: grid;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.grid-11 {
+  grid-template-columns: repeat(11, 1fr);
+}
+
+/* Individual Parking Slot Card */
+.parking-slot-cell {
+  position: relative;
+  height: 96px;
+  background: #ffffff;
+  border: 1.8px solid #cbd5e1;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.parking-slot-cell:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  z-index: 10;
+}
+
+.slot-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #475569;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+/* Slot Status Colors & Styling */
+.parking-slot-cell.available {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+.parking-slot-cell.available:hover {
+  border-color: #059669;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.25);
+}
+
+.parking-slot-cell.occupied {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+.parking-slot-cell.occupied:hover {
+  box-shadow: 0 8px 18px rgba(59, 130, 246, 0.25);
+}
+
+.parking-slot-cell.reserved {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+.parking-slot-cell.reserved:hover {
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.25);
+}
+
+.parking-slot-cell.overstayed {
+  border-color: #ef4444;
+  background: #fef2f2;
+  animation: overstayPulse 2s infinite;
+}
+@keyframes overstayPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.parking-slot-cell.disabled {
+  border-color: #94a3b8;
+  border-style: dashed;
+  background: #f1f5f9;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Vehicle Top-Down Silhouette inside slot */
+.slot-vehicle-wrap {
+  width: 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  animation: carSettle 0.3s ease-out;
+}
+
+.slot-vehicle-wrap.slot-bike-wrap {
+  animation: bikeSettle 0.3s ease-out;
+}
+
+@keyframes carSettle {
+  from { transform: scale(0.85); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bikeSettle {
+  from { transform: scale(0.85); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.slot-vehicle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.slot-bike-img {
+  filter: drop-shadow(0 2px 5px rgba(37, 99, 235, 0.25));
+}
+
+.slot-car-img {
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.2));
+}
+
+/* Drive Lane in Center */
+.drive-lane {
+  height: 48px;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  border-top: 1.5px dashed #cbd5e1;
+  border-bottom: 1.5px dashed #cbd5e1;
+  position: relative;
+  overflow: hidden;
+}
+
+.drive-lane::after {
+  content: 'DRIVE LANE ➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔➔';
+  position: absolute;
+  white-space: nowrap;
+  opacity: 0.35;
+  font-size: 11px;
+  letter-spacing: 4px;
+}
+
+/* Entry Gate Graphic */
+.entry-indicator {
+  position: absolute;
+  left: 2px;
+  bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #0d9488;
+}
+.entry-indicator i {
+  font-size: 14px;
+  animation: arrowBounce 1.5s infinite;
+}
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Double Row Section at bottom */
+.double-row-bay {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Status Legend Bar */
+.map-status-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.legend-dot.available { background: var(--available); }
+.legend-dot.occupied { background: var(--occupied); }
+.legend-dot.reserved { background: var(--reserved); }
+.legend-dot.overstayed { background: var(--overstayed); }
+.legend-dot.disabled { background: var(--disabled); }
+
+/* Zoom scaling states (25%, 50%, 75%, 100%, 125%, 150%) */
+.zoom-25 { zoom: 0.25; }
+.zoom-50 { zoom: 0.50; }
+.zoom-75 { zoom: 0.75; }
+.zoom-100 { zoom: 1.0; }
+.zoom-125 { zoom: 1.15; }
+.zoom-150 { zoom: 1.30; }
+
+@supports not (zoom: 1) {
+  .zoom-25 { transform: scale(0.25); transform-origin: top left; }
+  .zoom-50 { transform: scale(0.50); transform-origin: top left; }
+  .zoom-75 { transform: scale(0.75); transform-origin: top left; }
+  .zoom-100 { transform: scale(1); transform-origin: top left; }
+  .zoom-125 { transform: scale(1.15); transform-origin: top left; }
+  .zoom-150 { transform: scale(1.30); transform-origin: top left; }
+}
