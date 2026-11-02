@@ -32,10 +32,27 @@ except ImportError:
     render_template = None
     has_app_context = lambda: False
 
-# Configure logging
+# Configure logging with Windows console safe encoding fallback
+class SafeStreamHandler(logging.StreamHandler):
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            self.stream.write(msg + self.terminator)
+            self.flush()
+        except UnicodeEncodeError:
+            try:
+                encoding = getattr(self.stream, 'encoding', 'ascii') or 'ascii'
+                safe_msg = msg.encode(encoding, errors='replace').decode(encoding)
+                self.stream.write(safe_msg + self.terminator)
+                self.flush()
+            except Exception:
+                self.handleError(record)
+        except Exception:
+            self.handleError(record)
+
 logger = logging.getLogger("SmartParking.EmailService")
 if not logger.handlers:
-    _handler = logging.StreamHandler(sys.stdout)
+    _handler = SafeStreamHandler(sys.stdout)
     _handler.setFormatter(logging.Formatter("[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"))
     logger.addHandler(_handler)
 logger.setLevel(logging.INFO)
