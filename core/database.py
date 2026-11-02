@@ -646,13 +646,13 @@ def ensure_users_columns(conn=None):
     """No-op for MongoDB schema-free document model."""
     pass
 
-def create_notification(user_id, notif_type, title, message, related_id=None, conn=None):
-    """Creates a user notification document in MongoDB for in-app delivery."""
+def create_notification(user_id, notif_type, title, message, related_id=None, conn=None, send_email_alert=True):
+    """Creates a user notification document in MongoDB and dispatches an email alert to the registered user."""
     db = get_mongo_db()
     nid = get_next_sequence('notifications')
     doc = {
         'notification_id': nid,
-        'user_id': int(user_id),
+        'user_id': int(user_id) if str(user_id).isdigit() else user_id,
         'type': str(notif_type),
         'title': str(title),
         'message': str(message),
@@ -661,6 +661,58 @@ def create_notification(user_id, notif_type, title, message, related_id=None, co
         'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     db.notifications.insert_one(doc)
+
+    # Automatically dispatch notification as email to the registered user
+    if send_email_alert:
+        try:
+            uid_query = {'user_id': int(user_id)} if str(user_id).isdigit() else {'user_id': user_id}
+            user = db.users.find_one(uid_query)
+            recipient_email = (user.get('email') if user else '').strip()
+            user_name = user.get('name', 'Valued Driver') if user else 'Valued Driver'
+
+            if recipient_email and '@' in recipient_email:
+                from core.email_service import send_email
+                badge_map = {
+                    'booking_confirmed': 'Booking Confirmed',
+                    'booking_cancelled': 'Booking Cancelled',
+                    'overstay_alert': 'Overstay Violation',
+                    'grace_warning': 'Grace Period Warning',
+                    'booking_ended': 'Booking Notice',
+                    'penalty_applied': 'Penalty Notice',
+                    'wallet_topup': 'Wallet Update',
+                    'profile_updated': 'Profile Security',
+                    'password_changed': 'Security Notice',
+                    'vehicle_registered': 'Vehicle Update',
+                    'exchange_offered': 'Slot Exchange',
+                    'exchange_requested': 'Slot Exchange Request',
+                    'exchange_accepted': 'Slot Exchange Approved',
+                    'exchange_rejected': 'Slot Exchange Declined',
+                    'exchange_counter': 'Slot Exchange Counter-Offer',
+                    'payment_success': 'Payment Receipt'
+                }
+                badge_text = badge_map.get(str(notif_type), 'Smart Parking Alert')
+                formatted_message = str(message).replace('\n', '<br>')
+
+                send_email(
+                    to=recipient_email,
+                    subject=f"Smart Parking AI - {title}",
+                    template="emails/general_notification.html",
+                    context={
+                        "headline": title,
+                        "badge_text": badge_text,
+                        "user_name": user_name,
+                        "message": formatted_message,
+                        "action_url": "http://127.0.0.1:5000/user/panel",
+                        "action_text": "View In-App Dashboard",
+                        "current_year": datetime.now().year,
+                        "support_email": "support@smartparking.ai"
+                    },
+                    sync=False
+                )
+        except Exception as e:
+            import logging
+            logging.getLogger("SmartParking.Notification").warning(f"Could not dispatch email for notification {nid}: {e}")
+
     return nid
 
 # ======================================================================

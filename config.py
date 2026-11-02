@@ -1,4 +1,5 @@
 """
+
 Central Configuration Module for AI-Based Smart Parking System.
 Provides environment-aware settings for Flask, MongoDB, Simulation, Security, and Email Transport.
 """

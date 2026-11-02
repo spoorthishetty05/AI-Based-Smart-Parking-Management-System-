@@ -534,7 +534,8 @@ def check_and_update_overstays(simulated_now=None):
                         notif_type='overstay_alert',
                         title='🚨 Grace Period Expired — Penalty Applicable',
                         message=notif_msg,
-                        related_id=res_id
+                        related_id=res_id,
+                        send_email_alert=False
                     )
                     if send_templated_email and user_email:
                         try:

@@ -95,6 +95,11 @@ class EmailService:
 
     def _load_from_environ(self):
         """Loads configuration directly from os.environ when running standalone."""
+        try:
+            from config import Config
+        except Exception:
+            pass
+
         self.server = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
         self.port = int(os.environ.get("MAIL_PORT", 587))
         self.username = os.environ.get("MAIL_USERNAME", "").strip()
