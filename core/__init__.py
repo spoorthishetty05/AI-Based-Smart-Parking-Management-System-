@@ -1,7 +1,7 @@
 """
 Core Domain Package for AI-Based Smart Parking System.
 Exposes database drivers, MongoDB operational engines, ML predictive models,
-recommendations, overstay monitoring, time simulation, and visualization services.
+recommendations, overstay monitoring, time simulation, visualization, and email transport services.
 """
 
 import os
@@ -36,14 +36,33 @@ from .overstay_engine import (
     mark_overstay_paid, get_user_active_overstay, get_current_sim_time
 )
 
-from .ml_engine import (
-    predict_occupancy, get_eda_metrics, train_occupancy_models,
-    get_loaded_model, get_raw_dataset_preview, get_preprocessing_info,
-    train_kmeans_clusters, get_kmeans_clusters, predict_cluster_regime
-)
+try:
+    from .ml_engine import (
+        predict_occupancy, get_eda_metrics, train_occupancy_models,
+        get_loaded_model, get_raw_dataset_preview, get_preprocessing_info,
+        train_kmeans_clusters, get_kmeans_clusters, predict_cluster_regime
+    )
+except ImportError as _e:
+    predict_occupancy = None
+    get_eda_metrics = None
+    train_occupancy_models = None
+    get_loaded_model = None
+    get_raw_dataset_preview = None
+    get_preprocessing_info = None
+    train_kmeans_clusters = None
+    get_kmeans_clusters = None
+    predict_cluster_regime = None
 
-from .recommendation_engine import recommend_slots
+try:
+    from .recommendation_engine import recommend_slots
+except ImportError:
+    recommend_slots = None
 from .simulation_engine import step_simulation_time, set_simulation_time, trigger_random_arrival, trigger_random_departure
-from .visualization_engine import get_all_matplotlib_visualizations
-from .parking_places_config import get_categories, get_all_places, get_place_by_id, sync_places_to_mongodb
 
+try:
+    from .visualization_engine import get_all_matplotlib_visualizations
+except ImportError:
+    get_all_matplotlib_visualizations = None
+
+from .parking_places_config import get_categories, get_all_places, get_place_by_id, sync_places_to_mongodb
+from .email_service import EmailService, mail_service, send_email, send_templated_email

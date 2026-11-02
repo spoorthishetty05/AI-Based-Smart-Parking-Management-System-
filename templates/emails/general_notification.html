@@ -1,0 +1,32 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 24px;">
+  <span class="badge badge-info">{{ badge_text|default("System Notice") }}</span>
+  <h2 style="margin-top: 12px; margin-bottom: 6px;">{{ headline|default("Parking Update") }}</h2>
+</div>
+
+<p style="font-size: 15px; color: #334155;">Hello <strong>{{ user_name|default("Valued User") }}</strong>,</p>
+
+<div style="margin: 20px 0; font-size: 14px; color: #475569; line-height: 1.7;">
+  {{ message|safe }}
+</div>
+
+{% if details_table %}
+<table class="data-table">
+  {% for label, val in details_table.items() %}
+  <tr>
+    <th>{{ label }}</th>
+    <td>{{ val }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if action_url and action_text %}
+<div style="text-align: center; margin: 25px 0;">
+  <a href="{{ action_url }}" class="btn">{{ action_text }}</a>
+</div>
+{% endif %}
+{% endblock %}
+

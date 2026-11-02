@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ subject|default("Smart Parking AI Notification") }}</title>
+  <style>
+    /* Reset & Client-Specific Styles */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #334155;
+      line-height: 1.6;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #f1f5f9;
+      padding: 40px 0;
+    }
+    .main-card {
+      background-color: #ffffff;
+      margin: 0 auto;
+      max-width: 600px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 30px;
+      text-align: center;
+      color: #ffffff;
+      border-bottom: 3px solid #3b82f6;
+    }
+    .header-logo {
+      display: inline-block;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .header-logo span {
+      color: #38bdf8;
+    }
+    .header-tagline {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .content-body {
+      padding: 35px 30px;
+    }
+    h1, h2, h3 {
+      color: #0f172a;
+      margin-top: 0;
+      font-weight: 700;
+    }
+    p {
+      margin: 0 0 16px;
+      font-size: 15px;
+      color: #475569;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-success { background-color: #dcfce7; color: #15803d; }
+    .badge-warning { background-color: #fef3c7; color: #b45309; }
+    .badge-danger { background-color: #fee2e2; color: #b91c1c; }
+    .badge-info { background-color: #e0f2fe; color: #0369a1; }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background-color: #f8fafc;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .data-table th, .data-table td {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 14px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .data-table th {
+      color: #64748b;
+      font-weight: 600;
+      width: 40%;
+      background-color: #f1f5f9;
+    }
+    .data-table td {
+      color: #0f172a;
+      font-weight: 500;
+    }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
+      margin: 15px 0;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+    .footer {
+      background-color: #f8fafc;
+      padding: 24px 30px;
+      text-align: center;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .footer a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .footer p {
+      font-size: 12px;
+      margin: 4px 0;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center">
+          <div class="main-card">
+            
+            <!-- Email Header -->
+            <div class="header">
+              <a href="#" class="header-logo">
+                Smart<span>Parking</span> AI
+              </a>
+              <div class="header-tagline">Intelligent IoT & ML Urban Parking Management</div>
+            </div>
+
+            <!-- Email Body -->
+            <div class="content-body">
+              {% block content %}
+              <p>Welcome to Smart Parking AI.</p>
+              {% endblock %}
+            </div>
+
+            <!-- Email Footer -->
+            <div class="footer">
+              <p><strong>AI-Based Smart Parking Management System</strong></p>
+              <p>This is an automated operational email sent via Native Python SSL/TLS Transport.</p>
+              <p>&copy; 2026 Smart Parking AI System. All rights reserved.</p>
+            </div>
+
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
+

@@ -31,16 +31,27 @@ from core.database import (
     PERMANENT_ADMINS, create_notification, ensure_notifications_table,
     ensure_users_columns, get_mongo_db, get_next_sequence, clear_and_init_mongodb
 )
-from core.ml_engine import (
-    predict_occupancy, get_eda_metrics, train_occupancy_models, 
-    get_loaded_model, get_raw_dataset_preview, get_preprocessing_info,
-    train_kmeans_clusters, get_kmeans_clusters, predict_cluster_regime
-)
-from core.visualization_engine import (
-    get_all_matplotlib_visualizations, generate_kmeans_cluster_plot,
-    generate_feature_importance_plot, generate_actual_vs_predicted_plot,
-    generate_occupancy_distribution_plot
-)
+try:
+    from core.ml_engine import (
+        predict_occupancy, get_eda_metrics, train_occupancy_models, 
+        get_loaded_model, get_raw_dataset_preview, get_preprocessing_info,
+        train_kmeans_clusters, get_kmeans_clusters, predict_cluster_regime
+    )
+except ImportError:
+    predict_occupancy = get_eda_metrics = train_occupancy_models = None
+    get_loaded_model = get_raw_dataset_preview = get_preprocessing_info = None
+    train_kmeans_clusters = get_kmeans_clusters = predict_cluster_regime = None
+
+try:
+    from core.visualization_engine import (
+        get_all_matplotlib_visualizations, generate_kmeans_cluster_plot,
+        generate_feature_importance_plot, generate_actual_vs_predicted_plot,
+        generate_occupancy_distribution_plot
+    )
+except ImportError:
+    get_all_matplotlib_visualizations = generate_kmeans_cluster_plot = None
+    generate_feature_importance_plot = generate_actual_vs_predicted_plot = None
+    generate_occupancy_distribution_plot = None
 from core.mongo_engine import (
     get_mongo_client, get_mongo_db, get_mongo_status, sync_sqlite_to_mongodb, init_mongodb_data,
     mongo_save_user, mongo_get_user_by_email, mongo_get_user_by_id,
@@ -61,10 +72,14 @@ from core.overstay_engine import (
 )
 from core.simulation_engine import step_simulation_time, set_simulation_time, trigger_random_arrival, trigger_random_departure
 from core import parking_places_config
+from core.email_service import mail_service, send_email, send_templated_email
 
 app = Flask(__name__)
 CORS(app)
 app.config.from_object(Config)
+
+# Initialize Native Python SSL/TLS Secure Email Transport
+mail_service.init_app(app)
 
 # Ensure MongoDB database and collections exist on startup
 try:
@@ -73,7 +88,10 @@ except Exception as e:
     print(f"[MongoDB Startup Notice] {e}")
 
 # Auto-check initial overstays
-check_and_update_overstays()
+try:
+    check_and_update_overstays()
+except Exception as e:
+    print(f"[Overstay Check Notice] {e}")
 
 def verify_password_hash(stored_hash, password):
     """Verifies password hash with backward compatibility for legacy records."""
@@ -1110,6 +1128,30 @@ def booking_confirm():
     if not success:
         status_code = result.get('status_code') or 409
         return jsonify({'status': 'error', 'message': result.get('message', 'Booking failed.')}), status_code
+
+    # Dispatch confirmation email via Native SSL/TLS transport (Background Thread)
+    recipient_email = booking_payload.get('user_email') or session.get('user_email')
+    if recipient_email:
+        try:
+            send_templated_email(
+                to=recipient_email,
+                subject=f"Smart Parking AI - Booking Confirmation #{result.get('booking_id')}",
+                template="emails/booking_confirmation.html",
+                context={
+                    "booking_id": result.get('booking_id'),
+                    "lot_name": result.get('place_name') or result.get('lot_name') or "Smart Parking Facility",
+                    "slot_name": result.get('slot_number') or result.get('slot_name') or f"Slot {result.get('slot_id')}",
+                    "vehicle_number": booking_payload.get('vehicle_number', ''),
+                    "vehicle_type": booking_payload.get('vehicle_type', 'Car'),
+                    "start_time": f"{booking_payload.get('booking_date', '')} {booking_payload.get('start_time', '')}".strip(),
+                    "end_time": f"{booking_payload.get('booking_date', '')} {booking_payload.get('end_time', '')}".strip(),
+                    "total_amount": result.get('total_amount', 0.0),
+                    "dashboard_url": url_for('booking_my_bookings', _external=True)
+                },
+                sync=False
+            )
+        except Exception as e:
+            app.logger.warning(f"[Email Notification Warning] Failed to queue confirmation email: {e}")
 
     return jsonify({
         'status': 'success',
@@ -6193,6 +6235,148 @@ def check_and_generate_alerts():
         'new_alerts_generated': created_count,
         'simulated_time': sim_time.strftime('%Y-%m-%d %H:%M:%S')
     })
+
+
+# ==============================================================================
+# SECURE EMAIL TRANSPORT MANAGEMENT & DIAGNOSTIC APIS
+# ==============================================================================
+
+@app.route('/api/email/status', methods=['GET'])
+def api_email_status():
+    """
+    Returns current configuration status of Native Python SSL/TLS email transport.
+    Mirrors Nodemailer's secure: true (Port 465) / secure: false (Port 587).
+    """
+    return jsonify({
+        'status': 'success',
+        'mail_server': mail_service.server,
+        'mail_port': mail_service.port,
+        'secure_mode': mail_service.is_secure_ssl(),
+        'transport_protocol': mail_service.get_transport_mode(),
+        'authenticated': bool(mail_service.username and mail_service.password),
+        'default_sender': mail_service.default_sender,
+        'reply_to': mail_service.reply_to or 'None',
+        'timeout_seconds': mail_service.timeout,
+        'suppress_send': mail_service.suppress_send,
+        'is_simulation': mail_service.suppress_send or not (mail_service.username and mail_service.password),
+        'max_background_workers': mail_service.max_workers,
+        'outbox_count': len(mail_service.outbox)
+    }), 200
+
+
+@app.route('/api/email/test-connection', methods=['GET', 'POST'])
+def api_email_test_connection():
+    """
+    Tests SMTP server handshake and authentication without sending a message.
+    """
+    result = mail_service.test_connection()
+    status_code = 200 if result.get('success') else (400 if 'not configured' in result.get('error', '') else 502)
+    return jsonify(result), status_code
+
+
+@app.route('/api/email/test', methods=['GET', 'POST'])
+def api_email_test():
+    """
+    Sends a test email via Native Python SSL/TLS Transport.
+    Supports GET (for browser quick test) and POST (with custom payload).
+    Supports HTML templates, custom text, attachments, and background execution.
+    """
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or request.form.to_dict() or {}
+    else:
+        data = request.args.to_dict()
+
+    recipient = data.get('to') or session.get('user_email') or 'admin@smartparking.ai'
+    subject = data.get('subject') or f"Smart Parking AI - Email Transport Verification ({mail_service.get_transport_mode()})"
+    use_template = data.get('template', 'general')
+    sync = str(data.get('sync', 'true')).lower() in ('true', '1', 'yes')
+
+    try:
+        if use_template == 'booking':
+            result = send_templated_email(
+                to=recipient,
+                subject=subject,
+                template='emails/booking_confirmation.html',
+                context={
+                    'booking_id': 9999,
+                    'lot_name': 'Downtown Central Hub',
+                    'slot_name': 'Slot A-101',
+                    'vehicle_number': 'KA-01-AB-1234',
+                    'vehicle_type': 'Car',
+                    'start_time': datetime.now().strftime('%Y-%m-%d %H:00'),
+                    'end_time': (datetime.now() + timedelta(hours=2)).strftime('%Y-%m-%d %H:00'),
+                    'total_amount': 120.0,
+                    'dashboard_url': url_for('booking_my_bookings', _external=True)
+                },
+                sync=sync
+            )
+        elif use_template == 'overstay':
+            result = send_templated_email(
+                to=recipient,
+                subject=subject,
+                template='emails/overstay_alert.html',
+                context={
+                    'vehicle_number': 'KA-01-AB-1234',
+                    'slot_name': 'Slot A-101',
+                    'scheduled_end_time': datetime.now().strftime('%Y-%m-%d %H:00'),
+                    'overstay_minutes': 45,
+                    'penalty_amount': 180.0,
+                    'grace_status': 'Expired (15 min grace period exceeded)',
+                    'checkout_url': url_for('booking_my_bookings', _external=True)
+                },
+                sync=sync
+            )
+        else:
+            # Default rich HTML test message
+            html_content = f"""
+            <div style="font-family: Arial, sans-serif; padding: 20px; color: #1e293b;">
+              <h2 style="color: #2563eb;">Native Python SSL/TLS Email Transport Active</h2>
+              <p>This email verifies that your Flask application is successfully transmitting emails via:</p>
+              <ul>
+                <li><strong>Transport Mode:</strong> {mail_service.get_transport_mode()}</li>
+                <li><strong>Server:</strong> {mail_service.server}:{mail_service.port}</li>
+                <li><strong>Security:</strong> {'Direct smtplib.SMTP_SSL' if mail_service.is_secure_ssl() else 'STARTTLS upgrade via smtplib.SMTP'}</li>
+                <li><strong>Execution:</strong> {'Synchronous' if sync else 'Non-blocking Background Thread'}</li>
+                <li><strong>Timestamp:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</li>
+              </ul>
+              <p style="color: #10b981; font-weight: bold;">&#10004; Production-Ready Nodemailer Parity achieved natively in Python!</p>
+            </div>
+            """
+            result = send_email(
+                to=recipient,
+                subject=subject,
+                html=html_content,
+                sync=sync
+            )
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Test email executed successfully.',
+            'details': result,
+            'transport_mode': mail_service.get_transport_mode()
+        }), 200
+
+    except Exception as e:
+        app.logger.error(f"Test email execution failed: {e}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'transport_mode': mail_service.get_transport_mode()
+        }), 500
+
+
+@app.route('/api/email/outbox', methods=['GET'])
+def api_email_outbox():
+    """
+    Returns contents of the in-memory test/simulation outbox.
+    Useful for checking delivered emails in development and automated testing.
+    """
+    limit = int(request.args.get('limit', 20))
+    return jsonify({
+        'status': 'success',
+        'count': len(mail_service.outbox),
+        'outbox': mail_service.outbox[-limit:]
+    }), 200
 
 
 if __name__ == '__main__':

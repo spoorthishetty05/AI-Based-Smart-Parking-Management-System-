@@ -7,7 +7,10 @@ Uses pure MongoDB persistence.
 
 from datetime import datetime, timedelta
 from database import get_mongo_db
-from ml_engine import predict_occupancy
+try:
+    from ml_engine import predict_occupancy
+except ImportError:
+    predict_occupancy = None
 from overstay_engine import get_current_sim_time
 
 def calculate_slot_suitability(slot, user_pref, predicted_occupancy):

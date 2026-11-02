@@ -11,6 +11,13 @@ from datetime import datetime, timedelta
 import pymongo
 from pymongo import DESCENDING
 from database import get_mongo_db, get_next_sequence, create_notification
+try:
+    from email_service import send_templated_email
+except ImportError:
+    try:
+        from core.email_service import send_templated_email
+    except ImportError:
+        send_templated_email = None
 
 
 def normalize_vehicle_type(vtype):
@@ -529,6 +536,24 @@ def check_and_update_overstays(simulated_now=None):
                         message=notif_msg,
                         related_id=res_id
                     )
+                    if send_templated_email and user_email:
+                        try:
+                            send_templated_email(
+                                to=user_email,
+                                subject=f"URGENT: Overstay Alert for Slot {slot_name} - Smart Parking AI",
+                                template="emails/overstay_alert.html",
+                                context={
+                                    'vehicle_number': v_plate,
+                                    'slot_name': slot_name,
+                                    'scheduled_end_time': booked_end_display,
+                                    'overstay_minutes': calc.get('overstay_minutes', 0),
+                                    'penalty_amount': penalty_amount,
+                                    'grace_status': 'Expired (15 min grace period exceeded)'
+                                },
+                                sync=False
+                            )
+                        except Exception:
+                            pass
                     db.reservations.update_one(
                         {'reservation_id': res_id},
                         {'$set': {'overstay_notification_sent': True, 'notified_penalty_applicable': True, 'notification_status': 'Sent'}}

@@ -1,0 +1,53 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 24px;">
+  <span class="badge badge-danger">&#9888; Overstay Warning</span>
+  <h2 style="margin-top: 12px; margin-bottom: 6px; color: #b91c1c;">Immediate Action Required</h2>
+  <p style="color: #64748b; font-size: 14px;">Your parked vehicle has exceeded the scheduled reservation time.</p>
+</div>
+
+<div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+  <p style="margin: 0; color: #991b1b; font-size: 14px;">
+    <strong>Alert:</strong> Slot <strong>{{ slot_name|default("N/A") }}</strong> is currently in overstay status. Ongoing penalty charges are accumulating per hour as per city parking regulations.
+  </p>
+</div>
+
+<table class="data-table">
+  <tr>
+    <th>Vehicle Number</th>
+    <td><strong>{{ vehicle_number }}</strong></td>
+  </tr>
+  <tr>
+    <th>Slot Number</th>
+    <td>{{ slot_name|default("N/A") }}</td>
+  </tr>
+  <tr>
+    <th>Scheduled Departure</th>
+    <td>{{ scheduled_end_time }}</td>
+  </tr>
+  <tr>
+    <th>Overstay Duration</th>
+    <td><strong style="color: #b91c1c;">{{ overstay_minutes|default(0) }} minutes</strong></td>
+  </tr>
+  <tr>
+    <th>Current Penalty Fee</th>
+    <td><strong style="color: #b91c1c; font-size: 16px;">₹{{ "%.2f"|format(penalty_amount|float) if penalty_amount is defined else "0.00" }}</strong></td>
+  </tr>
+  <tr>
+    <th>Grace Period Status</th>
+    <td><span class="badge badge-warning">{{ grace_status|default("Expired") }}</span></td>
+  </tr>
+</table>
+
+<p style="font-size: 14px; color: #475569;">
+  To prevent escalating penalties or towing, please proceed to your vehicle and exit the facility immediately, or resolve your session via the parking portal.
+</p>
+
+<div style="text-align: center; margin-top: 25px;">
+  <a href="{{ checkout_url|default('#') }}" class="btn" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+    Pay Penalty &amp; Complete Exit
+  </a>
+</div>
+{% endblock %}
+

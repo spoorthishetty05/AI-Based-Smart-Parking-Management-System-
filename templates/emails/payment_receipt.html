@@ -1,0 +1,55 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 24px;">
+  <span class="badge badge-success">&#10003; Payment Received</span>
+  <h2 style="margin-top: 12px; margin-bottom: 6px;">Parking Checkout Receipt</h2>
+  <p style="color: #64748b; font-size: 14px;">Here is the receipt for your recent parking session.</p>
+</div>
+
+<table class="data-table">
+  <tr>
+    <th>Receipt Number</th>
+    <td><strong>REC-{{ booking_id }}</strong></td>
+  </tr>
+  <tr>
+    <th>Vehicle Number</th>
+    <td>{{ vehicle_number }}</td>
+  </tr>
+  <tr>
+    <th>Slot Number</th>
+    <td>{{ slot_name|default("N/A") }}</td>
+  </tr>
+  <tr>
+    <th>Duration</th>
+    <td>{{ duration_hours|default("1.0") }} hour(s)</td>
+  </tr>
+  <tr>
+    <th>Base Parking Fee</th>
+    <td>₹{{ "%.2f"|format(base_fee|float) if base_fee is defined else "0.00" }}</td>
+  </tr>
+  {% if penalty_fee and penalty_fee|float > 0 %}
+  <tr>
+    <th style="color: #b91c1c;">Overstay Penalty</th>
+    <td style="color: #b91c1c;">₹{{ "%.2f"|format(penalty_fee|float) }}</td>
+  </tr>
+  {% endif %}
+  <tr style="background-color: #f1f5f9;">
+    <th><strong>Total Paid</strong></th>
+    <td><strong style="color: #15803d; font-size: 16px;">₹{{ "%.2f"|format(total_amount|float) if total_amount is defined else "0.00" }}</strong></td>
+  </tr>
+  <tr>
+    <th>Payment Method</th>
+    <td>{{ payment_method|default("Digital Wallet / UPI") }}</td>
+  </tr>
+  <tr>
+    <th>Date &amp; Time</th>
+    <td>{{ payment_date|default("Current") }}</td>
+  </tr>
+</table>
+
+<p style="font-size: 13px; color: #64748b; text-align: center; margin-top: 20px;">
+  Thank you for choosing Smart Parking AI. Have a safe journey!
+</p>
+{% endblock %}
+

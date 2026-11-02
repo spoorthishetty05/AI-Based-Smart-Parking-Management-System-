@@ -133,6 +133,14 @@ All one-off, administrative, and maintenance utilities are organized under `scri
    - Real-time overstay sweeps with customizable grace periods and tiered hourly multipliers by vehicle type.
 4. **Peer-to-Peer Slot Exchange**:
    - Two-phase swap negotiation between registered drivers with atomic database swaps.
-5. **Clean & Resilient Architecture**:
+5. **Native Python SSL/TLS Secure Email Transport**:
+   - Integrated directly into Flask with zero external Node.js runtime dependencies.
+   - **Port 465**: Direct SSL/TLS encrypted connection via `smtplib.SMTP_SSL` (`MAIL_SECURE=true`, Nodemailer `secure: true` parity).
+   - **Port 587**: STARTTLS upgrade via `smtplib.SMTP` + `.starttls()` (`MAIL_SECURE=false`).
+   - Non-blocking background worker threading (`ThreadPoolExecutor`) ensures zero web request lag.
+   - Full Jinja2 responsive HTML templates (`booking_confirmation.html`, `overstay_alert.html`, `password_reset.html`, `payment_receipt.html`).
+   - Base64-encoded MIME attachments, fallback plaintext extraction, and `.env` configuration.
+   - Built-in Simulation Outbox for development without requiring live credentials.
+6. **Clean & Resilient Architecture**:
    - Root facades maintain complete backward-compatibility for legacy callers while modular code resides strictly in `core/`.
 
