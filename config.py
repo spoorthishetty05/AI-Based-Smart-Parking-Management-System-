@@ -1,21 +1,39 @@
-
 """
 Central Configuration Module for AI-Based Smart Parking System.
 Provides environment-aware settings for Flask, MongoDB, Simulation, Security, and Email Transport.
 """
 
 import os
+
+def _load_env_file(filepath):
+    """Zero-dependency .env parser fallback."""
+    if not os.path.exists(filepath):
+        return
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#') or '=' not in line:
+                    continue
+                k, v = line.split('=', 1)
+                k = k.strip()
+                v = v.strip().strip('"').strip("'")
+                if k not in os.environ:
+                    os.environ[k] = v
+    except Exception:
+        pass
+
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+_env_path = os.path.join(_BASE_DIR, '.env')
+
 try:
     from dotenv import load_dotenv
-    # Load .env from project root if it exists
-    _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    _env_path = os.path.join(_BASE_DIR, '.env')
     if os.path.exists(_env_path):
         load_dotenv(_env_path)
     else:
         load_dotenv()
 except ImportError:
-    pass
+    _load_env_file(_env_path)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

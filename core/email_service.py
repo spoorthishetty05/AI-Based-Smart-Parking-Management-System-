@@ -90,6 +90,38 @@ class EmailService:
 
         if app is not None:
             self.init_app(app)
+        else:
+            self._load_from_environ()
+
+    def _load_from_environ(self):
+        """Loads configuration directly from os.environ when running standalone."""
+        self.server = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+        self.port = int(os.environ.get("MAIL_PORT", 587))
+        self.username = os.environ.get("MAIL_USERNAME", "").strip()
+        self.password = os.environ.get("MAIL_PASSWORD", "").strip()
+        self.default_sender = os.environ.get("MAIL_DEFAULT_SENDER", "Smart Parking AI <noreply@smartparking.ai>")
+        self.reply_to = os.environ.get("MAIL_REPLY_TO", "").strip()
+        self.timeout = int(os.environ.get("MAIL_TIMEOUT", 15))
+        self.suppress_send = os.environ.get("MAIL_SUPPRESS_SEND", "false").lower() in ("true", "1")
+        self.debug = os.environ.get("MAIL_DEBUG", "false").lower() in ("true", "1")
+        self.max_workers = int(os.environ.get("MAIL_MAX_WORKERS", 4))
+
+        explicit_secure = os.environ.get("MAIL_SECURE", None)
+        if explicit_secure is not None:
+            self.secure = explicit_secure.lower() in ("true", "1")
+            self.use_ssl = self.secure
+            self.use_tls = not self.secure
+        else:
+            self.use_ssl = (os.environ.get("MAIL_USE_SSL", "false").lower() in ("true", "1")) or (self.port == 465)
+            self.use_tls = (os.environ.get("MAIL_USE_TLS", "true").lower() in ("true", "1")) if self.port != 465 else False
+            self.secure = self.use_ssl
+
+        with self._lock:
+            if self._executor is None:
+                self._executor = ThreadPoolExecutor(
+                    max_workers=self.max_workers,
+                    thread_name_prefix="EmailWorker"
+                )
 
     def init_app(self, app):
         """Initializes the email service with a Flask application."""
