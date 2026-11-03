@@ -4914,7 +4914,7 @@ def visual_slot_swap():
     # 3. Check target slot eligibility:
     # Check if target slot is listed for exchange by another user
     cursor.execute("""
-        SELECT l.*, r.user_id as listing_user_id, r.vehicle_plate as listing_plate, u.name as listing_user_name
+        SELECT l.*, r.user_id as listing_user_id, r.vehicle_plate as listing_plate, r.vehicle_type as listing_vehicle_type, u.name as listing_user_name
         FROM slot_exchange_listings l
         JOIN reservations r ON l.reservation_id = r.reservation_id
         JOIN users u ON l.user_id = u.user_id
@@ -5072,7 +5072,7 @@ def visual_slot_swap():
                     )
                     db_m.parking_slots.update_one(
                         {'slot_id': int(source_slot_id)},
-                        {'$set': {'current_reservation_id': other_res_id, 'current_plate': active_listing.get('listing_plate'), 'vehicle_type': active_listing.get('vehicle_type') or other_res.get('vehicle_type', 'Car')}}
+                        {'$set': {'current_reservation_id': other_res_id, 'current_plate': active_listing.get('listing_plate'), 'vehicle_type': active_listing.get('listing_vehicle_type') or active_listing.get('vehicle_type') or 'Car'}}
                     )
                     db_m.slot_exchange_listings.update_one({'listing_id': int(active_listing['listing_id'])}, {'$set': {'status': 'completed'}})
                 else:
