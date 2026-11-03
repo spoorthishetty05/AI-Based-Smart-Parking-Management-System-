@@ -11,6 +11,8 @@ import os
 import sys
 import ssl
 import smtplib
+import socket
+import time
 import mimetypes
 import logging
 import threading
@@ -221,40 +223,56 @@ class EmailService:
         """Returns readable transport descriptor for logging/debugging."""
         return "SSL/TLS (Direct smtplib.SMTP_SSL, port 465)" if self.is_secure_ssl() else "STARTTLS (Upgrade smtplib.SMTP + starttls, port 587)"
 
-    def _create_smtp_connection(self):
+    def _create_smtp_connection(self, max_retries: int = 2):
         """
         Instantiates and returns an authenticated secure SMTP connection.
         Handles direct SSL/TLS (port 465) or STARTTLS upgrade (port 587).
+        Automatically retries on transient DNS / socket connection errors.
         """
         # Modern secure SSL Context with TLS 1.2+ minimum
         ssl_context = ssl.create_default_context()
+        attempts = 0
 
-        if self.is_secure_ssl():
-            # Option 1A: Direct SSL/TLS (Nodemailer secure: true / port 465)
-            logger.debug(f"Connecting via direct SSL/TLS to {self.server}:{self.port}...")
-            server = smtplib.SMTP_SSL(
-                host=self.server,
-                port=self.port,
-                context=ssl_context,
-                timeout=self.timeout
-            )
-        else:
-            # Option 1B: STARTTLS Upgrade (Nodemailer secure: false / port 587)
-            logger.debug(f"Connecting via STARTTLS upgrade to {self.server}:{self.port}...")
-            server = smtplib.SMTP(
-                host=self.server,
-                port=self.port,
-                timeout=self.timeout
-            )
-            server.ehlo()
-            server.starttls(context=ssl_context)
-            server.ehlo()
+        while attempts <= max_retries:
+            attempts += 1
+            try:
+                if self.is_secure_ssl():
+                    # Option 1A: Direct SSL/TLS (Nodemailer secure: true / port 465)
+                    logger.debug(f"Connecting via direct SSL/TLS to {self.server}:{self.port}...")
+                    server = smtplib.SMTP_SSL(
+                        host=self.server,
+                        port=self.port,
+                        context=ssl_context,
+                        timeout=self.timeout
+                    )
+                else:
+                    # Option 1B: STARTTLS Upgrade (Nodemailer secure: false / port 587)
+                    logger.debug(f"Connecting via STARTTLS upgrade to {self.server}:{self.port}...")
+                    server = smtplib.SMTP(
+                        host=self.server,
+                        port=self.port,
+                        timeout=self.timeout
+                    )
+                    server.ehlo()
+                    server.starttls(context=ssl_context)
+                    server.ehlo()
 
-        if self.username and self.password:
-            logger.debug(f"Authenticating SMTP user: {self.username}")
-            server.login(self.username, self.password)
+                if self.username and self.password:
+                    logger.debug(f"Authenticating SMTP user: {self.username}")
+                    server.login(self.username, self.password)
 
-        return server
+                return server
+            except (socket.gaierror, socket.timeout, TimeoutError, OSError, ConnectionError) as net_err:
+                if attempts <= max_retries:
+                    logger.warning(
+                        f"[Email Transport Notice] Transient network/DNS issue connecting to {self.server}:{self.port} "
+                        f"({net_err}). Retrying attempt {attempts + 1}/{max_retries + 1}..."
+                    )
+                    time.sleep(1.0)
+                else:
+                    raise
+            except Exception:
+                raise
 
     def test_connection(self) -> Dict[str, Any]:
         """
@@ -579,15 +597,41 @@ class EmailService:
         """Worker function executed inside the background ThreadPool."""
         if flask_app:
             with flask_app.app_context():
-                try:
-                    self._send_raw(mime_msg, recipients)
-                except Exception as e:
-                    logger.error(f"[Background Email Error] Failed to send to {recipients}: {e}", exc_info=True)
+                self._dispatch_with_fallback(mime_msg, recipients)
         else:
-            try:
-                self._send_raw(mime_msg, recipients)
-            except Exception as e:
-                logger.error(f"[Background Email Error] Failed to send to {recipients}: {e}", exc_info=True)
+            self._dispatch_with_fallback(mime_msg, recipients)
+
+    def _dispatch_with_fallback(self, mime_msg: MIMEMultipart, recipients: List[str]):
+        """Executes raw send with graceful fallback to simulated outbox on network failure."""
+        try:
+            self._send_raw(mime_msg, recipients)
+        except Exception as e:
+            err_str = str(e).lower()
+            is_network = (
+                isinstance(e, (socket.gaierror, socket.timeout, TimeoutError, OSError, ConnectionError)) or
+                any(k in err_str for k in ["getaddrinfo", "errno 11001", "name or service not known", "timed out", "unreachable", "connection refused", "connection reset"])
+            )
+            if is_network:
+                record = {
+                    "message_id": mime_msg.get("Message-ID", ""),
+                    "to": recipients,
+                    "from": mime_msg.get("From", ""),
+                    "subject": mime_msg.get("Subject", ""),
+                    "text": _strip_html_tags(str(mime_msg)),
+                    "html": None,
+                    "has_attachments": False,
+                    "attachments_count": 0,
+                    "mode": "Offline (Network/DNS Unreachable)",
+                    "timestamp": formatdate(localtime=True),
+                    "offline_reason": str(e)
+                }
+                self.outbox.append(record)
+                logger.warning(
+                    f"[SmartParking.EmailService] [Offline Notice] Unable to deliver email to {recipients} due to transient DNS/network unavailability ({e}). "
+                    f"Message '{mime_msg.get('Subject', '')}' preserved in offline outbox."
+                )
+            else:
+                logger.error(f"[Background Email Error] Failed to send to {recipients}: {e}")
 
     def _send_raw(self, mime_msg: MIMEMultipart, recipients: List[str]) -> Dict[str, Any]:
         """Low-level SMTP dispatch method executing actual socket connection."""
@@ -613,6 +657,9 @@ class EmailService:
         except smtplib.SMTPException as e:
             err = f"SMTP Protocol Error: {str(e)}"
             logger.error(err)
+            raise EmailSendError(err) from e
+        except (socket.gaierror, socket.timeout, TimeoutError, OSError, ConnectionError) as e:
+            err = f"SMTP Network / DNS Error: {str(e)}"
             raise EmailSendError(err) from e
         except Exception as e:
             err = f"Failed to send email: {str(e)}"

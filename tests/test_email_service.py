@@ -238,6 +238,36 @@ class TestEmailTransport(unittest.TestCase):
         mock_instance.login.assert_called_with("test@gmail.com", "app_password_123")
         mock_instance.quit.assert_called()
 
+    @patch("smtplib.SMTP")
+    def test_dns_network_error_offline_outbox_fallback(self, mock_smtp):
+        """Verifies that transient DNS/socket failures trigger retries and archive cleanly into outbox."""
+        import socket
+        mock_smtp.side_effect = socket.gaierror(11001, "getaddrinfo failed")
+
+        app = Flask(__name__)
+        app.config.update({
+            "MAIL_PORT": 587,
+            "MAIL_SERVER": "smtp.gmail.com",
+            "MAIL_USERNAME": "test@gmail.com",
+            "MAIL_PASSWORD": "app_password_123",
+            "MAIL_SUPPRESS_SEND": False
+        })
+        service = EmailService(app)
+        service.outbox.clear()
+
+        res = service.send(
+            to="offline.driver@smartparking.ai",
+            subject="Offline Resilience Test",
+            html="<p>Testing offline queue fallback</p>",
+            sync=False
+        )
+        self.assertTrue(res.get("success"))
+        service.executor.shutdown(wait=True)
+
+        self.assertEqual(len(service.outbox), 1)
+        self.assertEqual(service.outbox[0]["subject"], "Offline Resilience Test")
+        self.assertIn("Offline", service.outbox[0]["mode"])
+
 
 if __name__ == "__main__":
     unittest.main()

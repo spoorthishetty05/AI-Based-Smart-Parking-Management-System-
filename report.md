@@ -29,8 +29,9 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 10. [Bug 10: Git Repository Synchronization & Unpushed Master Branch](#bug-10-git-repository-synchronization--unpushed-master-branch)
 11. [Bug 11: Absence of Payment Gateway and Online Reservation / Penalty Clearance Integration](#bug-11-absence-of-payment-gateway-and-online-reservation--penalty-clearance-integration)
 12. [Enterprise Architectural Refactoring: Flask Blueprints & SQLite Deprecation](#enterprise-architectural-refactoring-flask-blueprints--sqlite-deprecation)
-13. [Master Test Suite Verification](#master-test-suite-verification)
-14. [System Maintenance & Production Recommendations](#system-maintenance--production-recommendations)
+13. [Bug 12: Transient DNS Network Outage and Resilient Email Fallback](#bug-12-transient-dns-network-outage-and-resilient-email-fallback)
+14. [Master Test Suite Verification](#master-test-suite-verification)
+15. [System Maintenance & Production Recommendations](#system-maintenance--production-recommendations)
 
 ---
 
@@ -336,6 +337,21 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 
 ---
 
+### Bug 12: Transient DNS Network Outage and Resilient Email Fallback
+
+- **Component:** `core/email_service.py`, `tests/test_email_service.py`
+- **Severity:** Medium
+- **Symptom:**
+  During momentary DNS lags, Wi-Fi drops, or laptop sleep re-awakenings, background email dispatches failed with `socket.gaierror: [Errno 11001] getaddrinfo failed` connecting to `smtp.gmail.com:587`. The background thread dumped full multi-line tracebacks into the server terminal, and the undelivered messages were dropped without retry or persistence.
+- **Root Cause:**
+  `_create_smtp_connection()` made a single socket connection attempt without backoff retry. In addition, `_dispatch_background()` logged `exc_info=True` for transient socket/DNS errors and had no fallback storage mechanism when offline.
+- **Resolution:**
+  - **Automatic Retry with Backoff:** Implemented up to 2 retries with a 1.0s delay in `_create_smtp_connection()` for transient socket errors (`socket.gaierror`, `socket.timeout`, `OSError`, `ConnectionError`).
+  - **Graceful Offline Outbox Fallback:** Added `_dispatch_with_fallback()` which catches persistent offline/DNS errors, safely captures the undelivered email into `service.outbox` (`Offline (Network/DNS Unreachable)`), and logs a clean, informative single-line notice without dumping noisy tracebacks.
+  - **Unit Test Coverage:** Added `test_dns_network_error_offline_outbox_fallback` to `tests/test_email_service.py`, asserting that simulated socket failures trigger retries and archive cleanly into the outbox.
+
+---
+
 ## Master Test Suite Verification
 
 To verify that all bug fixes function harmoniously without regression, the project was evaluated using the unified test runner `tests/run_tests.py`:
@@ -345,8 +361,8 @@ To verify that all bug fixes function harmoniously without regression, the proje
   AI-BASED SMART PARKING SYSTEM — UNIFIED MASTER TEST SUITE
 ================================================================================
 Total Suites Executed : 8 (Admin, Auth, Booking, ML/Simulation, Overstay, Exchange, Email, Payment)
-Total Tests Executed  : 47
-Passed Tests          : 47
+Total Tests Executed  : 48
+Passed Tests          : 48
 Failures              : 0
 Errors                : 0
 Execution Time        : 38.25 seconds
@@ -364,9 +380,9 @@ RESULT: ALL SUITES PASSED [100% SUCCESS]
 | **ML Models & Virtual Clock** | `tests/test_ml_simulation.py` | 5 | **PASS** |
 | **Overstay & Penalty Engine** | `tests/test_overstay.py` | 4 | **PASS** |
 | **Slot Exchange Lifecycle** | `tests/test_slot_exchange.py` | 3 | **PASS** |
-| **SSL/TLS Email Transport** | `tests/test_email_service.py` | 12 | **PASS** |
+| **SSL/TLS Email Transport** | `tests/test_email_service.py` | 13 | **PASS** |
 | **Razorpay Payment Gateway** | `tests/test_payment.py` | 7 | **PASS** |
-| **TOTAL** | | **47** | **100%** |
+| **TOTAL** | | **48** | **100%** |
 
 ---
 
