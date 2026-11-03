@@ -446,7 +446,7 @@
                       <i class="fas fa-warehouse" style="color:#2563eb;"></i> Step 1: Where do you want to park?
                     </h3>
                     <p style="font-size:13.5px; color:#64748b; margin:4px 0 0;">
-                      Select your preferred parking facility. View real-time tariff rates and live vacancy.
+                      Select your preferred parking facility and view live vacancy.
                     </p>
                   </div>
                   <span class="badge"
@@ -477,8 +477,7 @@
                         <span>{{ lot.operating_hours or '24/7 (Open Daily)' }}</span>
                       </div>
                     </div>
-                    <div class="facility-pick-meta">
-                      <div class="facility-rate-tag">₹{{ lot.hourly_rate or 40 }}/hr</div>
+                    <div class="facility-pick-meta" style="justify-content:flex-end;">
                       <div class="facility-slots-badge">
                         <i class="fas fa-circle-check"></i>
                         <span>{{ lot.total_slots or 40 }}+ Total Slots</span>

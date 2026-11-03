@@ -302,6 +302,7 @@ During the project lifecycle, multiple subsystems—including user authenticatio
   - **Clean Typography:** Removed emoji icons from all vehicle dropdown menus, rendering crisp text labels (`Car`, `Bike`, `SUV`, `Electric Vehicle`, `Other Vehicle`).
   - **Added 'Other Vehicle' Option:** Added `<option value="Other">Other Vehicle</option>` across AI recommendation dropdowns, the 5-step booking wizard, and user vehicle registration modals.
   - **AI Compatibility Ranking:** Updated `core/recommendation_engine.py` to assign top suitability (1.0) for Standard and Compact slots when "Other Vehicle" is requested.
+  - **Booking Wizard Step 1 Tariff Removal:** Removed the hourly fee badge (`₹XX.0/hr`) from the facility selection cards in Step 1 (*"Where do you want to park?"*) of the booking wizard (`templates/user_panel.html`), aligning with the overall cleaner, decluttered overview style while retaining full live vacancy indicators.
 
 ---
 
