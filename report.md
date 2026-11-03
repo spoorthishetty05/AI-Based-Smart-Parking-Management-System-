@@ -28,8 +28,9 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 9. [Bug 9: Missing python-dotenv Dependency Silencing Environment Configuration](#bug-9-missing-python-dotenv-dependency-silencing-environment-configuration)
 10. [Bug 10: Git Repository Synchronization & Unpushed Master Branch](#bug-10-git-repository-synchronization--unpushed-master-branch)
 11. [Bug 11: Absence of Payment Gateway and Online Reservation / Penalty Clearance Integration](#bug-11-absence-of-payment-gateway-and-online-reservation--penalty-clearance-integration)
-12. [Master Test Suite Verification](#master-test-suite-verification)
-13. [System Maintenance & Production Recommendations](#system-maintenance--production-recommendations)
+12. [Enterprise Architectural Refactoring: Flask Blueprints & SQLite Deprecation](#enterprise-architectural-refactoring-flask-blueprints--sqlite-deprecation)
+13. [Master Test Suite Verification](#master-test-suite-verification)
+14. [System Maintenance & Production Recommendations](#system-maintenance--production-recommendations)
 
 ---
 
@@ -303,6 +304,35 @@ During the project lifecycle, multiple subsystems—including user authenticatio
   - **Added 'Other Vehicle' Option:** Added `<option value="Other">Other Vehicle</option>` across AI recommendation dropdowns, the 5-step booking wizard, and user vehicle registration modals.
   - **AI Compatibility Ranking:** Updated `core/recommendation_engine.py` to assign top suitability (1.0) for Standard and Compact slots when "Other Vehicle" is requested.
   - **Booking Wizard Step 1 Tariff Removal:** Removed the hourly fee badge (`₹XX.0/hr`) from the facility selection cards in Step 1 (*"Where do you want to park?"*) of the booking wizard (`templates/user_panel.html`), aligning with the overall cleaner, decluttered overview style while retaining full live vacancy indicators.
+
+---
+
+### Enterprise Architectural Refactoring: Flask Blueprints & SQLite Deprecation
+
+- **Component:** `app.py`, `routes/`, `.gitignore`, `smart_parking.db`
+- **Severity:** Architectural Modernization & Code Quality
+- **Symptom:**
+  `app.py` had accumulated 6,632 lines of code containing web routes, authentication, simulation, AI forecasts, Razorpay payment processing, and slot exchange logic in a single monolithic file. In addition, an orphaned binary `smart_parking.db` existed in the repository despite MongoDB being the exclusive database engine.
+- **Root Cause:**
+  Lack of domain decomposition and modular blueprint boundaries caused high cognitive load, tight coupling, and maintenance friction.
+- **Resolution:**
+  - **Deprecated & Removed SQLite Binary:** Cleanly removed `smart_parking.db` via `git rm`, added `*.db`, `*.sqlite`, `*.sqlite3` to `.gitignore`, and updated documentation.
+  - **Modular Blueprint Architecture (`routes/`):** Decomposed `app.py` into 12 dedicated Flask Blueprints in `routes/`:
+    1. `routes/auth_routes.py` (`auth_bp`): Login, registration, role verification, and authentication APIs.
+    2. `routes/web_routes.py` (`web_bp`): HTML web page views, root landing page, and dashboards.
+    3. `routes/booking_routes.py` (`booking_bp`): 5-step booking wizard, reservation lifecycle, passes.
+    4. `routes/payment_routes.py` (`payment_bp`): Razorpay orders, payment verification, penalty clearance.
+    5. `routes/admin_routes.py` (`admin_bp`): Admin metrics, live telemetry, and reports.
+    6. `routes/lot_routes.py` (`lot_bp`): Facilities, slot management, and activity logs.
+    7. `routes/ai_routes.py` (`ai_bp`): Recommendation engine, ML forecasting, and clustering.
+    8. `routes/overstay_routes.py` (`overstay_bp`): Radar tracking, barrier gate control, penalty fees.
+    9. `routes/simulation_routes.py` (`simulation_bp`): Virtual clock and simulation test harness.
+    10. `routes/exchange_routes.py` (`exchange_bp`): P2P slot marketplace and 2D visual swapping.
+    11. `routes/email_routes.py` (`email_bp`): SMTP telemetry, diagnostic delivery test, and outbox.
+    12. `routes/user_routes.py` (`user_bp`): Profile management, vehicle registrations, and settings.
+    13. `routes/middleware.py`: Reusable decorators (`login_required`, `admin_required`) and session helpers.
+  - **Lean Application Entrypoint:** Reduced `app.py` from 6,632 lines to 49 lines, retaining pure application factory instantiation, middleware loading, and MongoDB connectivity checks.
+  - **Full Backward Compatibility:** Preserved all 149 routes, endpoints, session handling, and backward-compatible route aliases. Verified with 100% test pass rate across the unified test suite.
 
 ---
 
