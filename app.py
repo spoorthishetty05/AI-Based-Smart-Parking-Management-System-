@@ -977,6 +977,7 @@ def booking_review():
 
     vehicle_doc = veh_owned or (db.vehicles.find_one({'license_plate': vehicle_plate}) if (db is not None and vehicle_plate) else {}) or {}
     vehicle_type = normalize_vehicle_type(vehicle_doc.get('vehicle_type', data.get('vehicle_type', 'Car')))
+    vehicle_name = (data.get('vehicle_name') or data.get('make_model') or vehicle_doc.get('make_model') or vehicle_doc.get('vehicle_name', '')).strip()
 
     if not slot_id:
         return jsonify({'status': 'error', 'message': 'Parking slot selection is required.'}), 400
@@ -1061,6 +1062,8 @@ def booking_review():
         'duration_hours': duration_hours,
         'vehicle_plate': vehicle_plate,
         'vehicle_type': vehicle_type,
+        'vehicle_name': vehicle_name,
+        'make_model': vehicle_name,
         'hourly_rate': hourly_rate,
         'total_amount': total_amount,
         'estimated_fare': total_amount,
@@ -1255,6 +1258,8 @@ def booking_confirm():
     uid = session.get('user_id')
     user_role = session.get('user_role', 'user')
     vehicle_plate = (data.get('vehicle_plate') or data.get('vehicle_number') or '').strip().upper()
+    vehicle_type = normalize_vehicle_type(data.get('vehicle_type', 'Car'))
+    vehicle_name = (data.get('vehicle_name') or data.get('make_model') or '').strip()
 
     db = get_mongo_db()
     if vehicle_plate:
@@ -1267,6 +1272,9 @@ def booking_confirm():
                     return jsonify({'status': 'error', 'message': f"Unauthorized: Vehicle '{vehicle_plate}' is registered to another user."}), 403
                 if not app.config.get('TESTING'):
                     return jsonify({'status': 'error', 'message': f"Unauthorized: Vehicle '{vehicle_plate}' is not registered to your account."}), 403
+        else:
+            if not vehicle_name:
+                vehicle_name = veh_owned.get('make_model') or veh_owned.get('vehicle_name', '')
 
     payment_id = data.get('payment_id') or data.get('razorpay_payment_id')
     payment_order_id = data.get('payment_order_id') or data.get('razorpay_order_id')
@@ -1287,7 +1295,9 @@ def booking_confirm():
         'start_time': start_time,
         'duration': data.get('duration', '2 Hours'),
         'vehicle_plate': vehicle_plate,
-        'vehicle_type': normalize_vehicle_type(data.get('vehicle_type', 'Car')),
+        'vehicle_type': vehicle_type,
+        'vehicle_name': vehicle_name,
+        'make_model': vehicle_name,
         'vehicle_id': data.get('vehicle_id'),
         'payment_id': payment_id,
         'payment_order_id': payment_order_id,
@@ -1319,7 +1329,8 @@ def booking_confirm():
                     "lot_name": result.get('place_name') or result.get('lot_name') or "Smart Parking Facility",
                     "slot_name": result.get('slot_number') or result.get('slot_name') or f"Slot {result.get('slot_id')}",
                     "vehicle_number": booking_payload.get('vehicle_number', ''),
-                    "vehicle_type": booking_payload.get('vehicle_type', 'Car'),
+                    "vehicle_name": vehicle_name,
+                    "vehicle_type": vehicle_type,
                     "start_time": f"{booking_payload.get('booking_date', '')} {booking_payload.get('start_time', '')}".strip(),
                     "end_time": f"{booking_payload.get('booking_date', '')} {booking_payload.get('end_time', '')}".strip(),
                     "total_amount": result.get('total_amount', 0.0),
@@ -1544,6 +1555,8 @@ def booking_get_pass(booking_id):
             'slot_number': booking.get('slot_number', 'A01'),
             'lot_name': booking.get('lot_name', 'City Parking'),
             'vehicle_plate': booking.get('vehicle_plate', 'Not Assigned'),
+            'vehicle_name': booking.get('vehicle_name') or booking.get('make_model', ''),
+            'vehicle_type': booking.get('vehicle_type', 'Car'),
             'date': booking.get('booking_date') or booking.get('date', ''),
             'start_time': booking.get('start_time', '10:00'),
             'end_time': booking.get('end_time') or booking.get('duration', '12:00')

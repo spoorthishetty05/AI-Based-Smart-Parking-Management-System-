@@ -96,6 +96,7 @@ class TestBookingModule(unittest.TestCase):
             'duration': '1 Hour',
             'vehicle_plate': 'KA10A4614',
             'vehicle_number': 'KA10A4614',
+            'vehicle_name': 'Yamaha FZ',
             'vehicle_type': 'Bike'
         })
         self.assertEqual(conf_res.status_code, 201)
@@ -107,6 +108,8 @@ class TestBookingModule(unittest.TestCase):
         mongo_b = self.db.bookings.find_one({'booking_id': bid})
         self.assertIsNotNone(mongo_b)
         self.assertEqual(mongo_b['status'], 'confirmed')
+        self.assertEqual(mongo_b.get('vehicle_name'), 'Yamaha FZ')
+        self.assertEqual(mongo_b.get('vehicle_type'), 'Bike')
 
         # 2. Digital Pass API
         pass_res = self.client.get(f'/booking/{bid}/pass')
@@ -114,6 +117,8 @@ class TestBookingModule(unittest.TestCase):
         pass_info = pass_res.json.get('pass')
         self.assertIsNotNone(pass_info)
         self.assertEqual(pass_info.get('slot_number'), slot_number)
+        self.assertEqual(pass_info.get('vehicle_name'), 'Yamaha FZ')
+        self.assertEqual(pass_info.get('vehicle_type'), 'Bike')
 
         # 3. View in My Bookings
         my_res = self.client.get('/booking/my-bookings', headers={'Accept': 'application/json'})

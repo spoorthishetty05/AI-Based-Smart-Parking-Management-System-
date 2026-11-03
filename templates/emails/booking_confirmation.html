@@ -21,8 +21,8 @@
     <td><strong style="color: #2563eb; font-size: 16px;">{{ slot_name|default("Slot A-01") }}</strong></td>
   </tr>
   <tr>
-    <th>Vehicle Number</th>
-    <td>{{ vehicle_number }} ({{ vehicle_type|default("Car")|title }})</td>
+    <th>Vehicle</th>
+    <td>{{ vehicle_number }}{% if vehicle_name %} &bull; {{ vehicle_name }}{% endif %} ({{ vehicle_type|default("Car")|title }})</td>
   </tr>
   <tr>
     <th>Entry (Start Time)</th>

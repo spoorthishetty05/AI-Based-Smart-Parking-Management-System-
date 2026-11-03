@@ -732,6 +732,7 @@ def mongo_create_booking(booking_data):
     user_role = booking_data.get('user_role', 'user')
     # Check vehicle in vehicles collection or embedded user vehicles
     veh_owned = db.vehicles.find_one({'user_id': user_id, 'license_plate': vehicle_plate})
+    vehicle_name = str(booking_data.get('vehicle_name') or booking_data.get('make_model') or (veh_owned.get('make_model') if veh_owned else '') or '').strip()
     if not veh_owned:
         u_doc = db.users.find_one({'user_id': user_id, 'vehicles.license_plate': vehicle_plate})
         if not u_doc and user_role != 'admin':
@@ -883,6 +884,8 @@ def mongo_create_booking(booking_data):
         'vehicle_id': booking_data.get('vehicle_id'),
         'vehicle_plate': vehicle_plate,
         'vehicle_type': booking_data.get('vehicle_type', 'Car'),
+        'vehicle_name': vehicle_name,
+        'make_model': vehicle_name,
         'category': final_category,
         'facility_category': final_category,
         'place_id': place.get('place_id') if place else None,
@@ -948,6 +951,8 @@ def mongo_create_booking(booking_data):
         'lot_name': final_place_name,
         'vehicle_plate': booking_doc['vehicle_plate'],
         'vehicle_type': booking_doc['vehicle_type'],
+        'vehicle_name': vehicle_name,
+        'make_model': vehicle_name,
         'date': date,
         'start_time': start_time,
         'end_time': end_time_str,

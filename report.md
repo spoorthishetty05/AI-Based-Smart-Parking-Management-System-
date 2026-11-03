@@ -233,6 +233,27 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 
 ---
 
+### Bug 12: Incomplete Vehicle Identification in Booking Wizard Step 2 & Missing Persistence of Vehicle Name / Type Across Booking Lifecycle
+
+- **Component:** `templates/user_panel.html`, `templates/booking_panel.html`, `static/js/guided_booking_wizard.js`, `app.py`, `core/mongo_engine.py`, `templates/emails/booking_confirmation.html`, `tests/test_booking.py`
+- **Severity:** Medium / User Experience & Data Integrity
+- **Symptom:**
+  In Step 2 of the guided booking wizard ("Which vehicle are you using?"), vehicle cards displayed only license plate numbers and generic subtitles without explicit category badges or prominent vehicle model labels. Clicking the "Manual Plate" card lacked inputs to enter the Vehicle Name / Model. Furthermore, `state.vehicleName` was omitted from the wizard state and booking submission payload, resulting in booking records, confirmation emails, and digital passes lacking the specific vehicle model name.
+- **Root Cause:**
+  1. `userWizardSelectVehicle(el, plate, type)` did not capture or store the vehicle model name (`make_model` / `vehicle_name`).
+  2. `#manualVehicleCard` referenced an undefined JavaScript function `userWizardSelectManualVehicle(this)`.
+  3. `#wizardManualPlateBox` only contained inputs for License Plate and Category, omitting Vehicle Name / Model.
+  4. Backend endpoints (`/booking/review`, `/booking/confirm`, `/booking/<id>/pass`) and `core/mongo_engine.py` (`mongo_create_booking`) did not persist or return `vehicle_name` and `make_model` in MongoDB `db.bookings` and `db.reservations`.
+- **Resolution:**
+  - **Enhanced Step 2 UI (`templates/user_panel.html` & `templates/booking_panel.html`):** Registered vehicle cards now prominently display the Vehicle Name / Model (e.g., Suzuki Swift, Tata Nexon), an explicit category badge (`Car`, `SUV`, `EV`, `Bike`), and the vehicle registration number. Also added a real-time selection indicator (`#wizardStep2SelectedPlate`) in the footer navigation.
+  - **Comprehensive Manual Vehicle Entry:** Implemented `userWizardSelectManualVehicle(el)` and `userWizardOnManualPlateChange()` with responsive input fields for License Plate Number, Vehicle Name / Model, and Vehicle Category / Type.
+  - **Wizard State Flow (`static/js/guided_booking_wizard.js`):** Extended `window.guidedBookingState` with `vehicleName`. Updated Step 5 Review (`#wizardRevVehicle`) to display `${plate} • ${name} (${type})`, and included `vehicle_name` and `make_model` in `basePayload` for wizard bookings and `quickPayload` for Quick Bookings.
+  - **Backend & MongoDB Persistence (`app.py` & `core/mongo_engine.py`):** Updated `booking_confirm` and `mongo_create_booking` to atomically persist `vehicle_name` and `make_model` in both `db.bookings` and `db.reservations`, and return them in digital parking passes (`booking_get_pass`).
+  - **Template & Email Updates (`templates/emails/booking_confirmation.html`):** Updated booking confirmation emails to present `{{ vehicle_number }} • {{ vehicle_name }} ({{ vehicle_type }})`.
+  - **Automated Test Suite (`tests/test_booking.py`):** Extended `test_04_full_booking_lifecycle_and_pass_and_cancellation` to confirm `vehicle_name` and `vehicle_type` persistence in MongoDB documents and digital pass responses.
+
+---
+
 ## Master Test Suite Verification
 
 To verify that all bug fixes function harmoniously without regression, the project was evaluated using the unified test runner `tests/run_tests.py`:

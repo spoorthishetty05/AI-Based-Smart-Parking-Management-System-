@@ -21,6 +21,7 @@
     hourlyRate: 30.0,
     vehiclePlate: '',
     vehicleType: 'Car',
+    vehicleName: '',
     bookingDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
     startTime: `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`,
     durationHours: 1.0,
@@ -196,14 +197,16 @@
 
     // 3. Initialize Vehicle (Current user's registered vehicles)
     const firstVehicleCard = document.querySelector('.vehicle-card-pick');
-    if (firstVehicleCard) {
+    if (firstVehicleCard && (!firstVehicleCard.id || !firstVehicleCard.id.includes('manualVehicleCard'))) {
       const plate = firstVehicleCard.getAttribute('data-plate') || '';
       const vtype = firstVehicleCard.getAttribute('data-type') || 'Car';
+      const vname = firstVehicleCard.getAttribute('data-name') || '';
       state.vehiclePlate = plate;
       state.vehicleType = vtype;
+      state.vehicleName = vname;
       firstVehicleCard.classList.add('selected');
       const selPlateEl = document.getElementById('wizardStep2SelectedPlate');
-      if (selPlateEl) selPlateEl.textContent = plate;
+      if (selPlateEl) selPlateEl.textContent = plate ? `${plate}${vname ? ' • ' + vname : ''} (${vtype})` : 'None Selected';
       const btnStep2 = document.getElementById('btnWizardStep2Next');
       if (btnStep2) btnStep2.disabled = false;
     } else {
@@ -357,18 +360,60 @@
   // ============================================================
   // STEP 2: SELECT VEHICLE NUMBER & ADD VEHICLE
   // ============================================================
-  window.userWizardSelectVehicle = function (el, plate, type) {
+  window.userWizardSelectVehicle = function (el, plate, type, name) {
     state.vehiclePlate = plate;
     state.vehicleType = type || 'Car';
+    state.vehicleName = name || '';
 
     document.querySelectorAll('.vehicle-card-pick').forEach(c => c.classList.remove('selected'));
     if (el) el.classList.add('selected');
 
+    const manualBox = document.getElementById('wizardManualPlateBox');
+    if (manualBox) manualBox.style.display = 'none';
+
     const selPlateEl = document.getElementById('wizardStep2SelectedPlate');
-    if (selPlateEl) selPlateEl.textContent = plate;
+    if (selPlateEl) {
+      selPlateEl.textContent = `${plate}${state.vehicleName ? ' • ' + state.vehicleName : ''} (${state.vehicleType})`;
+    }
 
     const btnNext = document.getElementById('btnWizardStep2Next');
     if (btnNext) btnNext.disabled = false;
+  };
+
+  window.userWizardSelectManualVehicle = function (el) {
+    document.querySelectorAll('.vehicle-card-pick').forEach(c => c.classList.remove('selected'));
+    if (el) el.classList.add('selected');
+
+    const manualBox = document.getElementById('wizardManualPlateBox');
+    if (manualBox) manualBox.style.display = 'block';
+
+    userWizardOnManualPlateChange();
+    const input = document.getElementById('wizardInputManualPlate');
+    if (input) input.focus();
+  };
+
+  window.userWizardOnManualPlateChange = function () {
+    const plateInput = document.getElementById('wizardInputManualPlate');
+    const nameInput = document.getElementById('wizardInputManualName');
+    const typeSelect = document.getElementById('wizardInputManualType');
+
+    const plate = (plateInput ? plateInput.value : '').trim().toUpperCase();
+    const name = (nameInput ? nameInput.value : '').trim();
+    const type = (typeSelect ? typeSelect.value : 'Car') || 'Car';
+
+    state.vehiclePlate = plate;
+    state.vehicleName = name;
+    state.vehicleType = type;
+
+    const selPlateEl = document.getElementById('wizardStep2SelectedPlate');
+    if (selPlateEl) {
+      selPlateEl.textContent = plate ? `${plate}${name ? ' • ' + name : ''} (${type})` : 'Manual Entry';
+    }
+
+    const btnNext = document.getElementById('btnWizardStep2Next');
+    if (btnNext) {
+      btnNext.disabled = (plate.length < 4);
+    }
   };
 
   window.openAddVehicleModal = function () {
@@ -428,6 +473,7 @@
         newCard.className = 'vehicle-card-pick selected';
         newCard.setAttribute('data-plate', plate);
         newCard.setAttribute('data-type', vType);
+        newCard.setAttribute('data-name', model);
         const icon = vType.toLowerCase() === 'bike' ? '🏍️' : (vType.toLowerCase() === 'ev' ? '⚡' : (vType.toLowerCase() === 'suv' ? '🚙' : '🚗'));
         newCard.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -444,14 +490,14 @@
             <div class="vehicle-card-sub">${escapeHtml(model || 'Registered Vehicle')} &bull; ${escapeHtml(color || 'Standard')}</div>
           </div>
         `;
-        newCard.onclick = () => userWizardSelectVehicle(newCard, plate, vType);
+        newCard.onclick = () => userWizardSelectVehicle(newCard, plate, vType, model);
 
         document.querySelectorAll('.vehicle-card-pick').forEach(c => c.classList.remove('selected'));
         if (grid && addBox) {
           grid.insertBefore(newCard, addBox);
         }
 
-        userWizardSelectVehicle(newCard, plate, vType);
+        userWizardSelectVehicle(newCard, plate, vType, model);
         closeAddVehicleModal();
         showWizardToast(`Vehicle '${plate}' registered successfully!`, 'success');
       } else {
@@ -1035,7 +1081,10 @@
 
     setField('wizardRevFacility', `${state.categoryName} • ${state.placeName}`);
     setField('wizardRevAddress', state.placeAddress || 'Bangalore Central Hub');
-    setField('wizardRevVehicle', `${state.vehiclePlate} (${state.vehicleType})`);
+    const vehDisp = state.vehicleName 
+      ? `${state.vehiclePlate} • ${state.vehicleName} (${state.vehicleType})`
+      : `${state.vehiclePlate} (${state.vehicleType})`;
+    setField('wizardRevVehicle', vehDisp);
     setField('wizardRevDate', state.bookingDate);
     setField('wizardRevTimeInterval', `${state.startTime} – ${endTime}`);
     setField('wizardRevDuration', state.durationLabel);
@@ -1104,7 +1153,9 @@
       duration: state.durationLabel,
       vehicle_plate: state.vehiclePlate,
       vehicle_number: state.vehiclePlate,
-      vehicle_type: state.vehicleType
+      vehicle_type: state.vehicleType,
+      vehicle_name: state.vehicleName,
+      make_model: state.vehicleName
     };
 
     if (isRazorpay && typeof window.openRazorpayModal === 'function') {
@@ -1297,7 +1348,10 @@
     const startTimeVal = b.start_time || state.startTime;
     const bookingId = b.booking_id || (b.reservation_id ? `BK-${b.reservation_id}` : 'BK-CONFIRMED');
     const passCode = b.pass_code || bookingId;
-    const vehicle = b.vehicle_plate || b.vehicle_number || state.vehiclePlate || 'KA01AB1234';
+    const vehName = b.vehicle_name || b.make_model || state.vehicleName || '';
+    const vehType = b.vehicle_type || state.vehicleType || 'Car';
+    const vehPlate = b.vehicle_plate || b.vehicle_number || state.vehiclePlate || 'KA01AB1234';
+    const vehicle = vehName ? `${vehPlate} • ${vehName} (${vehType})` : `${vehPlate} (${vehType})`;
     const facility = b.place_name || b.parking_place || b.lot_name || state.placeName || state.categoryName || 'Parking Facility';
     const rawFee = (b.total_amount !== undefined && b.total_amount !== null) ? Number(b.total_amount) : (state.hourlyRate * state.durationHours);
     const feeStr = isNaN(rawFee) ? '35.00' : rawFee.toFixed(2);
@@ -1404,6 +1458,10 @@
       return;
     }
 
+    const selectedOpt = vehicleSelect ? vehicleSelect.options[vehicleSelect.selectedIndex] : null;
+    const vType = selectedOpt ? (selectedOpt.getAttribute('data-type') || 'Car') : 'Car';
+    const vName = selectedOpt ? (selectedOpt.getAttribute('data-name') || '') : '';
+
     const quickPayload = {
       slot_id: parseInt(slotId),
       lot_id: parseInt(lotId),
@@ -1414,7 +1472,9 @@
       duration: '2 Hours',
       vehicle_plate: plate.toUpperCase().trim(),
       vehicle_number: plate.toUpperCase().trim(),
-      vehicle_type: 'Car'
+      vehicle_type: vType,
+      vehicle_name: vName,
+      make_model: vName
     };
 
     if (typeof window.openRazorpayModal === 'function') {

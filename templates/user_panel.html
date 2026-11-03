@@ -531,19 +531,27 @@
                 <div class="vehicle-grid" id="wizardVehicleGrid">
                   {% for v in vehicles %}
                   <div class="vehicle-card-pick {% if loop.first %}selected{% endif %}"
-                    data-plate="{{ v.license_plate }}" data-type="{{ v.vehicle_type or 'Car' }}"
-                    onclick="userWizardSelectVehicle(this, '{{ v.license_plate }}', '{{ v.vehicle_type or 'Car' }}')">
+                    data-plate="{{ v.license_plate }}"
+                    data-type="{{ v.vehicle_type or 'Car' }}"
+                    data-name="{{ v.make_model or '' }}"
+                    onclick="userWizardSelectVehicle(this, '{{ v.license_plate }}', '{{ v.vehicle_type or 'Car' }}', '{{ v.make_model or '' }}')">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                      <div style="font-size:24px;">
-                        {% if (v.vehicle_type or '')|lower == 'bike' %}🏍️{% elif (v.vehicle_type or '')|lower == 'ev'
-                        %}⚡{% elif (v.vehicle_type or '')|lower == 'suv' %}🚙{% else %}🚗{% endif %}
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="font-size:24px;">
+                          {% if (v.vehicle_type or '')|lower == 'bike' %}🏍️{% elif (v.vehicle_type or '')|lower == 'ev' %}⚡{% elif (v.vehicle_type or '')|lower == 'suv' %}🚙{% else %}🚗{% endif %}
+                        </div>
+                        <span class="badge" style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">
+                          {{ v.vehicle_type or 'Car' }}
+                        </span>
                       </div>
                       <div class="facility-radio-mark"><i class="fas fa-check"></i></div>
                     </div>
-                    <div>
+                    <div style="margin-top:8px;">
                       <div class="vehicle-card-plate">{{ v.license_plate }}</div>
-                      <div class="vehicle-card-sub">{{ v.make_model or v.vehicle_type or 'Personal Vehicle' }} &bull; {{
-                        v.color or 'Standard' }}</div>
+                      <div class="vehicle-card-sub">
+                        <strong style="color:#1e293b; font-size:13px;">{{ v.make_model or 'Personal Vehicle' }}</strong>
+                        {% if v.color %} &bull; <span>{{ v.color }}</span>{% endif %}
+                      </div>
                     </div>
                   </div>
                   {% endfor %}
@@ -551,12 +559,17 @@
                   <!-- Manual Plate Option Card -->
                   <div class="vehicle-card-pick" id="manualVehicleCard" onclick="userWizardSelectManualVehicle(this)">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                      <div style="font-size:24px;">✏️</div>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="font-size:24px;">✏️</div>
+                        <span class="badge" style="background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">
+                          Manual Entry
+                        </span>
+                      </div>
                       <div class="facility-radio-mark"><i class="fas fa-check"></i></div>
                     </div>
-                    <div>
+                    <div style="margin-top:8px;">
                       <div class="vehicle-card-plate" style="font-size:16px;">Manual Plate</div>
-                      <div class="vehicle-card-sub">Enter another vehicle plate manually</div>
+                      <div class="vehicle-card-sub">Enter vehicle plate and model manually</div>
                     </div>
                   </div>
                 </div>
@@ -564,10 +577,10 @@
                 <!-- Manual Plate Input Form -->
                 <div id="wizardManualPlateBox"
                   style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:18px; margin-top:16px;">
-                  <h4 style="font-size:14px; font-weight:700; color:#1e293b; margin-bottom:10px;">
-                    <i class="fas fa-pen"></i> Enter Vehicle Information
+                  <h4 style="font-size:14px; font-weight:700; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-pen" style="color:#2563eb;"></i> Enter Vehicle Details for this Booking
                   </h4>
-                  <div style="display:grid; grid-template-columns: 2fr 1fr; gap:14px;">
+                  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
                     <div>
                       <label class="user-form-label">License Plate Number <span style="color:#ef4444;">*</span></label>
                       <input type="text" id="wizardInputManualPlate" class="user-form-input"
@@ -575,7 +588,13 @@
                         oninput="userWizardOnManualPlateChange()">
                     </div>
                     <div>
-                      <label class="user-form-label">Vehicle Category</label>
+                      <label class="user-form-label">Vehicle Name / Model <span style="color:#ef4444;">*</span></label>
+                      <input type="text" id="wizardInputManualName" class="user-form-input"
+                        placeholder="e.g. Suzuki Swift / Tata Nexon"
+                        oninput="userWizardOnManualPlateChange()">
+                    </div>
+                    <div>
+                      <label class="user-form-label">Vehicle Category / Type <span style="color:#ef4444;">*</span></label>
                       <select id="wizardInputManualType" class="user-form-select"
                         onchange="userWizardOnManualPlateChange()">
                         <option value="Car">🚗 Car</option>
@@ -585,12 +604,18 @@
                       </select>
                     </div>
                   </div>
+                  <div style="font-size:12px; color:#64748b; margin-top:10px;">
+                    <i class="fas fa-info-circle" style="color:#3b82f6;"></i> Both vehicle name and vehicle type will be recorded on your booking pass and receipt.
+                  </div>
                 </div>
 
-                <div class="wizard-footer-nav">
+                <div class="wizard-footer-nav" style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
                   <button type="button" class="btn-user btn-user-secondary" onclick="userWizardGoToStep(1)">
                     <i class="fas fa-arrow-left"></i> &larr; Back
                   </button>
+                  <div style="font-size:13.5px; color:#64748b;">
+                    Selected Vehicle: <strong id="wizardStep2SelectedPlate" style="color:#2563eb;">{{ vehicles[0].license_plate if vehicles else 'None Selected' }}</strong>
+                  </div>
                   <button type="button" class="btn-user btn-user-primary" id="btnWizardStep2Next"
                     onclick="userWizardGoToStep(3)" style="padding:11px 26px; font-weight:700;">
                     <span>Continue to Schedule &rarr;</span>
