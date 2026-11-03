@@ -284,6 +284,7 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 - **Resolution:**
   - **Terminology Unification:** Changed header titles, browser document title, fallback session attributes, and sidebar badges to consistently say **"User Dashboard"** and **"USER PORTAL"** across `templates/user_panel.html`, `templates/booking_panel.html`, `templates/my_bookings.html`, and `static/js/user_panel.js`.
   - **Rate Display Removal:** Removed the hourly fee line from the dashboard's `renderDashboardNearbyLots` component, leaving a clean display of facility names, operating hours, and live vacant count.
+  - **Find Parking Lots Optimization:** Removed the hourly rate badge (`₹XX/hr`) and the redundant search filter bar from the **Find Parking Lots** view (`tab-find` in `templates/user_panel.html` and `searchParkingLots` in `static/js/user_panel.js`), providing a clean, distraction-free view of all available facilities.
 
 ---
 

@@ -608,7 +608,7 @@ async function searchParkingLots() {
   const query = (document.getElementById('lotSearchInput')?.value || '').trim();
   const container = document.getElementById('findParkingLotsContainer');
   if (!container) return;
-  container.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> Searching parking lots...</div>';
+  container.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> Loading parking facilities...</div>';
 
   try {
     const res = await fetch(`/api/lots/search?query=${encodeURIComponent(query)}`);
@@ -616,7 +616,7 @@ async function searchParkingLots() {
     if (data.status === 'success') {
       const lots = data.lots || [];
       if (lots.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:#64748b;">No parking lots found matching your query.</div>';
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#64748b;">No parking facilities available.</div>';
         return;
       }
 
@@ -635,7 +635,6 @@ async function searchParkingLots() {
                     <i class="fas ${lotIcon}"></i>
                   </span>
                   <h3 style="font-size:17px; font-weight:800; color:#0f172a; margin:0;">${escapeHtml(l.lot_name)}</h3>
-                  <span style="font-size:11px; background:#dbeafe; color:#1d4ed8; font-weight:700; padding:2px 8px; border-radius:4px;">₹${l.hourly_rate || 40}/hr</span>
                 </div>
                 <div style="font-size:13px; color:#64748b; margin-top:6px; display:flex; align-items:center; gap:8px;">
                   <span><i class="fas fa-layer-group" style="color:#6366f1;"></i> ${l.total_floors || 2} Floors</span>
