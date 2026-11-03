@@ -36,6 +36,7 @@ from core.overstay_engine import (
     get_overstay_dashboard_data, complete_parking_session
 )
 from core.email_service import send_templated_email
+from core.ml_engine import predict_occupancy
 
 overstay_bp = Blueprint('overstay', __name__)
 

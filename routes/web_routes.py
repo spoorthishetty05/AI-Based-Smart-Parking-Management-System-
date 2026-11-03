@@ -7,7 +7,7 @@ import re
 from functools import wraps
 from datetime import datetime, timedelta
 
-from flask import Blueprint, request, jsonify, Response, session, redirect, url_for, flash, make_response
+from flask import Blueprint, request, jsonify, Response, session, redirect, url_for, flash, make_response, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, DuplicateKeyError
 

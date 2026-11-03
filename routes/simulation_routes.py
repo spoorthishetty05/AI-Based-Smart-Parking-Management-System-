@@ -30,7 +30,7 @@ from core.mongo_engine import (
 from routes.middleware import login_required, admin_required, verify_password_hash, get_authenticated_user_id
 
 from core.simulation_engine import step_simulation_time, set_simulation_time, trigger_random_arrival, trigger_random_departure
-from core.overstay_engine import get_current_sim_time
+from core.overstay_engine import get_current_sim_time, check_and_update_overstays
 
 simulation_bp = Blueprint('simulation', __name__)
 

@@ -28,7 +28,7 @@ from core.mongo_engine import (
     validate_booking_datetime, calculate_end_time_string, check_time_intervals_overlap
 )
 from routes.middleware import login_required, admin_required, verify_password_hash, get_authenticated_user_id
-from core.overstay_engine import normalize_vehicle_type
+from core.overstay_engine import normalize_vehicle_type, get_current_sim_time
 
 user_bp = Blueprint('user', __name__)
 
