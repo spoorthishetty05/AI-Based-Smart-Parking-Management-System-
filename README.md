@@ -1,6 +1,6 @@
 # AI-Based Smart Parking System
 
-An enterprise-grade, intelligent parking management and reservation platform powered by Flask, MongoDB, SQLite, and Scikit-Learn.
+An enterprise-grade, intelligent parking management and reservation platform powered by Flask, MongoDB, and Scikit-Learn.
 
 ---
 
@@ -15,7 +15,7 @@ Smart Parking/
 ├── requirements.txt            # Python dependencies
 │
 ├── core/                       # Core domain logic & backend engines
-│   ├── database.py             # Dual SQLite + MongoDB connection management
+│   ├── database.py             # MongoDB connection management & persistence adapter
 │   ├── mongo_engine.py         # MongoDB document validation & sync engine
 │   ├── overstay_engine.py      # Real-time overstay detection & tiered penalty engine
 │   ├── ml_engine.py            # AI occupancy prediction & regression models
@@ -30,7 +30,7 @@ Smart Parking/
 │   ├── seed_overstay_demo.py   # Simulates realistic overstay sessions for demo
 │   ├── seed_active_session.py  # Quick-seeds active vehicle check-ins
 │   ├── reset_database.py       # Resets database to pristine initial state
-│   ├── migrate_database.py     # Schema migrations across SQLite and MongoDB
+│   ├── migrate_database.py     # Database schema migrations & facility seeding
 │   ├── clean_database.py       # Database sanitization tool
 │   ├── clean_city_parking.py   # Cleans specific facility records
 │   └── check_lots_and_slots.py # Telemetry verification tool

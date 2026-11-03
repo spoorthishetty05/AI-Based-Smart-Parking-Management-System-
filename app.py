@@ -1,7 +1,33 @@
 """
 Flask Backend Application for AI-Based Smart Parking System.
 Provides RESTful APIs for Dashboard, AI ML Predictions, Smart Allocations,
-Overstay Detection, Time Simulation, and Admin Management.
+Overstay Detection, Time Simulation, Payment Gateway, and Admin Management.
+
+================================================================================
+  APPLICATION MODULE MAP & ARCHITECTURAL INDEX
+================================================================================
+  1. Core Configuration & App Initialization          (Lines ~1 - 137)
+  2. Authentication & Web Dashboard Pages             (Lines ~138 - 685)
+     - Login, Registration, Logout, Admin & User Panels
+  3. 5-Step Guided Booking Wizard Endpoints           (Lines ~686 - 1072)
+     - Places, Facility Selection, Tariffs, Slot Allocations & Passes
+  4. Razorpay Dummy / Sandbox Payment Gateway         (Lines ~1073 - 1568)
+     - Order Creation, Payment Verification, Penalty Payments
+  5. System Status, KPIs & Auth JSON APIs             (Lines ~1569 - 2005)
+  6. User Profile & Multi-Vehicle Management APIs     (Lines ~2006 - 2296)
+  7. Parking Lot & 2D Slot Management APIs            (Lines ~2297 - 2896)
+  8. AI / Machine Learning Occupancy Prediction       (Lines ~2897 - 2966)
+  9. Smart Reservation Engine & Pass Validation       (Lines ~2967 - 3400)
+ 10. Overstay Radar & Real-Time Penalty Engine        (Lines ~3401 - 3592)
+ 11. Virtual Clock & Dynamic Simulation APIs          (Lines ~3593 - 3668)
+ 12. P2P Slot Exchange & 2D Visual Slot Swap          (Lines ~3669 - 5115)
+ 13. Administrator Analytics, Reports & User Controls (Lines ~5116 - 5614)
+ 14. Advanced AI K-Means & Feature Visualizations     (Lines ~5615 - 5722)
+ 15. MongoDB Health, Status & Collection APIs         (Lines ~5723 - 5757)
+ 16. Extended Search & Multi-Criteria Allocation      (Lines ~5758 - 5895)
+ 17. Extended Overstay Sweeps & Barrier Controls      (Lines ~5896 - 6301)
+ 18. In-App Notification Engine & SMTP Diagnostics    (Lines ~6302 - 6606)
+================================================================================
 """
 
 # pyrefly: ignore [missing-import]
