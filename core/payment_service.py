@@ -336,18 +336,48 @@ class PaymentService:
                     'penalty_paid_amount': float(amount),
                     'penalty_paid_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
+                b_query_list = [{'booking_id': str(booking_id)}, {'pass_code': str(booking_id)}]
+                if str(booking_id).isdigit():
+                    b_query_list.append({'reservation_id': int(booking_id)})
+                b_filter = {'$or': b_query_list}
+
                 booking = db.bookings.find_one_and_update(
-                    {'booking_id': booking_id},
+                    b_filter,
                     {'$set': update_fields},
                     return_document=True
                 )
-                db.reservations.update_one(
-                    {'booking_id': booking_id},
-                    {'$set': update_fields}
-                )
+                if not booking:
+                    booking = db.reservations.find_one_and_update(
+                        b_filter,
+                        {'$set': update_fields},
+                        return_document=True
+                    )
+                else:
+                    db.reservations.update_many(b_filter, {'$set': update_fields})
+
                 if overstay_id:
-                    db.overstay_records.update_one(
-                        {'overstay_id': int(overstay_id)},
+                    try:
+                        db.overstay_records.update_one(
+                            {'overstay_id': int(overstay_id)},
+                            {
+                                '$set': {
+                                    'payment_status': 'Paid',
+                                    'payment_id': payment_id,
+                                    'paid_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                    'status': 'resolved'
+                                }
+                            }
+                        )
+                    except Exception:
+                        pass
+                else:
+                    ov_query_list = [{'booking_id': str(booking_id)}]
+                    if str(booking_id).isdigit():
+                        ov_query_list.append({'reservation_id': int(booking_id)})
+                    if booking and booking.get('vehicle_plate'):
+                        ov_query_list.append({'vehicle_number': booking['vehicle_plate']})
+                    db.overstay_records.update_many(
+                        {'$or': ov_query_list},
                         {
                             '$set': {
                                 'payment_status': 'Paid',

@@ -1150,21 +1150,45 @@ function renderOverstayTable(records) {
       rowClass += ' ov-row-active';
     }
 
+    const isPaidPenalty = Boolean(r.penalty_paid || (r.payment_status && String(r.payment_status).trim().toLowerCase() === 'paid'));
+
     // Penalty amount display in INR (₹)
     const penaltyAmt = Number(r.penalty || r.current_penalty || 0);
-    const penaltyDisplay = penaltyAmt > 0
-      ? `<span class="ov-penalty-badge ov-penalty-due">₹${penaltyAmt.toFixed(0)}</span>`
-      : `<span class="ov-penalty-badge ov-penalty-zero">₹0</span>`;
+    let penaltyDisplay = '';
+    if (isPaidPenalty && penaltyAmt > 0) {
+      penaltyDisplay = `<span class="ov-penalty-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:3px 8px; border-radius:6px; font-weight:700;">₹${penaltyAmt.toFixed(0)} <span style="font-size:10px; color:#10b981; font-weight:800;">✓ PAID</span></span>`;
+    } else if (penaltyAmt > 0) {
+      penaltyDisplay = `<span class="ov-penalty-badge ov-penalty-due">₹${penaltyAmt.toFixed(0)}</span>`;
+    } else {
+      penaltyDisplay = `<span class="ov-penalty-badge ov-penalty-zero">₹0</span>`;
+    }
 
     // Slot badge
     const slotDisplay = `<span class="ov-slot-badge">${escapeHtml(vSlot)}</span>`;
 
-    // Action button
-    const actionHtml = isCompleted
-      ? `<span class="ov-dash">—</span>`
-      : `<button class="btn-ov-notify ${isNotified ? 'notified' : ''}" onclick="notifyOverstay('${escapeHtml(vPlate)}', '${r.reservation_id || r.booking_id || ''}', this)">
-          <i class="${isNotified ? 'fas fa-check' : 'far fa-bell'}"></i> ${isNotified ? 'Notified' : 'Notify'}
-        </button>`;
+    // Action button with direct Razorpay payment clearance
+    const targetBookingId = r.booking_id || r.reservation_id || '';
+    let actionHtml = '';
+    if (isCompleted || isPaidPenalty) {
+      actionHtml = `<span style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-check-circle" style="color:#10b981;"></i> Cleared</span>`;
+    } else if (penaltyAmt > 0) {
+      actionHtml = `
+        <div style="display:flex; gap:6px; align-items:center; justify-content:center; flex-wrap:wrap;">
+          <button type="button" class="btn-ov-pay-penalty"
+            onclick="payOverstayDirectly('${escapeHtml(vPlate)}', '${targetBookingId}', ${penaltyAmt}, ${r.overstay_id || 'null'}, this)"
+            title="Pay Overstay Penalty ₹${penaltyAmt.toFixed(0)} with Razorpay">
+            <i class="fas fa-credit-card"></i> Pay ₹${penaltyAmt.toFixed(0)}
+          </button>
+          <button type="button" class="btn-ov-notify ${isNotified ? 'notified' : ''}" onclick="notifyOverstay('${escapeHtml(vPlate)}', '${targetBookingId}', this)" title="${isNotified ? 'Notified' : 'Notify Driver'}">
+            <i class="${isNotified ? 'fas fa-check' : 'far fa-bell'}"></i>
+          </button>
+        </div>
+      `;
+    } else {
+      actionHtml = `<button type="button" class="btn-ov-notify ${isNotified ? 'notified' : ''}" onclick="notifyOverstay('${escapeHtml(vPlate)}', '${targetBookingId}', this)">
+        <i class="${isNotified ? 'fas fa-check' : 'far fa-bell'}"></i> ${isNotified ? 'Notified' : 'Notify'}
+      </button>`;
+    }
 
     return `
       <tr class="${rowClass}">
@@ -1246,6 +1270,77 @@ async function notifyOverstay(vehiclePlate, resId, btn) {
     }
   }
 }
+
+window.payOverstayDirectly = function (vehiclePlate, bookingId, amount, overstayId, btn) {
+  const penalty = parseFloat(amount) || 0.0;
+  if (penalty <= 0) {
+    showUserToast('No overstay penalty due.', 'info');
+    return;
+  }
+
+  if (typeof window.openRazorpayModal === 'function') {
+    window.openRazorpayModal({
+      amount: penalty,
+      title: 'Smart Parking AI',
+      description: `Overstay Penalty Clearance (${vehiclePlate})`,
+      bookingId: bookingId,
+      type: 'overstay_penalty',
+      onSuccess: async function (paymentResult) {
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing...';
+        }
+
+        try {
+          const res = await fetch(`/api/reservations/${bookingId}/pay-penalty`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              payment_id: paymentResult.razorpay_payment_id,
+              order_id: paymentResult.razorpay_order_id,
+              signature: paymentResult.razorpay_signature,
+              amount: penalty,
+              method: paymentResult.method || 'Razorpay',
+              overstay_id: overstayId
+            })
+          });
+          const data = await res.json();
+          if (res.ok && data.status === 'success') {
+            showUserToast(`Penalty ₹${penalty.toFixed(2)} for ${vehiclePlate} cleared successfully via Razorpay!`, 'success');
+            if (btn) {
+              btn.disabled = true;
+              btn.style.background = '#059669';
+              btn.innerHTML = '<i class="fas fa-check-circle"></i> Paid';
+            }
+            setTimeout(() => {
+              if (typeof loadOverstayDashboard === 'function') {
+                loadOverstayDashboard(true);
+              }
+            }, 600);
+          } else {
+            showUserToast(data.message || 'Payment recorded but status update failed.', 'error');
+            if (btn) {
+              btn.disabled = false;
+              btn.innerHTML = `<i class="fas fa-credit-card"></i> Pay ₹${penalty.toFixed(0)}`;
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          showUserToast('Network error updating penalty status.', 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-credit-card"></i> Pay ₹${penalty.toFixed(0)}`;
+          }
+        }
+      },
+      onFailure: function () {
+        showUserToast('Penalty payment cancelled.', 'info');
+      }
+    });
+  } else {
+    showUserToast('Payment checkout system is unavailable.', 'error');
+  }
+};
 
 function onOverstaySearch() {
   renderOverstayTable(activeOverstayRecords);

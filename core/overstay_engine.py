@@ -1118,13 +1118,18 @@ def get_overstay_dashboard_data():
 
         ov_rec = overstay_by_res.get(res_id)
 
+        penalty_paid = bool(
+            res.get('penalty_payment_status') == 'Paid' or
+            (ov_rec and ov_rec.get('payment_status') == 'Paid')
+        )
         status_label = calc['status']
         if calc['is_overstay']:
             current_overstays += 1
             status_badge = 'danger'
             overstay_dur_display = calc['duration_formatted']
             effective_penalty = calc['penalty']
-            pending_penalties += effective_penalty
+            if not penalty_paid:
+                pending_penalties += effective_penalty
         elif calc['status'] == 'Grace Period':
             active_parking += 1
             approaching_overstay += 1
@@ -1210,7 +1215,8 @@ def get_overstay_dashboard_data():
             'penalty': effective_penalty,
             'current_penalty': effective_penalty,
             'penalty_formatted': f"₹{int(effective_penalty)}" if effective_penalty > 0 else "₹0",
-            'payment_status': ov_rec.get('payment_status', 'Pending') if ov_rec else 'Pending',
+            'penalty_paid': penalty_paid,
+            'payment_status': 'Paid' if penalty_paid else (ov_rec.get('payment_status', 'Pending') if ov_rec else 'Pending'),
             'can_complete': True,
             'remaining_text': calc.get('remaining_text', ''),
             'is_overstay': calc['is_overstay'],

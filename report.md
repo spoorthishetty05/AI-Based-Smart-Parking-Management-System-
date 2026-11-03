@@ -254,6 +254,23 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 
 ---
 
+### Bug 13: Absence of Direct Online Penalty Clearance in Overstay Details Radar Table
+
+- **Component:** `static/js/user_panel.js`, `static/css/user_panel.css`, `core/overstay_engine.py`, `core/payment_service.py`
+- **Severity:** Medium / Revenue Clearance & User Experience
+- **Symptom:**
+  In the Overstay Details table (`tab-overstay`), active violations exceeding duration limits with applicable penalties (e.g. `₹60`) only displayed a "Notify" button in the Action column. Drivers and users viewing the overstay radar had no direct mechanism to settle the overdue penalty fee online, leaving penalties unpaid until exit.
+- **Root Cause:**
+  1. `renderOverstayTable` in `static/js/user_panel.js` solely rendered the notify action button without an online payment trigger for penalty fees.
+  2. `get_overstay_dashboard_data` in `core/overstay_engine.py` did not check `penalty_payment_status` on reservations or overstay documents, continuing to report paid records as pending.
+  3. `process_penalty_payment` in `core/payment_service.py` only queried by strict `booking_id` string rather than supporting polymorphic identifiers (`reservation_id`, `pass_code`, vehicle plate).
+- **Resolution:**
+  - **Direct Razorpay Penalty Action (`static/js/user_panel.js` & `static/css/user_panel.css`):** Added a prominent emerald green **"Pay ₹XX"** action button (`btn-ov-pay-penalty`) in the Overstay Details table for any vehicle with an unpaid penalty. When paid, the action updates to an emerald **"Cleared ✓"** badge and the penalty column displays **"₹XX (PAID ✓)"**.
+  - **Modal Flow (`payOverstayDirectly`):** Clicking "Pay ₹XX" launches the Razorpay Sandbox Modal with UPI / QR, test cards, Netbanking, and Wallets. Upon completion, calls `/api/reservations/<id>/pay-penalty` and refreshes the radar table.
+  - **Polymorphic Lookup & Persistence (`core/payment_service.py` & `core/overstay_engine.py`):** Updated `process_penalty_payment` to atomically resolve and mark `db.bookings`, `db.reservations`, and `db.overstay_records` as `Paid` and `resolved`, deducting from pending penalty totals.
+
+---
+
 ## Master Test Suite Verification
 
 To verify that all bug fixes function harmoniously without regression, the project was evaluated using the unified test runner `tests/run_tests.py`:
