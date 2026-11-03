@@ -474,7 +474,7 @@
         newCard.setAttribute('data-plate', plate);
         newCard.setAttribute('data-type', vType);
         newCard.setAttribute('data-name', model);
-        const icon = vType.toLowerCase() === 'bike' ? '🏍️' : (vType.toLowerCase() === 'ev' ? '⚡' : (vType.toLowerCase() === 'suv' ? '🚙' : '🚗'));
+        const icon = vType.toLowerCase() === 'bike' ? '🏍️' : (vType.toLowerCase() === 'ev' ? '⚡' : (vType.toLowerCase() === 'suv' ? '🚙' : (vType.toLowerCase() === 'other' ? '🚐' : '🚗')));
         newCard.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div style="display:flex; align-items:center; gap:8px;">

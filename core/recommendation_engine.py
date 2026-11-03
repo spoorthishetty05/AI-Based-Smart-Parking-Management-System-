@@ -47,6 +47,8 @@ def calculate_slot_suitability(slot, user_pref, predicted_occupancy):
         vtype_score = 1.0 if slot_type in ('Compact', 'Standard') else 0.70
     elif requested_vtype.lower() in ('suv', 'truck'):
         vtype_score = 1.0 if slot_type == 'Standard' else (0.80 if slot_type == 'VIP' else 0.50)
+    elif requested_vtype.lower() in ('other', 'other vehicle'):
+        vtype_score = 1.0 if slot_type in ('Standard', 'Compact') else 0.80
     else: # Standard Sedan / Car
         vtype_score = 1.0 if slot_type == 'Standard' else (0.85 if slot_type == 'VIP' else (0.70 if slot_type == 'EV' else 0.60))
 

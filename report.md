@@ -288,6 +288,23 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 
 ---
 
+### Bug 15: Emoji Glyphs in Vehicle Type Dropdowns and Missing 'Other Vehicle' Option
+
+- **Component:** `templates/user_panel.html`, `templates/booking_panel.html`, `core/recommendation_engine.py`, `static/js/guided_booking_wizard.js`
+- **Severity:** Low / UI Consistency & Usability
+- **Symptom:**
+  1. The **AI Intelligent Parking Slot Recommender** vehicle type dropdown displayed emojis (`🚗 Car`, `🏍️ Bike`) inside select menu options which caused rendering artifacts and inconsistency.
+  2. Users with vehicles other than cars or bikes (such as commercial vans, crossovers, or other transport) had no "Other Vehicle" category to choose in the recommendation form, vehicle registration modal, and booking wizard.
+- **Root Cause:**
+  1. `<select id="aiVehicleType">`, `<select id="wizardInputManualType">`, and `<select id="newVehicleType">` hardcoded Unicode emoji characters in option labels.
+  2. Recommendation suitability calculation (`calculate_slot_suitability` in `core/recommendation_engine.py`) did not have an explicit branch for `'Other'` / `'Other Vehicle'`.
+- **Resolution:**
+  - **Clean Typography:** Removed emoji icons from all vehicle dropdown menus, rendering crisp text labels (`Car`, `Bike`, `SUV`, `Electric Vehicle`, `Other Vehicle`).
+  - **Added 'Other Vehicle' Option:** Added `<option value="Other">Other Vehicle</option>` across AI recommendation dropdowns, the 5-step booking wizard, and user vehicle registration modals.
+  - **AI Compatibility Ranking:** Updated `core/recommendation_engine.py` to assign top suitability (1.0) for Standard and Compact slots when "Other Vehicle" is requested.
+
+---
+
 ## Master Test Suite Verification
 
 To verify that all bug fixes function harmoniously without regression, the project was evaluated using the unified test runner `tests/run_tests.py`:
