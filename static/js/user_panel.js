@@ -3132,6 +3132,42 @@ function escapeHtml(text) {
    ========================================================================== */
 
 let activeExitBookingId = null;
+let activeExitPreview = null;
+let activeExitPenaltyPaid = false;
+
+window.payOverstayWithRazorpay = function() {
+  if (!activeExitPreview || !activeExitBookingId) return;
+  const penalty = parseFloat(activeExitPreview.overstay_penalty) || 0.0;
+  if (penalty <= 0) {
+    showUserToast('No overstay penalty due.', 'info');
+    return;
+  }
+
+  if (typeof window.openRazorpayModal === 'function') {
+    window.openRazorpayModal({
+      amount: penalty,
+      title: 'Smart Parking AI',
+      description: `Overstay Penalty Settlement (${activeExitPreview.overstay_duration_minutes}m)`,
+      bookingId: activeExitBookingId,
+      type: 'overstay_penalty',
+      onSuccess: function(paymentResult) {
+        activeExitPenaltyPaid = true;
+        const btnPay = document.getElementById('btnPayOverstayRazorpay');
+        if (btnPay) {
+          btnPay.disabled = true;
+          btnPay.innerHTML = '<i class="fas fa-check-circle"></i> Paid via Razorpay';
+          btnPay.style.background = '#059669';
+        }
+        const amtEl = document.getElementById('checkoutOverstayAmount');
+        if (amtEl) amtEl.innerHTML = `₹${penalty.toFixed(2)} <span style="font-size:12px; color:#10b981;">(Settled)</span>`;
+        showUserToast(`Penalty ₹${penalty.toFixed(2)} paid successfully via Razorpay!`, 'success');
+      },
+      onFailure: function() {
+        showUserToast('Penalty payment cancelled or declined.', 'error');
+      }
+    });
+  }
+};
 
 async function openExitParkingModal(bookingId) {
   activeExitBookingId = bookingId;
@@ -3160,6 +3196,16 @@ async function openExitParkingModal(bookingId) {
     const data = await res.json();
     if (data.status === 'success') {
       const p = data.preview;
+      activeExitPreview = p;
+      activeExitPenaltyPaid = false;
+      const amtEl = document.getElementById('checkoutOverstayAmount');
+      if (amtEl) amtEl.textContent = `₹${(p.overstay_penalty || 0).toFixed(2)}`;
+      const btnPay = document.getElementById('btnPayOverstayRazorpay');
+      if (btnPay) {
+        btnPay.disabled = false;
+        btnPay.innerHTML = '<i class="fas fa-lock"></i> Pay via Razorpay';
+        btnPay.style.background = '#10b981';
+      }
       document.getElementById('checkoutSlotDisplay').textContent = p.slot_number;
       document.getElementById('checkoutPlateDisplay').textContent = p.vehicle_number;
       document.getElementById('checkoutTypeDisplay').textContent = p.vehicle_type;

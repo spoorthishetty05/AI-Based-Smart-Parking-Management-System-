@@ -87,6 +87,15 @@ class Config:
     MAIL_SUPPRESS_SEND = _str_to_bool(os.environ.get('MAIL_SUPPRESS_SEND', 'false'))
     MAIL_DEBUG = _str_to_bool(os.environ.get('MAIL_DEBUG', 'false'))
 
+    # ------------------------------------------------------------------
+    # Razorpay Payment Gateway Configuration (Sandbox / Dummy & Live)
+    # ------------------------------------------------------------------
+    RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_smartpark123')
+    RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'mock_secret_key_smartpark999')
+    RAZORPAY_CURRENCY = os.environ.get('RAZORPAY_CURRENCY', 'INR')
+    RAZORPAY_COMPANY_NAME = os.environ.get('RAZORPAY_COMPANY_NAME', 'Smart Parking AI')
+    RAZORPAY_MOCK_MODE = _str_to_bool(os.environ.get('RAZORPAY_MOCK_MODE', 'true'))
+
 class DevelopmentConfig(Config):
     """Development environment configuration."""
     DEBUG = True

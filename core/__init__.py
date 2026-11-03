@@ -66,3 +66,8 @@ except ImportError:
 
 from .parking_places_config import get_categories, get_all_places, get_place_by_id, sync_places_to_mongodb
 from .email_service import EmailService, mail_service, send_email, send_templated_email
+
+from .payment_service import (
+    PaymentService, payment_service, create_payment_order,
+    verify_payment, process_booking_payment, process_penalty_payment
+)

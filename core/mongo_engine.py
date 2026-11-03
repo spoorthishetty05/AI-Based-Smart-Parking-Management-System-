@@ -868,6 +868,11 @@ def mongo_create_booking(booking_data):
     if not updated_slot:
         return False, {'status_code': 409, 'message': f"Sorry, slot {slot.get('slot_number')} was just reserved by another request for an overlapping interval. Please choose another slot."}
 
+    payment_id = booking_data.get('payment_id') or None
+    payment_order_id = booking_data.get('payment_order_id') or None
+    payment_method = booking_data.get('payment_method') or ('Razorpay (Dummy)' if payment_id else 'Pay on Arrival')
+    payment_status = booking_data.get('payment_status') or ('Paid' if payment_id else 'Pending')
+
     booking_doc = {
         'booking_id': booking_id,
         'reservation_id': res_seq,
@@ -906,6 +911,12 @@ def mongo_create_booking(booking_data):
         'overstay_notification_sent': False,
         'hourly_rate': hourly_rate,
         'total_amount': total_amount,
+        'payment_id': payment_id,
+        'payment_order_id': payment_order_id,
+        'payment_method': payment_method,
+        'payment_status': payment_status,
+        'amount_paid': total_amount if payment_status == 'Paid' else 0.0,
+        'paid_at': now_str if payment_status == 'Paid' else None,
         'status': 'confirmed',
         'created_at': now_str,
         'updated_at': now_str
@@ -951,6 +962,12 @@ def mongo_create_booking(booking_data):
         'overstay_notification_sent': False,
         'hourly_rate': hourly_rate,
         'total_amount': total_amount,
+        'payment_id': payment_id,
+        'payment_order_id': payment_order_id,
+        'payment_method': payment_method,
+        'payment_status': payment_status,
+        'amount_paid': total_amount if payment_status == 'Paid' else 0.0,
+        'paid_at': now_str if payment_status == 'Paid' else None,
         'status': 'confirmed',
         'created_at': now_str,
         'updated_at': now_str

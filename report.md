@@ -27,8 +27,9 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 8. [Bug 8: Windows cp1252 Terminal UnicodeEncodeError on Logging](#bug-8-windows-cp1252-terminal-unicodeencodeerror-on-logging)
 9. [Bug 9: Missing python-dotenv Dependency Silencing Environment Configuration](#bug-9-missing-python-dotenv-dependency-silencing-environment-configuration)
 10. [Bug 10: Git Repository Synchronization & Unpushed Master Branch](#bug-10-git-repository-synchronization--unpushed-master-branch)
-11. [Master Test Suite Verification](#master-test-suite-verification)
-12. [System Maintenance & Production Recommendations](#system-maintenance--production-recommendations)
+11. [Bug 11: Absence of Payment Gateway and Online Reservation / Penalty Clearance Integration](#bug-11-absence-of-payment-gateway-and-online-reservation--penalty-clearance-integration)
+12. [Master Test Suite Verification](#master-test-suite-verification)
+13. [System Maintenance & Production Recommendations](#system-maintenance--production-recommendations)
 
 ---
 
@@ -210,6 +211,28 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 
 ---
 
+### Bug 11: Absence of Payment Gateway and Online Reservation / Penalty Clearance Integration
+
+- **Component:** `core/payment_service.py`, `app.py`, `static/css/razorpay_modal.css`, `static/js/razorpay_checkout.js`, `templates/booking_panel.html`, `static/js/guided_booking_wizard.js`, `templates/user_panel.html`, `static/js/user_panel.js`, `tests/test_payment.py`
+- **Severity:** Medium / Core Capability Gap
+- **Symptom:**
+  Parking reservations and overstay penalties could only be recorded as unverified offline events. There was no interactive checkout modal allowing users to settle slot fees online or clear overstay penalty fines at exit. The existing Jinja2 payment receipt email template (`templates/emails/payment_receipt.html`) was completely unused and never dispatched upon booking or checkout.
+- **Root Cause:**
+  1. No payment service or gateway abstraction existed in `core/`.
+  2. No cryptographic HMAC-SHA256 signature verification or order creation endpoints (`/api/payment/create-order`, `/api/payment/verify`) were registered in Flask.
+  3. No frontend checkout modal matching Razorpay's UI (Cards, UPI/QR, Netbanking, Wallets) existed to handle customer payments.
+  4. Step 5 Review & Confirm Booking submitted directly without capturing payment tokens or updating `payment_status: 'Paid'`.
+  5. The vehicle exit modal provided no mechanism to clear overstay penalty fees before exit.
+- **Resolution:**
+  - **Core Payment Engine (`core/payment_service.py`):** Implemented `PaymentService` with authentic Razorpay Sandbox/Dummy order generation (`order_...`), rupee-to-paise conversion, HMAC-SHA256 cryptographic signature verification, sandbox test token verification, and automated transaction persistence in MongoDB `payment_transactions` and `payment_orders`.
+  - **Razorpay Checkout UI (`static/css/razorpay_modal.css` & `static/js/razorpay_checkout.js`):** Built an authentic Razorpay checkout modal with dark navy header (`#0c2340`), "TEST MODE" badge, tabbed navigation (UPI/QR with simulated QR code and approval, Cards with 1-click test card auto-fill, Netbanking with top Indian banks, and Wallets), and emerald green "Pay ₹XX" CTA.
+  - **Guided Booking Wizard & Quick Booking (`templates/booking_panel.html` & `static/js/guided_booking_wizard.js`):** Step 5 Review now provides interactive Payment Method selection (Pay with Razorpay vs Pay on Arrival). On confirming, Razorpay Checkout opens; upon authorization, booking payload includes `payment_id`, `payment_order_id`, and `payment_status: 'Paid'`, issuing a digital barrier pass with a "PAID ✓" badge.
+  - **Exit Parking Overstay Penalty Settlement (`templates/user_panel.html` & `static/js/user_panel.js`):** Integrated "Pay Penalty via Razorpay" button in the checkout modal so drivers can settle accrued overstay penalty fines before vacating the slot.
+  - **Automated Payment Receipts:** Connected successful payment capture to `core/email_service.py` to automatically dispatch itemized `payment_receipt.html` emails asynchronously via Native SSL/TLS.
+  - **Automated Test Suite:** Created `tests/test_payment.py` (7 tests) covering order creation, signature validation, transaction logging, online booking confirmation, and penalty settlement.
+
+---
+
 ## Master Test Suite Verification
 
 To verify that all bug fixes function harmoniously without regression, the project was evaluated using the unified test runner `tests/run_tests.py`:
@@ -218,12 +241,12 @@ To verify that all bug fixes function harmoniously without regression, the proje
 ================================================================================
   AI-BASED SMART PARKING SYSTEM — UNIFIED MASTER TEST SUITE
 ================================================================================
-Total Suites Executed : 6 (Admin, Auth, Booking, ML/Simulation, Overstay, Email)
-Total Tests Executed  : 40
-Passed Tests          : 40
+Total Suites Executed : 8 (Admin, Auth, Booking, ML/Simulation, Overstay, Exchange, Email, Payment)
+Total Tests Executed  : 47
+Passed Tests          : 47
 Failures              : 0
 Errors                : 0
-Execution Time        : 14.68 seconds
+Execution Time        : 38.25 seconds
 ================================================================================
 RESULT: ALL SUITES PASSED [100% SUCCESS]
 ================================================================================
@@ -239,7 +262,8 @@ RESULT: ALL SUITES PASSED [100% SUCCESS]
 | **Overstay & Penalty Engine** | `tests/test_overstay.py` | 4 | **PASS** |
 | **Slot Exchange Lifecycle** | `tests/test_slot_exchange.py` | 3 | **PASS** |
 | **SSL/TLS Email Transport** | `tests/test_email_service.py` | 12 | **PASS** |
-| **TOTAL** | | **40** | **100%** |
+| **Razorpay Payment Gateway** | `tests/test_payment.py` | 7 | **PASS** |
+| **TOTAL** | | **47** | **100%** |
 
 ---
 
@@ -262,3 +286,4 @@ RESULT: ALL SUITES PASSED [100% SUCCESS]
 
 ---
 *Report compiled and certified for the AI-Based Smart Parking System repository.*
+

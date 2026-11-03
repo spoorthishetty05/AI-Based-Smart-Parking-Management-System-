@@ -1046,6 +1046,33 @@
 
     const totalFee = (state.hourlyRate * state.durationHours).toFixed(2);
     setField('wizardRevTotalFee', `₹${totalFee}`);
+    if (typeof window.updatePaymentChoiceUI === 'function') {
+      window.updatePaymentChoiceUI();
+    }
+  };
+
+  window.updatePaymentChoiceUI = function () {
+    const isRazorpay = document.getElementById('optPayRazorpay') && document.getElementById('optPayRazorpay').checked;
+    const lblRzp = document.getElementById('lblPayRazorpay');
+    const lblArr = document.getElementById('lblPayArrival');
+    const btnText = document.getElementById('btnWizardConfirmText');
+    const totalFee = (state.hourlyRate * state.durationHours).toFixed(2);
+
+    if (lblRzp && lblArr) {
+      if (isRazorpay) {
+        lblRzp.style.borderColor = '#2563eb';
+        lblRzp.style.background = '#f0f7ff';
+        lblArr.style.borderColor = '#e2e8f0';
+        lblArr.style.background = '#ffffff';
+        if (btnText) btnText.innerHTML = `Pay ₹${totalFee} with Razorpay & Confirm`;
+      } else {
+        lblArr.style.borderColor = '#2563eb';
+        lblArr.style.background = '#f0f7ff';
+        lblRzp.style.borderColor = '#e2e8f0';
+        lblRzp.style.background = '#ffffff';
+        if (btnText) btnText.innerHTML = `Confirm Booking (Pay on Arrival)`;
+      }
+    }
   };
 
   window.userWizardSubmitBooking = async function () {
@@ -1061,10 +1088,10 @@
       return;
     }
 
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Reserving Slot in MongoDB...';
+    const isRazorpay = document.getElementById('optPayRazorpay') && document.getElementById('optPayRazorpay').checked;
+    const totalFee = parseFloat((state.hourlyRate * state.durationHours).toFixed(2)) || 40.0;
 
-    const payload = {
+    const basePayload = {
       slot_id: state.selectedSlot.slot_id,
       lot_id: state.lotId,
       place_id: state.placeId,
@@ -1080,6 +1107,45 @@
       vehicle_type: state.vehicleType
     };
 
+    if (isRazorpay && typeof window.openRazorpayModal === 'function') {
+      window.openRazorpayModal({
+        amount: totalFee,
+        title: 'Smart Parking AI',
+        description: `Slot ${state.selectedSlot.slot_number} Reservation (${state.durationLabel})`,
+        type: 'booking',
+        onSuccess: async function (paymentResult) {
+          const paidPayload = Object.assign({}, basePayload, {
+            payment_id: paymentResult.razorpay_payment_id,
+            payment_order_id: paymentResult.razorpay_order_id,
+            payment_signature: paymentResult.razorpay_signature,
+            payment_method: paymentResult.method || 'Razorpay',
+            payment_status: 'Paid',
+            amount_paid: totalFee
+          });
+          await commitBookingToBackend(paidPayload);
+        },
+        onFailure: function (err) {
+          showWizardToast('Payment was not completed. You can retry or choose Pay on Arrival.', 'error');
+        }
+      });
+      return;
+    }
+
+    // Direct submission (Pay on arrival)
+    const arrivalPayload = Object.assign({}, basePayload, {
+      payment_method: 'Pay on Arrival',
+      payment_status: 'Pending'
+    });
+    await commitBookingToBackend(arrivalPayload);
+  };
+
+  async function commitBookingToBackend(payload) {
+    const btn = document.getElementById('btnWizardFinalConfirm');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Securing Reservation...';
+    }
+
     try {
       const res = await fetch('/booking/confirm', {
         method: 'POST',
@@ -1092,7 +1158,10 @@
       if (res.status === 201 && data.status === 'success') {
         state.confirmedBooking = data.booking;
         userWizardShowSuccess(data.booking);
-        showWizardToast('Booking confirmed successfully! Digital Barrier Pass issued.', 'success');
+        const msg = payload.payment_status === 'Paid'
+          ? 'Payment Captured & Booking Confirmed! Digital Barrier Pass issued.'
+          : 'Booking Confirmed! Please settle payment upon arrival.';
+        showWizardToast(msg, 'success');
 
         if (typeof window.loadUserNotifications === 'function') {
           window.loadUserNotifications();
@@ -1116,10 +1185,14 @@
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Booking';
+        if (typeof window.updatePaymentChoiceUI === 'function') {
+          window.updatePaymentChoiceUI();
+        } else {
+          btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirm Booking';
+        }
       }
     }
-  };
+  }
 
   // Pass Date and Time formatters for Pixel-Perfect Parking Pass
   function formatPassDate(dateStr) {
@@ -1237,7 +1310,12 @@
     setField('wizardSuccessDate', formatPassDate(dateVal));
     setField('wizardSuccessTime', formatPassTimeRange(startTimeVal, endTime));
     setField('wizardSuccessDateTime', `${dateVal} (${startTimeVal} – ${endTime})`);
-    setField('wizardSuccessFee', `₹${feeStr}`);
+    const isPaid = (b.payment_status === 'Paid' || b.payment_id);
+    setField('wizardSuccessFee', `₹${feeStr}${isPaid ? ' (PAID ✓)' : ''}`);
+    const feeLbl = document.getElementById('wizardSuccessFeeLabel');
+    if (feeLbl && isPaid) {
+      feeLbl.textContent = 'TOTAL FEE (PAID ✓)';
+    }
 
     // Generate genuine QR code encoding confirmed booking/pass code
     renderSuccessPassQr(bookingId);
@@ -1326,22 +1404,49 @@
       return;
     }
 
+    const quickPayload = {
+      slot_id: parseInt(slotId),
+      lot_id: parseInt(lotId),
+      parking_lot_id: parseInt(lotId),
+      booking_date: dateVal,
+      date: dateVal,
+      start_time: startTime,
+      duration: '2 Hours',
+      vehicle_plate: plate.toUpperCase().trim(),
+      vehicle_number: plate.toUpperCase().trim(),
+      vehicle_type: 'Car'
+    };
+
+    if (typeof window.openRazorpayModal === 'function') {
+      window.openRazorpayModal({
+        amount: 80.0,
+        title: 'Smart Parking AI',
+        description: `Quick Booking (Slot ${slotId})`,
+        type: 'booking',
+        onSuccess: async function (paymentResult) {
+          quickPayload.payment_id = paymentResult.razorpay_payment_id;
+          quickPayload.payment_order_id = paymentResult.razorpay_order_id;
+          quickPayload.payment_signature = paymentResult.razorpay_signature;
+          quickPayload.payment_method = paymentResult.method || 'Razorpay';
+          quickPayload.payment_status = 'Paid';
+          await executeQuickBookingSubmit(quickPayload, dateVal, startTime, plate);
+        },
+        onFailure: function () {
+          showWizardToast('Payment cancelled.', 'error');
+        }
+      });
+      return;
+    }
+
+    await executeQuickBookingSubmit(quickPayload, dateVal, startTime, plate);
+  };
+
+  async function executeQuickBookingSubmit(payload, dateVal, startTime, plate) {
     try {
       const res = await fetch('/booking/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          slot_id: parseInt(slotId),
-          lot_id: parseInt(lotId),
-          parking_lot_id: parseInt(lotId),
-          booking_date: dateVal,
-          date: dateVal,
-          start_time: startTime,
-          duration: '2 Hours',
-          vehicle_plate: plate.toUpperCase().trim(),
-          vehicle_number: plate.toUpperCase().trim(),
-          vehicle_type: 'Car'
-        })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (res.status === 201 && data.status === 'success') {

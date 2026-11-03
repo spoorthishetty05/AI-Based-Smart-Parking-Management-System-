@@ -16,6 +16,7 @@
 
   <!-- User Panel Stylesheet -->
   <link rel="stylesheet" href="/static/css/user_panel.css">
+  <link rel="stylesheet" href="/static/css/razorpay_modal.css">
 </head>
 
 <body class="user-body">
@@ -1858,8 +1859,16 @@
             <div>
               <strong style="color:#be123c; font-size:14px; display:block;">⚠️ Overstay Detected</strong>
               <div style="font-size:12.5px; color:#9f1239; margin-top:3px;" id="checkoutOverstayDesc">
-                Exceeded booked window and grace period by <strong id="checkoutOverstayDurationMins">20
-                  minutes</strong>.
+                Exceeded booked window and grace period by <strong id="checkoutOverstayDurationMins">20 minutes</strong>.
+              </div>
+              <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between; background:#ffffff; padding:10px 14px; border-radius:8px; border:1px solid #fecdd3;" id="checkoutOverstayPayRow">
+                <div>
+                  <span style="font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">Accrued Penalty</span>
+                  <div style="font-size:17px; font-weight:800; color:#e11d48;" id="checkoutOverstayAmount">₹0.00</div>
+                </div>
+                <button type="button" class="btn-user btn-user-primary btn-user-sm" id="btnPayOverstayRazorpay" onclick="payOverstayWithRazorpay()" style="background:#10b981; border:none; font-weight:700; font-size:12.5px; padding:7px 16px; border-radius:6px; box-shadow:0 3px 10px rgba(16,185,129,0.3); color:#fff; cursor:pointer;">
+                  <i class="fas fa-lock"></i> Pay via Razorpay
+                </button>
               </div>
             </div>
           </div>
@@ -1968,6 +1977,7 @@
 
   <!-- User Panel Scripts -->
   <script src="/static/js/qrcode.min.js"></script>
+  <script src="/static/js/razorpay_checkout.js"></script>
   <script src="/static/js/user_panel.js"></script>
   <script src="/static/js/guided_booking_wizard.js"></script>
 </body>

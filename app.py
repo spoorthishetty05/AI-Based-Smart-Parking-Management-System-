@@ -73,6 +73,10 @@ from core.overstay_engine import (
 from core.simulation_engine import step_simulation_time, set_simulation_time, trigger_random_arrival, trigger_random_departure
 from core import parking_places_config
 from core.email_service import mail_service, send_email, send_templated_email
+from core.payment_service import (
+    payment_service, create_payment_order, verify_payment,
+    process_booking_payment, process_penalty_payment
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -1063,6 +1067,168 @@ def booking_review():
         'is_available': True
     })
 
+# ==============================================================================
+# RAZORPAY DUMMY / SANDBOX PAYMENT GATEWAY ENDPOINTS
+# ==============================================================================
+
+@app.route('/api/payment/create-order', methods=['POST'])
+def api_payment_create_order():
+    """
+    Creates a new payment order for Razorpay Checkout.
+    Supports both dynamic amounts and booking-derived amounts.
+    """
+    data = request.get_json(silent=True) or {}
+    amount = data.get('amount')
+    booking_id = data.get('booking_id')
+
+    if amount is None and booking_id:
+        db = get_mongo_db()
+        if db is not None:
+            b = db.bookings.find_one({'booking_id': booking_id})
+            if b:
+                amount = b.get('total_amount', 40.0)
+
+    try:
+        amt_float = float(amount) if amount is not None else 80.0
+    except (ValueError, TypeError):
+        amt_float = 80.0
+
+    if amt_float <= 0:
+        amt_float = 1.0
+
+    uid = session.get('user_id')
+    notes = data.get('notes') or {}
+    if booking_id:
+        notes['booking_id'] = booking_id
+
+    order = create_payment_order(
+        amount=amt_float,
+        notes=notes,
+        user_id=uid
+    )
+
+    return jsonify({
+        'status': 'success',
+        'order': order,
+        'key_id': Config.RAZORPAY_KEY_ID,
+        'mock_mode': getattr(Config, 'RAZORPAY_MOCK_MODE', True)
+    }), 200
+
+
+@app.route('/api/payment/verify', methods=['POST'])
+def api_payment_verify():
+    """
+    Verifies payment credentials (payment_id, order_id, signature).
+    Persists transaction in 'payment_transactions' and triggers receipt email.
+    Supports both Slot Reservation fees and Overstay Penalty fees.
+    """
+    data = request.get_json(silent=True) or {}
+    payment_id = data.get('razorpay_payment_id') or data.get('payment_id')
+    order_id = data.get('razorpay_order_id') or data.get('order_id')
+    signature = data.get('razorpay_signature') or data.get('signature')
+    amount = data.get('amount', 0.0)
+    booking_id = data.get('booking_id')
+    overstay_id = data.get('overstay_id')
+    method = data.get('method', 'UPI / QR')
+    pay_type = data.get('type', 'booking')
+    uid = session.get('user_id')
+    user_email = session.get('user_email')
+
+    if not payment_id or not order_id:
+        return jsonify({'status': 'error', 'message': 'Payment ID and Order ID are required.'}), 400
+
+    if pay_type == 'overstay_penalty' or overstay_id:
+        success, res = process_penalty_payment(
+            booking_id=booking_id or 'OVERSTAY',
+            overstay_id=overstay_id,
+            payment_id=payment_id,
+            order_id=order_id,
+            signature=signature,
+            amount=amount,
+            user_id=uid,
+            payment_method=method,
+            user_email=user_email
+        )
+    elif booking_id:
+        success, res = process_booking_payment(
+            booking_id=booking_id,
+            payment_id=payment_id,
+            order_id=order_id,
+            signature=signature,
+            amount=amount,
+            user_id=uid,
+            payment_method=method,
+            user_email=user_email
+        )
+    else:
+        success, res = verify_payment(
+            payment_id=payment_id,
+            order_id=order_id,
+            signature=signature,
+            amount=amount,
+            user_id=uid,
+            method=method
+        )
+
+    if not success:
+        return jsonify({'status': 'error', 'message': res.get('message', 'Payment verification failed.')}), 400
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Payment successfully verified and captured.',
+        'transaction': res
+    }), 200
+
+
+@app.route('/api/payment/transactions', methods=['GET'])
+def api_payment_transactions():
+    """Returns payment history for the logged-in user."""
+    uid = session.get('user_id')
+    if not uid:
+        return jsonify({'status': 'error', 'message': 'Authentication required.'}), 401
+
+    txs = payment_service.get_user_transactions(uid)
+    return jsonify({
+        'status': 'success',
+        'transactions': txs,
+        'count': len(txs)
+    }), 200
+
+
+@app.route('/api/reservations/<booking_id>/pay-penalty', methods=['POST'])
+def api_reservation_pay_penalty(booking_id):
+    """
+    Settles overstay penalty fine for a reservation via Razorpay.
+    """
+    data = request.get_json(silent=True) or {}
+    payment_id = data.get('razorpay_payment_id') or data.get('payment_id')
+    order_id = data.get('razorpay_order_id') or data.get('order_id')
+    signature = data.get('razorpay_signature') or data.get('signature')
+    amount = float(data.get('amount', 0.0))
+    method = data.get('method', 'UPI / QR')
+    overstay_id = data.get('overstay_id')
+
+    success, res = process_penalty_payment(
+        booking_id=booking_id,
+        overstay_id=overstay_id,
+        payment_id=payment_id,
+        order_id=order_id,
+        signature=signature,
+        amount=amount,
+        user_id=session.get('user_id'),
+        payment_method=method,
+        user_email=session.get('user_email')
+    )
+
+    if not success:
+        return jsonify({'status': 'error', 'message': res.get('message', 'Failed to process penalty payment.')}), 400
+
+    return jsonify({
+        'status': 'success',
+        'message': f'Penalty fee of ₹{amount:.2f} successfully paid and cleared via Razorpay.',
+        'transaction': res
+    }), 200
+
 @app.route('/booking/confirm', methods=['POST'])
 @login_required
 def booking_confirm():
@@ -1102,6 +1268,12 @@ def booking_confirm():
                 if not app.config.get('TESTING'):
                     return jsonify({'status': 'error', 'message': f"Unauthorized: Vehicle '{vehicle_plate}' is not registered to your account."}), 403
 
+    payment_id = data.get('payment_id') or data.get('razorpay_payment_id')
+    payment_order_id = data.get('payment_order_id') or data.get('razorpay_order_id')
+    payment_signature = data.get('payment_signature') or data.get('razorpay_signature')
+    payment_method = data.get('payment_method') or ('Razorpay (Dummy)' if payment_id else 'Pay on Arrival')
+    payment_status = data.get('payment_status') or ('Paid' if payment_id else 'Pending')
+
     booking_payload = {
         'slot_id': int(slot_id),
         'parking_lot_id': data.get('lot_id') or data.get('parking_lot_id'),
@@ -1117,6 +1289,11 @@ def booking_confirm():
         'vehicle_plate': vehicle_plate,
         'vehicle_type': normalize_vehicle_type(data.get('vehicle_type', 'Car')),
         'vehicle_id': data.get('vehicle_id'),
+        'payment_id': payment_id,
+        'payment_order_id': payment_order_id,
+        'payment_signature': payment_signature,
+        'payment_method': payment_method,
+        'payment_status': payment_status,
         'user_id': uid,
         'user_role': user_role,
         'user_name': session.get('user_name', 'Driver'),
@@ -1152,6 +1329,19 @@ def booking_confirm():
             )
         except Exception as e:
             app.logger.warning(f"[Email Notification Warning] Failed to queue confirmation email: {e}")
+
+    # Dispatch payment receipt email via Native Python SSL/TLS if paid online
+    if payment_status == 'Paid' and recipient_email:
+        try:
+            payment_service.send_receipt_email(
+                recipient=recipient_email,
+                booking_id=result.get('booking_id'),
+                amount=result.get('total_amount', 0.0),
+                payment_method=payment_method,
+                booking_doc=result
+            )
+        except Exception as pe:
+            app.logger.warning(f"[Payment Receipt Warning] Failed to queue payment receipt email: {pe}")
 
     return jsonify({
         'status': 'success',
@@ -1273,6 +1463,25 @@ def booking_exit(booking_id=None):
             pass
     if session.get('user_role') == 'admin':
         uid = None
+
+    # Check if penalty was paid via Razorpay at checkout
+    if data.get('payment_id'):
+        try:
+            penalty_amt = float(data.get('penalty_amount') or data.get('amount') or 0.0)
+            if penalty_amt > 0:
+                payment_service.process_penalty_payment(
+                    booking_id=bid,
+                    overstay_id=data.get('overstay_id'),
+                    payment_id=data['payment_id'],
+                    order_id=data.get('order_id', 'order_exit_direct'),
+                    signature=data.get('signature', 'mock_signature'),
+                    amount=penalty_amt,
+                    user_id=uid,
+                    payment_method=data.get('payment_method', 'Razorpay'),
+                    user_email=session.get('user_email')
+                )
+        except Exception as pe:
+            app.logger.warning(f"[Exit Payment Warning] Failed to log exit penalty payment: {pe}")
 
     success, result = mongo_exit_booking(bid, user_id=uid)
     if not success:
