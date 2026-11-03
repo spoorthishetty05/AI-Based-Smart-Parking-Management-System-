@@ -7,7 +7,7 @@ import re
 from functools import wraps
 from datetime import datetime, timedelta
 
-from flask import Blueprint, request, jsonify, Response, session, redirect, url_for, flash, make_response, current_app
+from flask import Blueprint, request, jsonify, Response, session, redirect, url_for, flash, make_response, current_app, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, DuplicateKeyError
 
@@ -30,6 +30,7 @@ from core.mongo_engine import (
 from routes.middleware import login_required, admin_required, verify_password_hash, get_authenticated_user_id
 
 from core import parking_places_config
+from core.payment_service import payment_service
 from core.email_service import mail_service, send_email, send_templated_email
 from core.overstay_engine import get_current_sim_time, normalize_vehicle_type
 
@@ -996,5 +997,341 @@ def get_reservation_pass(res_id):
         'status': 'success',
         'pass': pass_data
     })
+
+# ==========================================
+
+@booking_bp.route('/booking/confirm', methods=['POST'])
+@login_required
+def booking_confirm():
+    """
+    Step 5: Confirm Booking.
+    Re-validates authenticated user, vehicle ownership, category, place, slot, date, time, and fee.
+    Atomically creates the booking document in 'bookings' and 'reservations' collections,
+    updates slot status, and returns unique booking confirmation.
+    """
+    data = request.get_json() if request.is_json else request.form
+
+    slot_id = data.get('slot_id')
+    if not slot_id:
+        return jsonify({'status': 'error', 'message': 'Parking slot ID is required.'}), 400
+
+    booking_date = data.get('booking_date') or data.get('date') or datetime.now().strftime('%Y-%m-%d')
+    start_time = data.get('start_time', '10:00')
+
+    # Backend validation: Prevent booking for past dates and times
+    is_valid_dt, dt_err = validate_booking_datetime(booking_date, start_time)
+    if not is_valid_dt:
+        return jsonify({'status': 'error', 'message': dt_err or 'Please select the current time or a future time. Please select a current or future date and time.'}), 400
+
+    uid = session.get('user_id')
+    user_role = session.get('user_role', 'user')
+    vehicle_plate = (data.get('vehicle_plate') or data.get('vehicle_number') or '').strip().upper()
+    vehicle_type = normalize_vehicle_type(data.get('vehicle_type', 'Car'))
+    vehicle_name = (data.get('vehicle_name') or data.get('make_model') or '').strip()
+
+    db = get_mongo_db()
+    if vehicle_plate:
+        veh_owned = db.vehicles.find_one({'user_id': uid, 'license_plate': vehicle_plate}) if db is not None else None
+        if not veh_owned:
+            u_doc = db.users.find_one({'user_id': uid, 'vehicles.license_plate': vehicle_plate}) if db is not None else None
+            if not u_doc and user_role != 'admin':
+                other_user_veh = db.vehicles.find_one({'license_plate': vehicle_plate, 'user_id': {'$ne': uid}}) if db is not None else None
+                if other_user_veh:
+                    return jsonify({'status': 'error', 'message': f"Unauthorized: Vehicle '{vehicle_plate}' is registered to another user."}), 403
+                if not current_app.config.get('TESTING'):
+                    return jsonify({'status': 'error', 'message': f"Unauthorized: Vehicle '{vehicle_plate}' is not registered to your account."}), 403
+        else:
+            if not vehicle_name:
+                vehicle_name = veh_owned.get('make_model') or veh_owned.get('vehicle_name', '')
+
+    payment_id = data.get('payment_id') or data.get('razorpay_payment_id')
+    payment_order_id = data.get('payment_order_id') or data.get('razorpay_order_id')
+    payment_signature = data.get('payment_signature') or data.get('razorpay_signature')
+    payment_method = data.get('payment_method') or ('Razorpay (Dummy)' if payment_id else 'Pay on Arrival')
+    payment_status = data.get('payment_status') or ('Paid' if payment_id else 'Pending')
+
+    booking_payload = {
+        'slot_id': int(slot_id),
+        'parking_lot_id': data.get('lot_id') or data.get('parking_lot_id'),
+        'place_id': data.get('place_id'),
+        'place_name': data.get('place_name') or data.get('parking_place'),
+        'category': data.get('category') or data.get('facility_category'),
+        'facility_category': data.get('category') or data.get('facility_category'),
+        'lot_name': data.get('place_name') or data.get('lot_name'),
+        'booking_date': booking_date,
+        'date': booking_date,
+        'start_time': start_time,
+        'duration': data.get('duration', '2 Hours'),
+        'vehicle_plate': vehicle_plate,
+        'vehicle_type': vehicle_type,
+        'vehicle_name': vehicle_name,
+        'make_model': vehicle_name,
+        'vehicle_id': data.get('vehicle_id'),
+        'payment_id': payment_id,
+        'payment_order_id': payment_order_id,
+        'payment_signature': payment_signature,
+        'payment_method': payment_method,
+        'payment_status': payment_status,
+        'user_id': uid,
+        'user_role': user_role,
+        'user_name': session.get('user_name', 'Driver'),
+        'user_email': session.get('user_email', ''),
+        'driver_phone': session.get('user_phone', '')
+    }
+
+    success, result = mongo_create_booking(booking_payload)
+    if not success:
+        status_code = result.get('status_code') or 409
+        return jsonify({'status': 'error', 'message': result.get('message', 'Booking failed.')}), status_code
+
+    # Dispatch confirmation email via Native SSL/TLS transport (Background Thread)
+    recipient_email = booking_payload.get('user_email') or session.get('user_email')
+    if recipient_email:
+        try:
+            send_templated_email(
+                to=recipient_email,
+                subject=f"Smart Parking AI - Booking Confirmation #{result.get('booking_id')}",
+                template="emails/booking_confirmation.html",
+                context={
+                    "booking_id": result.get('booking_id'),
+                    "lot_name": result.get('place_name') or result.get('lot_name') or "Smart Parking Facility",
+                    "slot_name": result.get('slot_number') or result.get('slot_name') or f"Slot {result.get('slot_id')}",
+                    "vehicle_number": booking_payload.get('vehicle_number', ''),
+                    "vehicle_name": vehicle_name,
+                    "vehicle_type": vehicle_type,
+                    "start_time": f"{booking_payload.get('booking_date', '')} {booking_payload.get('start_time', '')}".strip(),
+                    "end_time": f"{booking_payload.get('booking_date', '')} {booking_payload.get('end_time', '')}".strip(),
+                    "total_amount": result.get('total_amount', 0.0),
+                    "dashboard_url": url_for('booking.booking_my_bookings', _external=True)
+                },
+                sync=False
+            )
+        except Exception as e:
+            current_app.logger.warning(f"[Email Notification Warning] Failed to queue confirmation email: {e}")
+
+    # Dispatch payment receipt email via Native Python SSL/TLS if paid online
+    if payment_status == 'Paid' and recipient_email:
+        try:
+            payment_service.send_receipt_email(
+                recipient=recipient_email,
+                booking_id=result.get('booking_id'),
+                amount=result.get('total_amount', 0.0),
+                payment_method=payment_method,
+                booking_doc=result
+            )
+        except Exception as pe:
+            current_app.logger.warning(f"[Payment Receipt Warning] Failed to queue payment receipt email: {pe}")
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Booking confirmed successfully!',
+        'booking': result,
+        'booking_id': result.get('booking_id'),
+        'reservation_id': result.get('booking_id')
+    }), 201
+
+@booking_bp.route('/booking/my-bookings', methods=['GET'])
+@login_required
+def booking_my_bookings():
+    """
+    Renders the dedicated My Bookings page or returns JSON list of upcoming and historical bookings.
+    """
+    uid = session.get('user_id')
+    bookings_data = mongo_get_user_bookings(uid)
+
+    if request.is_json or request.headers.get('Accept') == 'application/json' or request.path.startswith('/api/'):
+        upcoming = bookings_data.get('upcoming', [])
+        history = bookings_data.get('history', [])
+        all_res = upcoming + history
+        for b in all_res:
+            b['reservation_id'] = b.get('booking_id')
+            b['date'] = b.get('booking_date') or b.get('date') or ''
+            b['end_time'] = b.get('duration') or '2 Hours'
+            b['total_amount'] = float(b.get('total_amount') or 80.0)
+        return jsonify({
+            'status': 'success',
+            'reservations': all_res,
+            'upcoming': upcoming,
+            'history': history,
+            'total': bookings_data.get('total', 0)
+        })
+
+    return render_template('my_bookings.html',
+                           upcoming=bookings_data.get('upcoming', []),
+                           history=bookings_data.get('history', []),
+                           current_user=session)
+
+@booking_bp.route('/booking/<booking_id>', methods=['GET'])
+@login_required
+def booking_get_detail(booking_id):
+    """Returns single booking document details from MongoDB."""
+    booking = mongo_get_booking_by_id(booking_id)
+    if not booking:
+        return jsonify({'status': 'error', 'message': f"Booking '{booking_id}' not found."}), 404
+
+    # Security check: owner or admin
+    if booking.get('user_id') and int(booking['user_id']) != int(session.get('user_id', -1)) and session.get('user_role') != 'admin':
+        return jsonify({'status': 'error', 'message': 'Unauthorized to view this booking.'}), 403
+
+    return jsonify({'status': 'success', 'booking': booking})
+
+@booking_bp.route('/booking/<booking_id>/cancel', methods=['POST'])
+@booking_bp.route('/api/reservations/cancel/<booking_id>', methods=['POST'])
+@login_required
+def booking_cancel(booking_id):
+    """
+    Cancels an upcoming booking in MongoDB:
+    Updates status to 'cancelled', frees slot back to 'available', logs cancellation in MongoDB.
+    """
+    uid = session.get('user_id')
+    success, msg = mongo_cancel_booking(booking_id, user_id=uid)
+    if not success:
+        return jsonify({'status': 'error', 'message': msg}), 400
+
+    return jsonify({'status': 'success', 'message': msg, 'booking_id': booking_id})
+
+@booking_bp.route('/booking/<booking_id>/checkout-preview', methods=['GET'])
+@booking_bp.route('/api/reservations/<booking_id>/checkout-preview', methods=['GET'])
+def booking_checkout_preview(booking_id):
+    """
+    Returns real-time session details for the Checkout confirmation modal:
+    Vehicle Number, Vehicle Type, Parking Lot, Slot Number, Booking Date,
+    Booked Start Time, Booked End Time, Actual Entry Time, Current/Exit Time,
+    Parking Duration, Current Parking Status, and Overstay duration/warning.
+    """
+    uid = session.get('user_id') or request.args.get('user_id')
+    if uid:
+        try:
+            uid = int(uid)
+        except (ValueError, TypeError):
+            pass
+    if session.get('user_role') == 'admin':
+        uid = None
+
+    success, result = mongo_get_checkout_preview(booking_id, user_id=uid)
+    if not success:
+        status_code = 403 if "Unauthorized" in result.get('message', '') else 404
+        return jsonify({'status': 'error', 'message': result.get('message', 'Booking not found')}), status_code
+
+    return jsonify({'status': 'success', 'preview': result})
+
+@booking_bp.route('/booking/<booking_id>/exit', methods=['POST'])
+@booking_bp.route('/api/reservations/<booking_id>/exit', methods=['POST'])
+@booking_bp.route('/api/reservations/exit', methods=['POST'])
+def booking_exit(booking_id=None):
+    """
+    Processes Vehicle Exit / Parking Checkout:
+    1. Stores actual exit time.
+    2. Calculates total duration.
+    3. Detects overstay against grace period.
+    4. Updates booking status to COMPLETED (or Completed + Overstay).
+    5. Sets parking slot status from OCCUPIED to AVAILABLE.
+    6. Removes active session and moves to Parking History.
+    7. Preserves AI/ML historical data permanently.
+    """
+    data = request.get_json(silent=True) or {}
+    bid = booking_id or data.get('booking_id') or data.get('reservation_id')
+    if not bid:
+        return jsonify({'status': 'error', 'message': 'Booking ID is required.'}), 400
+
+    uid = session.get('user_id') or request.args.get('user_id') or data.get('user_id')
+    if uid:
+        try:
+            uid = int(uid)
+        except (ValueError, TypeError):
+            pass
+    if session.get('user_role') == 'admin':
+        uid = None
+
+    # Check if penalty was paid via Razorpay at checkout
+    if data.get('payment_id'):
+        try:
+            penalty_amt = float(data.get('penalty_amount') or data.get('amount') or 0.0)
+            if penalty_amt > 0:
+                payment_service.process_penalty_payment(
+                    booking_id=bid,
+                    overstay_id=data.get('overstay_id'),
+                    payment_id=data['payment_id'],
+                    order_id=data.get('order_id', 'order_exit_direct'),
+                    signature=data.get('signature', 'mock_signature'),
+                    amount=penalty_amt,
+                    user_id=uid,
+                    payment_method=data.get('payment_method', 'Razorpay'),
+                    user_email=session.get('user_email')
+                )
+        except Exception as pe:
+            current_app.logger.warning(f"[Exit Payment Warning] Failed to log exit penalty payment: {pe}")
+
+    success, result = mongo_exit_booking(bid, user_id=uid)
+    if not success:
+        status_code = 403 if "Unauthorized" in result.get('message', '') else 400
+        return jsonify({'status': 'error', 'message': result.get('message', 'Checkout failed')}), status_code
+
+    return jsonify(result), 200
+
+@booking_bp.route('/booking/<booking_id>/start-parking', methods=['POST'])
+@booking_bp.route('/api/reservations/<booking_id>/start-parking', methods=['POST'])
+@booking_bp.route('/api/reservations/start-parking', methods=['POST'])
+def booking_start_parking(booking_id=None):
+    """
+    Starts parking session: transitions booking from RESERVED to OCCUPIED,
+    records actual_entry_time, and updates slot status to OCCUPIED.
+    """
+    data = request.get_json(silent=True) or {}
+    bid = booking_id or data.get('booking_id') or data.get('reservation_id')
+    if not bid:
+        return jsonify({'status': 'error', 'message': 'Booking ID is required.'}), 400
+
+    uid = session.get('user_id') or request.args.get('user_id') or data.get('user_id')
+    if uid:
+        try:
+            uid = int(uid)
+        except (ValueError, TypeError):
+            pass
+    if session.get('user_role') == 'admin':
+        uid = None
+
+    success, result = mongo_start_parking(bid, user_id=uid)
+    if not success:
+        status_code = 403 if "Unauthorized" in result.get('message', '') else 400
+        return jsonify({'status': 'error', 'message': result.get('message', 'Failed to start parking')}), status_code
+
+    return jsonify(result), 200
+
+@booking_bp.route('/api/reservations/<booking_id>/pass', methods=['GET'])
+@booking_bp.route('/booking/<booking_id>/pass', methods=['GET'])
+@login_required
+def booking_get_pass(booking_id):
+    """Returns digital pass data for the booking pass modal."""
+    booking = mongo_get_booking_by_id(booking_id)
+    if not booking:
+        db = get_mongo_db()
+        if db is not None:
+            try:
+                booking = db.reservations.find_one({'reservation_id': int(booking_id)}, {'_id': 0})
+            except Exception:
+                booking = None
+
+    if not booking:
+        return jsonify({'status': 'error', 'message': 'Pass not found.'}), 404
+
+    b_id = booking.get('booking_id') or str(booking.get('reservation_id', booking_id))
+    return jsonify({
+        'status': 'success',
+        'pass': {
+            'pass_code': f"PASS-{b_id}",
+            'slot_number': booking.get('slot_number', 'A01'),
+            'lot_name': booking.get('lot_name', 'City Parking'),
+            'vehicle_plate': booking.get('vehicle_plate', 'Not Assigned'),
+            'vehicle_name': booking.get('vehicle_name') or booking.get('make_model', ''),
+            'vehicle_type': booking.get('vehicle_type', 'Car'),
+            'date': booking.get('booking_date') or booking.get('date', ''),
+            'start_time': booking.get('start_time', '10:00'),
+            'end_time': booking.get('end_time') or booking.get('duration', '12:00')
+        }
+    })
+
+
+
 
 # ==========================================

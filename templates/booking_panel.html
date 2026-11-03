@@ -808,11 +808,11 @@
       <div class="user-sidebar-footer">
         <div class="user-profile-pill">
           <div class="user-avatar-circle">
-            {{ session.get('user_name', 'Driver')[0] | upper }}
+            {{ session.get('user_name', 'User')[0] | upper }}
           </div>
           <div class="user-profile-meta">
-            <h4>{{ session.get('user_name', 'Driver') }}</h4>
-            <p>{{ session.get('user_email', 'driver@example.com') }}</p>
+            <h4>{{ session.get('user_name', 'User') }}</h4>
+            <p>{{ session.get('user_email', 'user@example.com') }}</p>
           </div>
         </div>
         <a href="/logout" class="btn-user-signout" title="Logout">
@@ -1125,7 +1125,6 @@
                     </div>
                   </div>
                   <div class="place-pick-footer">
-                    <div class="place-rate-tag">₹{{ p.hourly_rate | int if p.hourly_rate == p.hourly_rate | int else p.hourly_rate }}/hr</div>
                     <div class="place-slots-badge">
                       <i class="fas fa-circle-check"></i>
                       <span><span class="place-avail-count">{{ p.available_slots }}</span> / <span class="place-total-count">{{ p.total_slots }}</span> Available</span>
