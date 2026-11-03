@@ -173,7 +173,7 @@ function switchUserTab(tabId) {
 
   // Header title update
   const titles = {
-    'dashboard': '<i class="fas fa-home"></i> Driver Dashboard',
+    'dashboard': '<i class="fas fa-home"></i> User Dashboard',
     'profile': '<i class="fas fa-user-circle"></i> My Profile & Vehicles',
     'find': '<i class="fas fa-search-location"></i> Find Parking Lots',
     'recommendation': '<i class="fas fa-robot"></i> AI Parking Recommendation',
@@ -222,7 +222,7 @@ async function loadUserDashboard() {
         userProfile = pData.user || pData.profile || {};
         userVehicles = pData.vehicles || [];
         const nameEl = document.getElementById('dashWelcomeName');
-        if (nameEl) nameEl.textContent = userProfile.name || 'Driver';
+        if (nameEl) nameEl.textContent = userProfile.name || 'User';
         
         const vehElem = document.getElementById('dashVehiclePlate');
         if (vehElem) {
@@ -464,7 +464,6 @@ function renderDashboardNearbyLots(lots) {
       </div>
       <div style="text-align:right;">
         <span style="color:#10b981; font-weight:800; font-size:13px;">${l.available_count || 0} Open</span>
-        <div style="font-size:11px; color:#64748b;">₹${l.hourly_rate || 40}/hr</div>
       </div>
     </div>
   `;

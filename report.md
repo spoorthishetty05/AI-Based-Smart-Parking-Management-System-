@@ -271,6 +271,22 @@ During the project lifecycle, multiple subsystems—including user authenticatio
 
 ---
 
+### Bug 14: Inconsistent Portal Terminology and Unwanted Rate Display on User Dashboard
+
+- **Component:** `templates/user_panel.html`, `templates/booking_panel.html`, `templates/my_bookings.html`, `static/js/user_panel.js`
+- **Severity:** Low / UI Consistency & Presentation
+- **Symptom:**
+  1. The top header of the user panel displayed **"Driver Dashboard"** and the sidebar badge displayed **"DRIVER PORTAL"**, while the navigation item was labelled **"User Dashboard"**.
+  2. The "Nearby Facilities" card on the main user dashboard showed hourly rates (e.g. `₹30/hr`, `₹50/hr`, `₹20/hr`, `₹40/hr`) under the live available count, which the user requested not to display on the dashboard overview.
+- **Root Cause:**
+  1. Static HTML in `templates/user_panel.html` and tab switching logic in `static/js/user_panel.js` defaulted to `Driver Dashboard` and `DRIVER PORTAL`.
+  2. `renderDashboardNearbyLots` in `static/js/user_panel.js` appended an hourly rate tag `₹${l.hourly_rate || 40}/hr` next to each facility's open slot count.
+- **Resolution:**
+  - **Terminology Unification:** Changed header titles, browser document title, fallback session attributes, and sidebar badges to consistently say **"User Dashboard"** and **"USER PORTAL"** across `templates/user_panel.html`, `templates/booking_panel.html`, `templates/my_bookings.html`, and `static/js/user_panel.js`.
+  - **Rate Display Removal:** Removed the hourly fee line from the dashboard's `renderDashboardNearbyLots` component, leaving a clean display of facility names, operating hours, and live vacant count.
+
+---
+
 ## Master Test Suite Verification
 
 To verify that all bug fixes function harmoniously without regression, the project was evaluated using the unified test runner `tests/run_tests.py`:

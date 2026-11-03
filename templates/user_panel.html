@@ -33,7 +33,7 @@
         </div>
         <div>
           <div class="user-brand-title">Smart Parking</div>
-          <span class="user-brand-badge">DRIVER PORTAL</span>
+          <span class="user-brand-badge">USER PORTAL</span>
         </div>
       </div>
 
@@ -109,11 +109,11 @@
       <div class="user-sidebar-footer">
         <div class="user-profile-pill">
           <div class="user-avatar-circle">
-            {{ session.get('user_name', 'Driver')[0] | upper }}
+            {{ session.get('user_name', 'User')[0] | upper }}
           </div>
           <div class="user-profile-meta">
-            <h4>{{ session.get('user_name', 'Driver') }}</h4>
-            <p>{{ session.get('user_email', 'driver@example.com') }}</p>
+            <h4>{{ session.get('user_name', 'User') }}</h4>
+            <p>{{ session.get('user_email', 'user@example.com') }}</p>
           </div>
         </div>
         <a href="/logout" class="btn-user-signout" id="logoutBtn" title="Logout">
@@ -130,7 +130,7 @@
       <!-- Topbar -->
       <header class="user-topbar">
         <div class="user-topbar-title" id="userTopHeaderTitle">
-          <i class="fas fa-home"></i> Driver Dashboard
+          <i class="fas fa-home"></i> User Dashboard
         </div>
         <div style="display:flex; align-items:center; gap:16px;">
 
@@ -161,7 +161,7 @@
           <!-- Welcome Banner -->
           <div class="user-welcome-banner">
             <div class="user-welcome-text">
-              <h2>Welcome back, <span id="dashWelcomeName">{{ session.get('user_name', 'Driver') }}</span> 👋</h2>
+              <h2>Welcome back, <span id="dashWelcomeName">{{ session.get('user_name', 'User') }}</span> 👋</h2>
               <p>Find nearby parking, view real-time available slots, and book in seconds with AI assistance.</p>
             </div>
             <div>
