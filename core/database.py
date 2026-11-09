@@ -139,6 +139,29 @@ STANDARD_DRIVERS = [
     }
 ]
 
+SECURITY_GUARDS = [
+    {
+        'name': 'Chief Security Officer',
+        'email': 'security@smartparking.ai',
+        'password': 'security123',
+        'phone': '+91 9876500099',
+        'role': 'security',
+        'gate': 'Gate 1 (North Entry)',
+        'assigned_lot': 'Institutions',
+        'lot_id': 1
+    },
+    {
+        'name': 'Guard Ramesh Kumar',
+        'email': 'guard@smartparking.ai',
+        'password': 'guard123',
+        'phone': '+91 9876500098',
+        'role': 'security',
+        'gate': 'Gate 2 (Main Mall Entrance)',
+        'assigned_lot': 'Mall',
+        'lot_id': 2
+    }
+]
+
 # ======================================================================
 # COMPLETE DATABASE RESET & INITIALIZATION (MONGODB ONLY)
 # ======================================================================
@@ -255,6 +278,7 @@ def clear_and_init_mongodb(force_reseed=True, preserve_users=True):
     lots_data = [
         {
             'lot_id': 1,
+            'name': 'Institutions',
             'lot_name': 'Institutions',
             'location': 'Campus Block, University & Medical Center, Bangalore',
             'total_floors': 2,
@@ -265,6 +289,7 @@ def clear_and_init_mongodb(force_reseed=True, preserve_users=True):
         },
         {
             'lot_id': 2,
+            'name': 'Mall',
             'lot_name': 'Mall',
             'location': 'Phoenix Grand Mall, Commercial Blvd, Bangalore',
             'total_floors': 2,
@@ -275,6 +300,7 @@ def clear_and_init_mongodb(force_reseed=True, preserve_users=True):
         },
         {
             'lot_id': 3,
+            'name': 'Public places',
             'lot_name': 'Public places',
             'location': 'City Metro Interchange & Public Plaza, Bangalore',
             'total_floors': 2,
@@ -285,6 +311,7 @@ def clear_and_init_mongodb(force_reseed=True, preserve_users=True):
         },
         {
             'lot_id': 4,
+            'name': 'City Parking',
             'lot_name': 'City Parking',
             'location': 'Hampankatta, Mangaluru',
             'total_floors': 2,
@@ -635,8 +662,39 @@ def ensure_permanent_admin(conn=None):
                 {'$set': {'role': 'user', 'is_active': 1, 'password_hash': hashed}}
             )
 
-    # Ensure counters sequence for users is at least 4 so next registered user gets 5
-    db.counters.update_one({'_id': 'users'}, {'$max': {'seq': 4}}, upsert=True)
+    # Also seed security guard officers for instant gate operator portal access
+    for idx, guard in enumerate(SECURITY_GUARDS, start=6):
+        existing = db.users.find_one({'email': guard['email'].lower()})
+        hashed = generate_password_hash(guard['password'])
+        if not existing:
+            db.users.insert_one({
+                'user_id': idx,
+                'name': guard['name'],
+                'email': guard['email'].lower(),
+                'password_hash': hashed,
+                'phone': guard['phone'],
+                'role': 'security',
+                'gate': guard.get('gate', 'Gate 1 (North Entry)'),
+                'assigned_lot': guard.get('assigned_lot', 'Institutions'),
+                'lot_id': guard.get('lot_id', 1),
+                'is_active': 1,
+                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+        else:
+            db.users.update_one(
+                {'email': guard['email'].lower()},
+                {'$set': {
+                    'role': 'security',
+                    'is_active': 1,
+                    'password_hash': hashed,
+                    'gate': guard.get('gate', 'Gate 1 (North Entry)'),
+                    'assigned_lot': guard.get('assigned_lot', 'Institutions'),
+                    'lot_id': guard.get('lot_id', 1)
+                }}
+            )
+
+    # Ensure counters sequence for users is at least 7 so next registered user gets 8
+    db.counters.update_one({'_id': 'users'}, {'$max': {'seq': 7}}, upsert=True)
 
 def ensure_notifications_table(conn=None):
     """No-op for MongoDB (collection dynamically created)."""

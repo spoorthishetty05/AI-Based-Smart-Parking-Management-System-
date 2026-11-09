@@ -489,7 +489,215 @@ def admin_delete_vehicle(vehicle_id):
     mongo_delete_vehicle(vehicle_id)
     return jsonify({'status': 'success', 'message': f"Vehicle '{v['license_plate']}' removed successfully."})
 
+# ==========================================
+# SECURITY GUARD & GATE OPERATOR MANAGEMENT
+# ==========================================
+
+@admin_bp.route('/api/admin/guards', methods=['GET'])
+@admin_required
+def get_admin_guards():
+    """Returns list of all registered security personnel and assigned lots."""
+    db = get_mongo_db()
+    if db is None:
+        return jsonify({'status': 'error', 'message': 'Database offline'}), 503
+    
+    # Ensure standard security guards exist
+    ensure_permanent_admin()
+    
+    guards = list(db.users.find({'role': {'$in': ['security', 'guard']}}).sort('user_id', 1))
+    clean_guards = []
+    for g in guards:
+        clean_guards.append({
+            'user_id': g.get('user_id'),
+            'name': g.get('name', 'Security Officer'),
+            'email': g.get('email'),
+            'phone': g.get('phone', ''),
+            'role': g.get('role', 'security'),
+            'gate': g.get('gate', 'Gate 1 (North Entry)'),
+            'assigned_lot': g.get('assigned_lot', 'Institutions'),
+            'lot_id': g.get('lot_id', 1),
+            'shift': g.get('shift', 'Day Shift (08:00 - 20:00)'),
+            'is_active': g.get('is_active', 1),
+            'created_at': g.get('created_at', '2026-11-01 00:00:00')
+        })
+    
+    lots = list(db.parking_lots.find({}, {'_id': 0, 'lot_id': 1, 'name': 1, 'total_slots': 1}))
+    return jsonify({
+        'status': 'success',
+        'guards': clean_guards,
+        'lots': lots,
+        'total_count': len(clean_guards)
+    })
+
+@admin_bp.route('/api/admin/guards/create', methods=['POST'])
+@admin_required
+def api_admin_create_guard():
+    """Admin creates a new security guard with gate & parking lot assignment."""
+    data = request.get_json() or {}
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip().lower()
+    phone = data.get('phone', '').strip()
+    password = data.get('password', 'guard123').strip()
+    gate = data.get('gate', 'Gate 1 (North Entry)').strip()
+    assigned_lot = data.get('assigned_lot', 'Institutions').strip()
+    shift = data.get('shift', 'Day Shift (08:00 - 20:00)').strip()
+    try:
+        lot_id = int(data.get('lot_id', 1))
+    except (ValueError, TypeError):
+        lot_id = 1
+
+    if not name or not email:
+        return jsonify({'status': 'error', 'message': 'Guard Name and Email are required.'}), 400
+
+    db = get_mongo_db()
+    if db is None:
+        return jsonify({'status': 'error', 'message': 'Database offline'}), 503
+
+    existing = db.users.find_one({'email': email})
+    if existing:
+        return jsonify({'status': 'error', 'message': f"A user or guard with email '{email}' already exists."}), 409
+
+    new_uid = get_next_sequence('users')
+    pwd_hash = generate_password_hash(password)
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    guard_doc = {
+        'user_id': new_uid,
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'password_hash': pwd_hash,
+        'role': 'security',
+        'gate': gate,
+        'assigned_lot': assigned_lot,
+        'lot_id': lot_id,
+        'shift': shift,
+        'is_active': 1,
+        'created_at': now_str
+    }
+    db.users.insert_one(guard_doc)
+
+    return jsonify({
+        'status': 'success',
+        'message': f"Security Guard '{name}' assigned to {assigned_lot} ({gate}) successfully.",
+        'guard': {
+            'user_id': new_uid,
+            'name': name,
+            'email': email,
+            'gate': gate,
+            'assigned_lot': assigned_lot,
+            'lot_id': lot_id,
+            'shift': shift,
+            'is_active': 1
+        }
+    }), 201
+
+@admin_bp.route('/api/admin/guards/update', methods=['POST'])
+@admin_required
+def api_admin_update_guard():
+    """Admin updates security guard credentials, gate assignment or shift."""
+    data = request.get_json() or {}
+    user_id = data.get('user_id')
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip().lower()
+    phone = data.get('phone', '').strip()
+    gate = data.get('gate', '').strip()
+    assigned_lot = data.get('assigned_lot', '').strip()
+    shift = data.get('shift', '').strip()
+    password = data.get('password', '').strip()
+    is_active = 1 if data.get('is_active', True) else 0
+
+    if not user_id or not name or not email:
+        return jsonify({'status': 'error', 'message': 'Guard ID, name, and email are required.'}), 400
+
+    db = get_mongo_db()
+    if db is None:
+        return jsonify({'status': 'error', 'message': 'Database offline'}), 503
+
+    try:
+        uid = int(user_id)
+    except (ValueError, TypeError):
+        return jsonify({'status': 'error', 'message': 'Invalid Guard ID format.'}), 400
+
+    existing = db.users.find_one({'user_id': uid})
+    if not existing:
+        return jsonify({'status': 'error', 'message': 'Security Guard not found.'}), 404
+
+    updates = {
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'gate': gate or existing.get('gate', 'Gate 1'),
+        'assigned_lot': assigned_lot or existing.get('assigned_lot', 'Institutions'),
+        'shift': shift or existing.get('shift', 'Day Shift'),
+        'is_active': is_active
+    }
+    if 'lot_id' in data:
+        try:
+            updates['lot_id'] = int(data['lot_id'])
+        except (ValueError, TypeError):
+            pass
+
+    if password:
+        updates['password_hash'] = generate_password_hash(password)
+
+    db.users.update_one({'user_id': uid}, {'$set': updates})
+    return jsonify({'status': 'success', 'message': f"Security Guard '{name}' updated successfully."})
+
+@admin_bp.route('/api/admin/guards/toggle-status', methods=['POST'])
+@admin_required
+def api_admin_toggle_guard_status():
+    """Admin toggles active/inactive duty status of a security guard."""
+    data = request.get_json() or {}
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({'status': 'error', 'message': 'Guard ID is required.'}), 400
+
+    db = get_mongo_db()
+    if db is None:
+        return jsonify({'status': 'error', 'message': 'Database offline'}), 503
+
+    try:
+        uid = int(user_id)
+    except (ValueError, TypeError):
+        return jsonify({'status': 'error', 'message': 'Invalid Guard ID format.'}), 400
+
+    guard = db.users.find_one({'user_id': uid})
+    if not guard:
+        return jsonify({'status': 'error', 'message': 'Security Guard not found.'}), 404
+
+    current_status = guard.get('is_active', 1)
+    new_status = 0 if current_status == 1 else 1
+
+    db.users.update_one({'user_id': uid}, {'$set': {'is_active': new_status}})
+    action = "activated for shift" if new_status == 1 else "deactivated"
+    return jsonify({
+        'status': 'success',
+        'message': f"Guard '{guard.get('name')}' has been {action}.",
+        'is_active': new_status
+    })
+
+@admin_bp.route('/api/admin/guards/<int:guard_id>', methods=['DELETE'])
+@admin_required
+def api_admin_delete_guard(guard_id):
+    """Admin removes a security guard account."""
+    db = get_mongo_db()
+    if db is None:
+        return jsonify({'status': 'error', 'message': 'Database offline'}), 503
+
+    guard = db.users.find_one({'user_id': guard_id})
+    if not guard:
+        return jsonify({'status': 'error', 'message': 'Security Guard not found.'}), 404
+
+    # Keep default security officer seeded
+    if guard.get('email') == 'security@smartparking.ai':
+        return jsonify({'status': 'error', 'message': 'Default Chief Security Officer cannot be deleted.'}), 400
+
+    db.users.delete_one({'user_id': guard_id})
+    return jsonify({'status': 'success', 'message': f"Guard '{guard.get('name')}' removed successfully."})
+
 @admin_bp.route('/api/reports/history', methods=['GET'])
+@admin_required
 def get_reports_history():
     """Returns complete parking history and transaction ledger with status filtering."""
     status_filter = request.args.get('status', 'all').strip().lower()
@@ -535,6 +743,7 @@ def get_reports_history():
     })
 
 @admin_bp.route('/api/reports/summary', methods=['GET'])
+@admin_required
 def get_reports_summary():
     """Generates analytics report data for reports dashboard from MongoDB."""
     eda = get_eda_metrics()
@@ -712,6 +921,7 @@ def get_reports_summary():
 # ==========================================
 
 @admin_bp.route('/api/mongo/status', methods=['GET'])
+@admin_required
 def api_mongo_status():
     """Returns MongoDB server connectivity status and collection document statistics."""
     uri = request.args.get('uri')
@@ -719,6 +929,7 @@ def api_mongo_status():
     return jsonify(status_info)
 
 @admin_bp.route('/api/mongo/sync', methods=['POST'])
+@admin_required
 def api_mongo_sync():
     """Synchronizes SQLite database tables to MongoDB collections."""
     data = request.get_json() or {}
@@ -727,6 +938,7 @@ def api_mongo_sync():
     return jsonify(result)
 
 @admin_bp.route('/api/mongo/collections/<collection_name>', methods=['GET'])
+@admin_required
 def api_mongo_collection_docs(collection_name):
     """Returns the latest documents from any MongoDB collection (e.g. users, reservations, login_logs)."""
     limit = int(request.args.get('limit', 50))
@@ -737,6 +949,11 @@ def api_mongo_collection_docs(collection_name):
             for d in docs:
                 if '_id' in d:
                     d['_id'] = str(d['_id'])
+                # Security: Redact sensitive credential hashes if viewing users collection
+                if collection_name.lower() in ('users', 'user'):
+                    d.pop('password_hash', None)
+                    d.pop('password', None)
+                    d.pop('hashed_password', None)
             return jsonify({'status': 'success', 'collection': collection_name, 'count': len(docs), 'documents': docs})
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500

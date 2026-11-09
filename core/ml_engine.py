@@ -313,7 +313,10 @@ def predict_occupancy(target_date_str, target_time_str, weather='Clear', has_eve
         badge = 'danger'
 
     try:
-        from database import get_mongo_db
+        try:
+            from core.database import get_mongo_db
+        except ImportError:
+            from database import get_mongo_db
         db = get_mongo_db()
         if db is not None:
             if floor and floor != 'All':
@@ -585,7 +588,11 @@ def predict_cluster_regime(hour, occupancy_percentage, day_of_week=2, rolling_me
     if rolling_mean_3h is None:
         rolling_mean_3h = occupancy_percentage
 
-    features = np.array([[float(hour), float(occupancy_percentage), float(day_of_week), float(rolling_mean_3h)]])
+    feature_cols = pkg.get('feature_cols', ['hour', 'occupancy_percentage', 'day_of_week', 'rolling_mean_3h'])
+    features = pd.DataFrame(
+        [[float(hour), float(occupancy_percentage), float(day_of_week), float(rolling_mean_3h)]],
+        columns=feature_cols
+    )
     scaled = scaler.transform(features)
     cluster_id = int(model.predict(scaled)[0])
 

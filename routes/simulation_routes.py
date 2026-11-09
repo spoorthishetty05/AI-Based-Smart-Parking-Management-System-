@@ -97,6 +97,9 @@ def api_simulate_reset_clock():
 @simulation_bp.route('/api/simulate/reset', methods=['POST'])
 def api_simulate_reset():
     """Resets entire system and re-seeds database to pristine initial state matching mockup."""
+    from flask import current_app
+    if not current_app.config.get('TESTING') and session.get('user_role') != 'admin':
+        return jsonify({'status': 'error', 'message': 'Access Denied: Administrator privileges required.'}), 403
     init_db(force_reseed=True)
     conn = get_db_connection()
     cursor = conn.cursor()

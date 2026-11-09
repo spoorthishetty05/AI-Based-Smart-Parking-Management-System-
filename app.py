@@ -43,6 +43,10 @@ except Exception as e:
 # Register all modular Flask Blueprints
 register_all_blueprints(app)
 
+def create_app():
+    """Application factory helper function returning the configured Flask app instance."""
+    return app
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print(f"Starting AI-Based Smart Parking System server on http://127.0.0.1:{port}")

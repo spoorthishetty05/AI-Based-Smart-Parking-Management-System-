@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- User Panel Stylesheet -->
-  <link rel="stylesheet" href="/static/css/user_panel.css">
-  <link rel="stylesheet" href="/static/css/razorpay_modal.css">
+  <link rel="stylesheet" href="/static/css/user_panel.css?v=2.2">
+  <link rel="stylesheet" href="/static/css/razorpay_modal.css?v=2.2">
 </head>
 
 <body class="user-body">
@@ -1313,7 +1313,7 @@
             <form onsubmit="if(typeof submitSlotBooking === 'function'){ submitSlotBooking(event); } else { userSubmitQuickBooking(event); }">
               <div class="user-form-group">
                 <label class="user-form-label" style="font-weight:700;"><i class="fas fa-warehouse" style="color:#2563eb;"></i> Select Parking Facility</label>
-                <select id="bookingLotSelect" class="user-form-select" onchange="if(typeof loadAvailableSlotsForBooking === 'function') loadAvailableSlotsForBooking(); else if(typeof loadAvailableSlotsForQuickBooking === 'function') loadAvailableSlotsForQuickBooking();" required>
+                <select id="bookingLotSelect" class="user-form-select" onchange="if(typeof loadAvailableSlotsForBooking === 'function') loadAvailableSlotsForBooking(); else if(typeof loadAvailableSlotsForQuickBooking === 'function') loadAvailableSlotsForQuickBooking(); if(typeof updateEstimatedFare === 'function') updateEstimatedFare(); else if(typeof updateQuickBookingFare === 'function') updateQuickBookingFare();" required>
                   {% for lot in lots %}
                   <option value="{{ lot.lot_id }}" data-rate="{{ lot.hourly_rate or 40.0 }}" {% if loop.first %}selected{% endif %}>{{ lot.lot_name }} (₹{{ lot.hourly_rate or 40 }}/hr)</option>
                   {% endfor %}
@@ -1334,11 +1334,11 @@
                 </div>
                 <div class="user-form-group">
                   <label class="user-form-label" style="font-weight:700;"><i class="fas fa-clock" style="color:#0ea5e9;"></i> Start Time</label>
-                  <input type="time" id="bookingStartTime" class="user-form-input" value="10:00" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare();" required>
+                  <input type="time" id="bookingStartTime" class="user-form-input" value="10:00" oninput="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" required>
                 </div>
                 <div class="user-form-group">
                   <label class="user-form-label" style="font-weight:700;"><i class="fas fa-hourglass-end" style="color:#0ea5e9;"></i> End Time</label>
-                  <input type="time" id="bookingEndTime" class="user-form-input" value="12:00" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare();" required>
+                  <input type="time" id="bookingEndTime" class="user-form-input" value="12:00" oninput="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" required>
                 </div>
               </div>
 
@@ -1356,9 +1356,9 @@
               <div style="background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:10px; padding:16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <div>
                   <span style="font-size:12px; color:#64748b; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">Estimated Total Fare</span>
-                  <div style="font-size:12.5px; color:#64748b; margin-top:2px;" id="bookingRateSubtext">Standard tariff: ₹40/hr &bull; 15-min grace included</div>
+                  <div style="font-size:12.5px; color:#64748b; margin-top:2px;" id="bookingRateSubtext">Standard tariff: ₹{{ lots[0].hourly_rate or 40 }}/hr &bull; Duration: 2 Hours &bull; Overstay grace: 15m</div>
                 </div>
-                <div style="font-family:var(--font-mono); font-size:26px; font-weight:800; color:#10b981;" id="bookingEstimatedFare">₹80.00</div>
+                <div style="font-family:var(--font-mono); font-size:26px; font-weight:800; color:#10b981;" id="bookingEstimatedFare">₹{{ "%.2f"|format(2 * (lots[0].hourly_rate or 40.0)) }}</div>
               </div>
 
               <div style="display:flex; gap:12px;">
@@ -1433,27 +1433,61 @@
               <svg id="swapSvgOverlay" class="swap-svg-overlay"
                 style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;"></svg>
 
-              <!-- 4x4 / Multi-row Grid of Slots -->
-              <div class="grid-2d-box" id="interactive2DGrid">
-                <!-- Rendered dynamically -->
+              <!-- Main Flex Wrap: Grid on Left/Center, Legend on Right Side -->
+              <div class="layout-2d-flex-wrap">
+                <div class="layout-2d-grid-col">
+                  <!-- 4x4 / Multi-row Grid of Slots -->
+                  <div class="grid-2d-box" id="interactive2DGrid">
+                    <!-- Rendered dynamically -->
+                  </div>
+                </div>
+
+                <!-- Right-side Legend with only requested items -->
+                <aside class="layout-legend-sidebar" id="layoutLegendSidebar" aria-label="Parking Slot Legend">
+                  <div class="legend-sidebar-header">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Legend</span>
+                  </div>
+                  <div class="legend-sidebar-list">
+                    <div class="legend-sidebar-item">
+                      <span class="legend-symbol">🟢</span>
+                      <span class="legend-label">Available</span>
+                    </div>
+                    <div class="legend-sidebar-item">
+                      <span class="legend-symbol">🟡</span>
+                      <span class="legend-label">Reserved</span>
+                    </div>
+                    <div class="legend-sidebar-item">
+                      <span class="legend-symbol">🔴</span>
+                      <span class="legend-label">Occupied</span>
+                    </div>
+                    <div class="legend-sidebar-item">
+                      <span class="legend-symbol">🚨</span>
+                      <span class="legend-label overstay-label">Overstay</span>
+                    </div>
+                    <div class="legend-sidebar-item">
+                      <span class="legend-icon swapped-icon"><i class="fas fa-rotate"></i></span>
+                      <span class="legend-label swapped-label">Swapped</span>
+                    </div>
+                    <div class="legend-sidebar-item">
+                      <span class="legend-dot-you">YOU</span>
+                      <span class="legend-label">Your Slot</span>
+                    </div>
+                    <div class="legend-sidebar-item">
+                      <span class="legend-icon eligible-icon"><i class="fas fa-arrow-right-arrow-left"></i></span>
+                      <span class="legend-label eligible-label">Eligible Swap</span>
+                    </div>
+                    <div class="legend-sidebar-item">
+                      <span class="legend-icon marketplace-icon"><i class="fas fa-handshake"></i></span>
+                      <span class="legend-label marketplace-label">Marketplace Listed</span>
+                    </div>
+                  </div>
+                </aside>
               </div>
 
               <!-- Floating Visual Swap Preview & Confirmation Card -->
               <div id="visualSwapCardContainer" class="visual-swap-card-container" style="display:none;">
                 <!-- Rendered dynamically during swap preview -->
-              </div>
-
-              <!-- Legend Matching Specification -->
-              <div class="layout-legend-bar">
-                <span><img src="/static/images/car-top.svg" style="height:15px; width:9px; vertical-align:middle; margin-right:4px;" alt="Car"> Car Parked</span>
-                <span><img src="/static/images/bike-top.svg" style="height:15px; width:9px; vertical-align:middle; margin-right:4px;" alt="Bike"> Bike/Scooter Parked</span>
-                <span>🟢 Available</span>
-                <span><span class="legend-dot-you">YOU</span> Your Slot</span>
-                <span style="color:#38bdf8;"><i class="fas fa-arrow-right-arrow-left"></i> Eligible Swap</span>
-                <span style="color:#ec4899;"><i class="fas fa-handshake"></i> Marketplace Listed</span>
-                <span>🔴 Occupied (Locked)</span>
-                <span>🟡 Reserved</span>
-                <span style="color:#e11d48; font-weight:700;">🚨 Overstayed</span>
               </div>
             </div>
 

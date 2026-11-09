@@ -775,6 +775,158 @@ body.user-body {
   box-shadow: 0 1px 4px rgba(2, 132, 199, 0.5);
 }
 
+/* 2D Layout Flex Wrapper: Slots on Left/Center, Legend on Right Side */
+.layout-2d-flex-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.layout-2d-grid-col {
+  flex: 1;
+  max-width: 680px;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.layout-2d-grid-col .grid-2d-box {
+  width: 100%;
+  margin: 0;
+}
+
+/* Right-side Legend Sidebar Panel */
+.layout-legend-sidebar {
+  width: 210px;
+  min-width: 195px;
+  flex-shrink: 0;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 14px;
+  padding: 16px 18px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 16px;
+  z-index: 5;
+}
+
+.legend-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #38bdf8;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.legend-sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.legend-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1.2;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.legend-sidebar-item:hover {
+  transform: translateX(3px);
+}
+
+.legend-sidebar-item .legend-symbol {
+  font-size: 13px;
+  width: 18px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-sidebar-item .legend-icon {
+  font-size: 13px;
+  width: 18px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-sidebar-item .overstay-icon {
+  font-size: 13px;
+}
+
+.legend-sidebar-item .overstay-label {
+  color: #fb7185;
+  font-weight: 700;
+}
+
+.legend-sidebar-item .swapped-icon {
+  color: #f472b6;
+}
+
+.legend-sidebar-item .swapped-label {
+  color: #f472b6;
+  font-weight: 700;
+}
+
+.legend-sidebar-item .eligible-icon {
+  color: #38bdf8;
+}
+
+.legend-sidebar-item .eligible-label {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.legend-sidebar-item .marketplace-icon {
+  color: #ec4899;
+}
+
+.legend-sidebar-item .marketplace-label {
+  color: #ec4899;
+  font-weight: 700;
+}
+
+.legend-sidebar-item .legend-label {
+  white-space: nowrap;
+}
+
+@media (max-width: 992px) {
+  .layout-2d-flex-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+  .layout-legend-sidebar {
+    width: 100%;
+    max-width: 680px;
+    position: static;
+  }
+  .legend-sidebar-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px 14px;
+  }
+}
+
 /* Floating Visual Swap Preview & Confirmation Card */
 .visual-swap-card-container {
   margin-top: 20px;

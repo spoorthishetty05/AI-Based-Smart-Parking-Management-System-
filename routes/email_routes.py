@@ -61,6 +61,7 @@ def api_email_status():
 
 
 @email_bp.route('/api/email/test-connection', methods=['GET', 'POST'])
+@admin_required
 def api_email_test_connection():
     """
     Tests SMTP server handshake and authentication without sending a message.
@@ -71,6 +72,7 @@ def api_email_test_connection():
 
 
 @email_bp.route('/api/email/test', methods=['GET', 'POST'])
+@admin_required
 def api_email_test():
     """
     Sends a test email via Native Python SSL/TLS Transport.
@@ -162,6 +164,7 @@ def api_email_test():
 
 
 @email_bp.route('/api/email/outbox', methods=['GET'])
+@admin_required
 def api_email_outbox():
     """
     Returns contents of the in-memory test/simulation outbox.

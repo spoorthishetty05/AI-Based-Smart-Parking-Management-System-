@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Guard Gate Terminal — Smart Parking</title>
+
+  <!-- Google Fonts & FontAwesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Base & Admin Panel CSS -->
+  <link rel="stylesheet" href="/static/css/admin_panel.css">
+
+  <style>
+    :root {
+      --sec-emerald: #10b981;
+      --sec-emerald-hover: #059669;
+      --sec-emerald-glow: rgba(16, 185, 129, 0.25);
+      --sec-dark-card: #0f1c30;
+      --sec-border: #1e2e48;
+    }
+
+    body.admin-body {
+      background: #070d18;
+    }
+
+    .security-topbar {
+      background: #0c1728;
+      border-bottom: 1px solid var(--sec-border);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+
+    .security-badge-gate {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .security-guard-banner {
+      background: linear-gradient(135deg, #0d233a 0%, #093325 100%);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .guard-meta-details {
+      display: flex;
+      gap: 20px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .guard-meta-details span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .guard-meta-details strong {
+      color: #ffffff;
+    }
+
+    .barrier-action-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .barrier-open-btn {
+      background: #059669;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+    }
+
+    .barrier-open-btn:hover {
+      background: #047857;
+      transform: translateY(-1px);
+    }
+
+    .barrier-close-btn {
+      background: #dc2626;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+    }
+
+    .barrier-close-btn:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+    }
+
+    /* Spot Booking Terminal Card */
+    .spot-terminal-card {
+      background: var(--sec-dark-card);
+      border: 1px solid var(--sec-border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+
+    .spot-terminal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--sec-border);
+      padding-bottom: 14px;
+    }
+
+    .veh-type-pills {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .veh-pill {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .veh-pill.active {
+      background: #059669;
+      border-color: #10b981;
+      color: #ffffff;
+    }
+
+    .duration-pills {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .dur-pill {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .dur-pill.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #ffffff;
+    }
+
+    .plate-input-large {
+      font-family: var(--font-mono);
+      font-size: 18px !important;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #091222 !important;
+      border: 2px solid #2563eb !important;
+      color: #38bdf8 !important;
+    }
+
+    .plate-badge-mono {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      background: #0b1526;
+      border: 1px solid #1e3a63;
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: #38bdf8;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action-checkout {
+      background: #dc2626;
+      border: none;
+      color: #ffffff;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
+    }
+
+    .btn-action-checkout:hover {
+      background: #b91c1c;
+    }
+
+    .btn-action-edit {
+      background: #2563eb;
+      border: none;
+      color: #ffffff;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
+    }
+
+    .btn-action-edit:hover {
+      background: #1d4ed8;
+    }
+
+    /* Barrier gate animation modal */
+    .gate-barrier-graphic {
+      width: 100%;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .barrier-pole {
+      width: 14px;
+      height: 70px;
+      background: #475569;
+      border-radius: 4px;
+      position: absolute;
+      left: 60px;
+      bottom: 20px;
+    }
+
+    .barrier-arm {
+      width: 220px;
+      height: 10px;
+      background: repeating-linear-gradient(45deg, #ef4444, #ef4444 15px, #ffffff 15px, #ffffff 30px);
+      border-radius: 4px;
+      position: absolute;
+      left: 70px;
+      bottom: 70px;
+      transform-origin: left center;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .barrier-arm.open {
+      transform: rotate(-65deg);
+    }
+
+    /* Search & Table Filter Bar */
+    .table-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-search {
+      position: relative;
+      flex: 1.6;
+      min-width: 320px;
+      display: flex;
+      align-items: center;
+    }
+
+    .filter-search i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748b;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .table-search-input {
+      width: 100% !important;
+      padding: 11px 16px 11px 42px !important;
+      background: #091322 !important;
+      border: 1px solid #1e2e48 !important;
+      border-radius: 10px !important;
+      color: #ffffff !important;
+      font-size: 13.5px !important;
+      font-family: inherit !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .table-search-input::placeholder {
+      color: #64748b !important;
+      opacity: 1 !important;
+    }
+
+    .table-search-input:focus {
+      border-color: #38bdf8 !important;
+      background: #0d1c33 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+    }
+
+    .filter-dropdowns {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-filter-select {
+      width: auto !important;
+      min-width: 180px !important;
+      padding: 10px 14px !important;
+      background: #091322 !important;
+      border: 1px solid #1e2e48 !important;
+      border-radius: 10px !important;
+      color: #ffffff !important;
+      font-size: 13px !important;
+      font-family: inherit !important;
+      cursor: pointer !important;
+      outline: none !important;
+      transition: border-color 0.2s ease !important;
+    }
+
+    .table-filter-select:focus {
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+    }
+
+    /* Dropdown Options High-Contrast Dark Styling */
+    select option,
+    .admin-form-select option,
+    .table-filter-select option {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      font-size: 13.5px !important;
+      padding: 8px 12px !important;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <div style="width: 100%; min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- TOPBAR -->
+    <header class="security-topbar">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="width: 40px; height: 40px; background: #059669; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0; line-height: 1.2;">
+            SMART PARKING &bull; SECURITY GATE CONSOLE
+          </h2>
+          <span id="guardStationDisplay" style="display: none;">{{ guard_meta.gate or 'Gate 1 (North Entry)' }}</span>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="security-badge-gate">
+          <i class="fas fa-satellite-dish fa-spin" style="--fa-animation-duration: 3s;"></i>
+          <span>GATE RADAR ONLINE</span>
+        </div>
+
+        {% if session.get('user_role') == 'admin' %}
+        <a href="/admin" class="btn-admin btn-admin-secondary" style="font-size: 12px; padding: 6px 12px;">
+          <i class="fas fa-cog"></i> Admin Panel
+        </a>
+        {% endif %}
+
+        <div style="display: flex; align-items: center; gap: 10px; padding-left: 10px; border-left: 1px solid var(--sec-border);">
+          <div style="text-align: right;">
+            <div style="font-weight: 700; color: #ffffff; font-size: 13px;">{{ session.get('user_name', 'Security Officer') }}</div>
+            <div style="font-size: 11px; color: #34d399;">Gate Operator (#{{ session.get('user_id', 1) }})</div>
+          </div>
+          <a href="/logout" class="btn-admin btn-admin-danger btn-admin-sm" title="Log Out of Gate Console">
+            <i class="fas fa-power-off"></i>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN BODY CONTENT -->
+    <main style="flex: 1; padding: 28px; max-width: 1440px; width: 100%; margin: 0 auto;">
+
+      <!-- 4 TELEMETRY KPI CARDS -->
+      <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 28px;">
+        <!-- Currently Parked -->
+        <div class="kpi-card" style="--kpi-color: #3b82f6;">
+          <div class="kpi-data">
+            <span class="kpi-label">CURRENTLY PARKED VEHICLES</span>
+            <span class="kpi-value" id="kpiCurrentlyParked">0</span>
+            <span class="kpi-sub">Active vehicles in bays</span>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-car-side"></i></div>
+        </div>
+
+        <!-- Available Vacant Slots -->
+        <div class="kpi-card" style="--kpi-color: #10b981;">
+          <div class="kpi-data">
+            <span class="kpi-label">VACANT SLOTS AVAILABLE</span>
+            <span class="kpi-value" id="kpiVacantSlots">0</span>
+            <span class="kpi-sub">Ready for walk-in arrivals</span>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-square-parking"></i></div>
+        </div>
+
+        <!-- Today's Gate Entries -->
+        <div class="kpi-card" style="--kpi-color: #f59e0b;">
+          <div class="kpi-data">
+            <span class="kpi-label">TODAY'S GATE ENTRIES</span>
+            <span class="kpi-value" id="kpiTodayEntries">0</span>
+            <span class="kpi-sub">Spot & online arrivals</span>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-right-to-bracket"></i></div>
+        </div>
+
+        <!-- Active Overstay Alerts -->
+        <div class="kpi-card" style="--kpi-color: #ef4444;">
+          <div class="kpi-data">
+            <span class="kpi-label">ACTIVE OVERSTAY ALERTS</span>
+            <span class="kpi-value" id="kpiOverstays">0</span>
+            <span class="kpi-sub">Exceeded reserved grace period</span>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-triangle-exclamation"></i></div>
+        </div>
+      </section>
+
+      <!-- ON-SPOT WALK-IN BOOKING QUICK TERMINAL -->
+      <section class="spot-terminal-card">
+        <div class="spot-terminal-header">
+          <div>
+            <h2 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-bolt" style="color: #fbbf24;"></i> Quick On-Spot Walk-In Booking
+            </h2>
+            <span style="font-size: 13px; color: #94a3b8;">Instantly register unreserved walk-in drivers arriving at the barrier gate</span>
+          </div>
+          <div>
+            <button type="button" class="btn-admin btn-admin-secondary btn-admin-sm" onclick="resetSpotForm()">
+              <i class="fas fa-rotate-left"></i> Clear Form
+            </button>
+          </div>
+        </div>
+
+        <form id="spotBookingForm" onsubmit="submitSpotBooking(event)">
+          <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 18px; align-items: start;">
+
+            <!-- Column 1: Vehicle License Plate -->
+            <div class="admin-form-group">
+              <label class="admin-form-label" style="color: #38bdf8; font-weight: 800;">
+                <i class="fas fa-id-card"></i> VEHICLE LICENSE PLATE *
+              </label>
+              <input 
+                type="text" 
+                id="spotPlate" 
+                class="admin-form-input plate-input-large" 
+                placeholder="e.g. KA01AB1234" 
+                required 
+                autocomplete="off"
+              >
+              <!-- Vehicle Type Pills -->
+              <div class="veh-type-pills">
+                <span class="veh-pill active" data-type="Car" onclick="selectVehType('Car', this)"><i class="fas fa-car"></i> Car</span>
+                <span class="veh-pill" data-type="SUV" onclick="selectVehType('SUV', this)"><i class="fas fa-truck-pickup"></i> SUV</span>
+                <span class="veh-pill" data-type="Bike" onclick="selectVehType('Bike', this)"><i class="fas fa-motorcycle"></i> Bike</span>
+                <span class="veh-pill" data-type="EV" onclick="selectVehType('EV', this)"><i class="fas fa-bolt"></i> EV</span>
+              </div>
+              <input type="hidden" id="spotVehType" value="Car">
+            </div>
+
+            <!-- Column 2: Facility & Floor -->
+            <div>
+              <div class="admin-form-group">
+                <label class="admin-form-label"><i class="fas fa-warehouse"></i> Parking Facility *</label>
+                <select id="spotLotSelect" class="admin-form-select" onchange="onSpotLotChanged()" required>
+                  {% for lot in lots %}
+                  <option value="{{ lot.lot_id }}" data-rate="{{ lot.hourly_rate or 40 }}" {% if guard_meta.lot_id == lot.lot_id %}selected{% endif %}>
+                    {{ lot.lot_name or lot.name }} (₹{{ lot.hourly_rate or 40 }}/hr)
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="admin-form-group" style="margin-top: 10px;">
+                <label class="admin-form-label"><i class="fas fa-layer-group"></i> Floor Level</label>
+                <select id="spotFloorSelect" class="admin-form-select" onchange="loadAvailableSlotsForSpot()">
+                  <option value="all">All Floors</option>
+                  <option value="Ground Floor">Ground Floor</option>
+                  <option value="Upper Floor">Upper Floor</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Column 3: Slot Assignment & Duration -->
+            <div>
+              <div class="admin-form-group">
+                <label class="admin-form-label"><i class="fas fa-square-parking"></i> Slot Allocation *</label>
+                <select id="spotSlotSelect" class="admin-form-select" required>
+                  <option value="">Auto-Assign Best Available Slot</option>
+                </select>
+              </div>
+
+              <div class="admin-form-group" style="margin-top: 10px;">
+                <label class="admin-form-label"><i class="far fa-clock"></i> Planned Duration</label>
+                <div class="duration-pills">
+                  <span class="dur-pill" data-dur="1" onclick="selectSpotDuration(1, this)">1h</span>
+                  <span class="dur-pill active" data-dur="2" onclick="selectSpotDuration(2, this)">2h</span>
+                  <span class="dur-pill" data-dur="3" onclick="selectSpotDuration(3, this)">3h</span>
+                  <span class="dur-pill" data-dur="4" onclick="selectSpotDuration(4, this)">4h</span>
+                </div>
+                <input type="hidden" id="spotDuration" value="2">
+              </div>
+            </div>
+
+            <!-- Column 4: Driver Meta & Register Action -->
+            <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+              <div>
+                <div class="admin-form-group">
+                  <label class="admin-form-label"><i class="fas fa-user"></i> Driver Name (Optional)</label>
+                  <input type="text" id="spotDriverName" class="admin-form-input" placeholder="Walk-in Guest Driver">
+                </div>
+                <div class="admin-form-group" style="margin-top: 8px;">
+                  <label class="admin-form-label"><i class="fas fa-phone"></i> Driver Phone</label>
+                  <input type="tel" id="spotDriverPhone" class="admin-form-input" placeholder="+91 98765 43210">
+                </div>
+              </div>
+
+              <div style="margin-top: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
+                  <span style="color: #94a3b8;">Est. Total (Paid at Gate):</span>
+                  <strong style="color: #10b981; font-size: 16px;" id="spotTotalEstimate">₹80.00</strong>
+                </div>
+                <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; background: #059669; border-color: #059669; padding: 12px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 14px rgba(5,150,105,0.4);">
+                  <i class="fas fa-check-circle"></i> REGISTER & OPEN BARRIER &rarr;
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </section>
+
+      <!-- ALL BOOKINGS & LIVE RADAR TABLE -->
+      <section class="admin-card">
+        <div class="admin-card-header">
+          <div>
+            <h2><i class="fas fa-list-check" style="color: #38bdf8;"></i> Gate Booking Radar & Management</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Monitor live parked vehicles, checkout departing guests, update slot allocations, and handle overstays</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-admin btn-admin-secondary btn-admin-sm" onclick="loadSecurityBookings()">
+              <i class="fas fa-sync-alt" id="refreshBtnIcon"></i> Refresh Radar
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter and Search Bar -->
+        <div class="table-filter-bar">
+          <div class="filter-search">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text" 
+              id="bookingSearchInput" 
+              class="table-search-input"
+              placeholder="Search by license plate (e.g. KA01), slot number, driver name, or booking ID..." 
+              oninput="debounceSearchBookings()"
+            >
+          </div>
+          <div class="filter-dropdowns">
+            <select id="bookingLotFilter" class="admin-form-select table-filter-select" onchange="loadSecurityBookings()">
+              <option value="all" selected>All Facilities</option>
+              {% for lot in lots %}
+              <option value="{{ lot.lot_id }}">{{ lot.lot_name or lot.name }}</option>
+              {% endfor %}
+            </select>
+            <select id="bookingStatusFilter" class="admin-form-select table-filter-select" onchange="loadSecurityBookings()">
+              <option value="all" selected>All Statuses</option>
+              <option value="checked_in">Currently Parked (Active)</option>
+              <option value="confirmed">Upcoming / Confirmed</option>
+              <option value="overstayed">Overstay Alert ⚠️</option>
+              <option value="completed">Completed / Departed</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Bookings Table -->
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Booking # & Type</th>
+                <th>Vehicle & Driver</th>
+                <th>Assigned Slot</th>
+                <th>Facility</th>
+                <th>Entry / Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="securityBookingsTbody">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">
+                  <i class="fas fa-spinner fa-spin"></i> Initializing live gate radar...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ====================================================================
+       MODALS: UPDATE BOOKING, CHECKOUT RECEIPT & BARRIER OVERRIDE
+       ==================================================================== -->
+
+  <!-- UPDATE BOOKING MODAL -->
+  <div id="updateBookingModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content" style="max-width: 580px;">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-pen-to-square" style="color: #38bdf8;"></i> Update Booking Details</h3>
+        <button class="admin-modal-close" onclick="closeUpdateBookingModal()">&times;</button>
+      </div>
+      <form id="updateBookingForm" onsubmit="submitUpdateBooking(event)">
+        <input type="hidden" id="modalBookingId">
+        <div class="admin-modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">License Plate Number *</label>
+              <input type="text" id="modalPlate" class="admin-form-input" style="font-family:var(--font-mono); font-weight:700; text-transform:uppercase;" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Vehicle Type</label>
+              <select id="modalVehType" class="admin-form-select">
+                <option value="Car">Car</option>
+                <option value="SUV">SUV</option>
+                <option value="Bike">Bike</option>
+                <option value="EV">EV</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Relocate Slot -->
+          <div class="admin-form-group" style="margin-top: 12px; background: rgba(59,130,246,0.06); padding: 12px; border-radius: 10px; border: 1px dashed rgba(59,130,246,0.3);">
+            <label class="admin-form-label" style="color: #60a5fa;"><i class="fas fa-arrow-right-arrow-left"></i> Relocate Slot (Optional)</label>
+            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">Current Slot: <strong id="modalCurrentSlotDisplay" style="color:#ffffff;"></strong></div>
+            <select id="modalRelocateSlotSelect" class="admin-form-select">
+              <option value="">Keep Current Slot</option>
+            </select>
+          </div>
+
+          <!-- Extend Duration -->
+          <div class="admin-form-group" style="margin-top: 12px;">
+            <label class="admin-form-label"><i class="fas fa-hourglass-start"></i> Extend Duration</label>
+            <select id="modalExtendHoursSelect" class="admin-form-select">
+              <option value="0">No Extension</option>
+              <option value="1">+1 Hour</option>
+              <option value="2">+2 Hours</option>
+              <option value="3">+3 Hours</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Driver Name</label>
+              <input type="text" id="modalDriverName" class="admin-form-input">
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Driver Phone</label>
+              <input type="tel" id="modalDriverPhone" class="admin-form-input">
+            </div>
+          </div>
+
+          <div class="admin-form-group" style="margin-top: 12px;">
+            <label class="admin-form-label">Gate Officer Notes</label>
+            <textarea id="modalNotes" class="admin-form-input" rows="2" placeholder="e.g. Plate verified by officer; relocated due to EV charging requirement"></textarea>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeUpdateBookingModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CHECKOUT / TERMINATION RECEIPT MODAL -->
+  <div id="checkoutReceiptModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content" style="max-width: 500px; text-align: center;">
+      <div class="admin-modal-header" style="justify-content: center; position: relative;">
+        <h3 style="color: #34d399;"><i class="fas fa-circle-check"></i> Booking Terminated & Checked Out</h3>
+        <button class="admin-modal-close" style="position: absolute; right: 20px;" onclick="closeCheckoutModal()">&times;</button>
+      </div>
+      <div class="admin-modal-body" style="padding: 24px;">
+        <div class="gate-barrier-graphic">
+          <div class="barrier-pole"></div>
+          <div class="barrier-arm open" id="receiptBarrierArm"></div>
+          <div style="position: absolute; bottom: 0; font-size: 13px; font-weight: 700; color: #34d399;">
+            <i class="fas fa-door-open"></i> EXIT BARRIER LIFTED
+          </div>
+        </div>
+
+        <div style="background: #091322; border: 1px solid var(--sec-border); border-radius: 12px; padding: 18px; margin-top: 16px; text-align: left;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: #94a3b8;">Vehicle License Plate:</span>
+            <strong id="receiptPlateDisplay" style="color: #38bdf8; font-family: var(--font-mono);">—</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: #94a3b8;">Slot Freed:</span>
+            <strong id="receiptSlotDisplay" style="color: #34d399;">— (Available)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: #94a3b8;">Total Dwell Time:</span>
+            <strong id="receiptDwellDisplay" style="color: #ffffff;">—</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;" id="receiptOverstayRow">
+            <span style="color: #f87171;">Overstay Penalty Fee:</span>
+            <strong id="receiptPenaltyDisplay" style="color: #ef4444;">₹0.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px solid #1e293b; font-size: 14px;">
+            <span style="font-weight: 700; color: #ffffff;">Exit Time:</span>
+            <strong id="receiptExitTimeDisplay" style="color: #34d399;">—</strong>
+          </div>
+        </div>
+      </div>
+      <div class="admin-modal-footer" style="justify-content: center;">
+        <button type="button" class="btn-admin btn-admin-primary" style="background:#059669; border-color:#059669; min-width: 140px;" onclick="closeCheckoutModal()">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div id="securityToast" class="admin-toast"></div>
+
+  <!-- SECURITY GATE JAVASCRIPT CONTROLLER -->
+  <script>
+    let allLiveBookings = [];
+    let searchDebounceTimeout = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSecurityStats();
+      loadAvailableSlotsForSpot();
+      loadSecurityBookings();
+
+      // Auto-poll telemetry every 10 seconds
+      setInterval(() => {
+        loadSecurityStats();
+      }, 10000);
+    });
+
+    // Helper: Toast notification
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('securityToast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.className = `admin-toast show ${type}`;
+      setTimeout(() => {
+        toast.className = 'admin-toast';
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ==========================================
+    // TELEMETRY STATS
+    // ==========================================
+    async function loadSecurityStats() {
+      try {
+        const lotId = document.getElementById('bookingLotFilter')?.value || 'all';
+        const res = await fetch(`/api/security/stats?lot_id=${lotId}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          const s = data.stats;
+          document.getElementById('kpiCurrentlyParked').textContent = s.currently_parked;
+          document.getElementById('kpiVacantSlots').textContent = s.vacant_slots;
+          document.getElementById('kpiTodayEntries').textContent = s.today_entries;
+          document.getElementById('kpiOverstays').textContent = s.active_overstays;
+        }
+      } catch (err) {
+        console.error('Failed to load telemetry stats:', err);
+      }
+    }
+
+    // ==========================================
+    // ON-SPOT QUICK BOOKING LOGIC
+    // ==========================================
+    function selectVehType(type, elem) {
+      document.querySelectorAll('.veh-pill').forEach(p => p.classList.remove('active'));
+      elem.classList.add('active');
+      document.getElementById('spotVehType').value = type;
+    }
+
+    function selectSpotDuration(hours, elem) {
+      document.querySelectorAll('.dur-pill').forEach(p => p.classList.remove('active'));
+      elem.classList.add('active');
+      document.getElementById('spotDuration').value = hours;
+      updateSpotEstimate();
+    }
+
+    function onSpotLotChanged() {
+      loadAvailableSlotsForSpot();
+      updateSpotEstimate();
+    }
+
+    function updateSpotEstimate() {
+      const lotSelect = document.getElementById('spotLotSelect');
+      const rate = lotSelect ? parseFloat(lotSelect.selectedOptions[0]?.getAttribute('data-rate') || 40) : 40;
+      const hours = parseFloat(document.getElementById('spotDuration').value || 2);
+      const total = rate * hours;
+      document.getElementById('spotTotalEstimate').textContent = `₹${total.toFixed(2)}`;
+    }
+
+    async function loadAvailableSlotsForSpot() {
+      const lotId = document.getElementById('spotLotSelect')?.value || '1';
+      const floor = document.getElementById('spotFloorSelect')?.value || 'all';
+      const slotSelect = document.getElementById('spotSlotSelect');
+
+      try {
+        const res = await fetch(`/api/security/slots/available?lot_id=${lotId}&floor=${floor}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          const slots = data.slots || [];
+          if (slots.length === 0) {
+            slotSelect.innerHTML = '<option value="">No vacant slots available on this floor</option>';
+          } else {
+            slotSelect.innerHTML = '<option value="">Auto-Assign Best Available Slot</option>' +
+              slots.map(s => `<option value="${s.slot_id}">${s.slot_number} &bull; ${s.floor} (${s.slot_type})</option>`).join('');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load vacant slots:', err);
+      }
+    }
+
+    function resetSpotForm() {
+      document.getElementById('spotBookingForm').reset();
+      selectVehType('Car', document.querySelector('.veh-pill'));
+      selectSpotDuration(2, document.querySelector('.dur-pill[data-dur="2"]'));
+      loadAvailableSlotsForSpot();
+    }
+
+    async function submitSpotBooking(e) {
+      e.preventDefault();
+      const license_plate = document.getElementById('spotPlate').value.trim().toUpperCase();
+      const vehicle_type = document.getElementById('spotVehType').value;
+      const lot_id = document.getElementById('spotLotSelect').value;
+      const slot_id = document.getElementById('spotSlotSelect').value;
+      const duration_hours = parseFloat(document.getElementById('spotDuration').value || 2);
+      const driver_name = document.getElementById('spotDriverName').value.trim();
+      const driver_phone = document.getElementById('spotDriverPhone').value.trim();
+
+      if (!license_plate) {
+        showToast('Please enter vehicle license plate number.', 'error');
+        return;
+      }
+
+      const payload = {
+        license_plate,
+        vehicle_type,
+        lot_id,
+        duration_hours,
+        driver_name: driver_name || 'Walk-in Guest Driver',
+        driver_phone: driver_phone || '—'
+      };
+      if (slot_id) payload.slot_id = slot_id;
+
+      try {
+        const res = await fetch('/api/security/spot-booking', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`Spot Arrival Registered! Barrier Gate Lifted for ${license_plate} at ${data.booking.slot_number}`, 'success');
+          resetSpotForm();
+          loadSecurityStats();
+          loadSecurityBookings();
+        } else {
+          showToast(data.message || 'Failed to register spot booking.', 'error');
+        }
+      } catch (err) {
+        showToast('Network error while processing spot arrival.', 'error');
+      }
+    }
+
+    // ==========================================
+    // LIVE BOOKINGS RADAR & MASTER QUERY
+    // ==========================================
+    function debounceSearchBookings() {
+      clearTimeout(searchDebounceTimeout);
+      searchDebounceTimeout = setTimeout(loadSecurityBookings, 300);
+    }
+
+    async function loadSecurityBookings() {
+      const tbody = document.getElementById('securityBookingsTbody');
+      const icon = document.getElementById('refreshBtnIcon');
+      if (icon) icon.classList.add('fa-spin');
+
+      const lotId = document.getElementById('bookingLotFilter')?.value || 'all';
+      const status = document.getElementById('bookingStatusFilter')?.value || 'all';
+      const search = (document.getElementById('bookingSearchInput')?.value || '').trim();
+
+      let url = `/api/security/bookings?status=${encodeURIComponent(status)}&lot_id=${encodeURIComponent(lotId)}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.status === 'success') {
+          allLiveBookings = data.bookings || [];
+          renderSecurityBookingsTable(allLiveBookings);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:30px;">${escapeHtml(data.message || 'Error loading bookings')}</td></tr>`;
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:30px;">Error communicating with gate server.</td></tr>';
+      } finally {
+        if (icon) icon.classList.remove('fa-spin');
+      }
+    }
+
+    function renderSecurityBookingsTable(bookings) {
+      const tbody = document.getElementById('securityBookingsTbody');
+      if (!tbody) return;
+
+      if (!bookings || bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:#94a3b8;">No bookings found matching current radar filters.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = bookings.map(b => {
+        const isCheckedIn = (b.status === 'checked_in' || b.status === 'active' || b.status === 'parked');
+        const isOverstay = (b.status === 'overstayed');
+        const isCompleted = (b.status === 'completed' || b.status === 'completed_overstay');
+
+        let statusBadge = '';
+        if (isCheckedIn) {
+          statusBadge = '<span class="status-badge active" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(52,211,153,0.3);"><i class="fas fa-circle-dot"></i> PARKED</span>';
+        } else if (isOverstay) {
+          statusBadge = '<span class="status-badge" style="background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(248,113,113,0.4);"><i class="fas fa-triangle-exclamation"></i> OVERSTAY</span>';
+        } else if (isCompleted) {
+          statusBadge = '<span class="status-badge" style="background:rgba(100,116,139,0.2); color:#94a3b8; border:1px solid rgba(148,163,184,0.3);"><i class="fas fa-check"></i> DEPARTED</span>';
+        } else {
+          statusBadge = `<span class="status-badge" style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(96,165,250,0.3);"><i class="fas fa-clock"></i> ${escapeHtml(b.status ? b.status.toUpperCase() : 'CONFIRMED')}</span>`;
+        }
+
+        const typeBadge = b.is_on_spot
+          ? '<span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.3); padding:2px 6px; border-radius:4px; font-weight:700; font-size:10.5px;">ON-SPOT</span>'
+          : '<span style="background:rgba(139,92,246,0.15); color:#c084fc; border:1px solid rgba(192,132,252,0.3); padding:2px 6px; border-radius:4px; font-weight:700; font-size:10.5px;">ONLINE</span>';
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#ffffff; font-family:var(--font-mono);">#BK-${b.booking_id}</div>
+              <div style="margin-top:3px;">${typeBadge}</div>
+            </td>
+            <td>
+              <div class="plate-badge-mono"><i class="fas fa-car"></i> ${escapeHtml(b.plate)}</div>
+              <div style="font-size:12px; color:#94a3b8; margin-top:3px;">
+                ${escapeHtml(b.driver)} &bull; <span style="color:#64748b;">${escapeHtml(b.vehicle_type || 'Car')}</span>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:800; color:#34d399; font-size:14px;">${escapeHtml(b.slot)}</div>
+              <div style="font-size:11px; color:#64748b;">${escapeHtml(b.floor || 'Ground Floor')}</div>
+            </td>
+            <td>
+              <span style="font-size:13px; color:#cbd5e1;">${escapeHtml(b.lot_name || 'Main Facility')}</span>
+            </td>
+            <td>
+              <div style="font-size:12.5px; color:#ffffff;">
+                <i class="far fa-clock" style="color:#38bdf8;"></i> ${escapeHtml(b.entry_time)}
+              </div>
+              <div style="font-size:11px; color:#94a3b8; margin-top:2px;">
+                Duration: ${escapeHtml(b.duration_str || b.duration_hours + 'h')} &bull; Exp: ${escapeHtml(b.end_time || '—')}
+              </div>
+            </td>
+            <td>${statusBadge}</td>
+            <td>
+              <div style="display:flex; gap:6px; align-items:center;">
+                ${!isCompleted ? `
+                  <button class="btn-action-checkout" onclick="terminateBookingAtGate('${b.booking_id}', '${escapeHtml(b.plate)}')" title="Exit & Checkout at Gate">
+                    <i class="fas fa-right-from-bracket"></i> Checkout
+                  </button>
+                  <button class="btn-action-edit" onclick="openUpdateBookingModal('${b.booking_id}')" title="Update Details / Relocate Slot">
+                    <i class="fas fa-edit"></i> Update
+                  </button>
+                ` : `
+                  <span style="font-size:11.5px; color:#64748b; font-style:italic;">Closed</span>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // ON-SPOT TERMINATION & CHECKOUT
+    // ==========================================
+    async function terminateBookingAtGate(bookingId, plate) {
+      if (!confirm(`Confirm checkout and lift exit barrier for vehicle ${plate} (Booking #${bookingId})?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/security/bookings/${bookingId}/terminate`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'}
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`Checked out ${plate}. Exit barrier gate opened!`, 'success');
+          
+          // Show termination receipt modal
+          const s = data.summary;
+          document.getElementById('receiptPlateDisplay').textContent = s.plate;
+          document.getElementById('receiptSlotDisplay').textContent = `${s.slot_number} (Now Available)`;
+          document.getElementById('receiptDwellDisplay').textContent = `${s.dwell_time_minutes} minutes (${s.dwell_time_hours} hrs)`;
+          document.getElementById('receiptExitTimeDisplay').textContent = s.exit_time;
+          
+          const penElem = document.getElementById('receiptPenaltyDisplay');
+          const penRow = document.getElementById('receiptOverstayRow');
+          if (s.overstay_penalty > 0) {
+            penElem.textContent = `₹${s.overstay_penalty.toFixed(2)} (${s.overstay_minutes} min overstay)`;
+            penRow.style.display = 'flex';
+          } else {
+            penElem.textContent = '₹0.00 (Within grace period)';
+            penRow.style.display = 'flex';
+          }
+
+          document.getElementById('checkoutReceiptModal').style.display = 'flex';
+
+          loadSecurityStats();
+          loadSecurityBookings();
+        } else {
+          showToast(data.message || 'Termination failed', 'error');
+        }
+      } catch (err) {
+        showToast('Error communicating with checkout gateway', 'error');
+      }
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutReceiptModal').style.display = 'none';
+    }
+
+    // ==========================================
+    // UPDATE BOOKING & RELOCATE SLOT
+    // ==========================================
+    async function openUpdateBookingModal(bookingId) {
+      const booking = allLiveBookings.find(b => String(b.booking_id) === String(bookingId));
+      if (!booking) return;
+
+      document.getElementById('modalBookingId').value = booking.booking_id;
+      document.getElementById('modalPlate').value = booking.plate || '';
+      document.getElementById('modalVehType').value = booking.vehicle_type || 'Car';
+      document.getElementById('modalDriverName').value = booking.driver || '';
+      document.getElementById('modalDriverPhone').value = booking.phone || '';
+      document.getElementById('modalNotes').value = booking.notes || '';
+      document.getElementById('modalCurrentSlotDisplay').textContent = `${booking.slot} (${booking.lot_name})`;
+      document.getElementById('modalExtendHoursSelect').value = '0';
+
+      // Load available slots in this lot for relocation
+      const relocateSelect = document.getElementById('modalRelocateSlotSelect');
+      relocateSelect.innerHTML = '<option value="">Loading vacant slots...</option>';
+
+      try {
+        const res = await fetch(`/api/security/slots/available?lot_id=${booking.lot_id}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          const slots = data.slots || [];
+          relocateSelect.innerHTML = '<option value="">Keep Current Slot</option>' +
+            slots.map(s => `<option value="${s.slot_id}">${s.slot_number} &bull; ${s.floor} (${s.slot_type})</option>`).join('');
+        }
+      } catch (err) {
+        relocateSelect.innerHTML = '<option value="">Failed to load vacant slots</option>';
+      }
+
+      document.getElementById('updateBookingModal').style.display = 'flex';
+    }
+
+    function closeUpdateBookingModal() {
+      document.getElementById('updateBookingModal').style.display = 'none';
+    }
+
+    async function submitUpdateBooking(e) {
+      e.preventDefault();
+      const bookingId = document.getElementById('modalBookingId').value;
+      const license_plate = document.getElementById('modalPlate').value.trim().toUpperCase();
+      const vehicle_type = document.getElementById('modalVehType').value;
+      const new_slot_id = document.getElementById('modalRelocateSlotSelect').value;
+      const extend_hours = parseFloat(document.getElementById('modalExtendHoursSelect').value || 0);
+      const driver_name = document.getElementById('modalDriverName').value.trim();
+      const driver_phone = document.getElementById('modalDriverPhone').value.trim();
+      const notes = document.getElementById('modalNotes').value.trim();
+
+      const payload = {
+        license_plate,
+        vehicle_type,
+        driver_name,
+        driver_phone,
+        notes
+      };
+      if (new_slot_id) payload.new_slot_id = new_slot_id;
+      if (extend_hours > 0) payload.extend_hours = extend_hours;
+
+      try {
+        const res = await fetch(`/api/security/bookings/${bookingId}/update`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.message, 'success');
+          closeUpdateBookingModal();
+          loadSecurityStats();
+          loadSecurityBookings();
+        } else {
+          showToast(data.message || 'Update failed', 'error');
+        }
+      } catch (err) {
+        showToast('Failed to update booking', 'error');
+      }
+    }
+
+    // ==========================================
+    // EMERGENCY MANUAL BARRIER CONTROLS
+    // ==========================================
+    async function triggerManualBarrier(action) {
+      const gateName = document.getElementById('guardStationDisplay')?.textContent || 'Gate 1 (North Entry)';
+      try {
+        const res = await fetch('/api/security/gate/barrier', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ action, gate_name: gateName, reason: `Manual officer command: ${action.toUpperCase()}` })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.message, action === 'open' ? 'success' : 'error');
+        } else {
+          showToast('Failed to toggle barrier gate', 'error');
+        }
+      } catch (err) {
+        showToast('Network error toggling barrier gate', 'error');
+      }
+    }
+  </script>
+</body>
+</html>
+

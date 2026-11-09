@@ -314,6 +314,30 @@ def booking_review():
     uid = session.get('user_id')
     user_role = session.get('user_role', 'user')
 
+    # Enforce: One person can book one at a time (no double booking)
+    # Active bookings: confirmed, checked_in, active, parked, reserved.
+    # Cancelled and completed sessions are excluded, permitting immediate rebooking.
+    if user_role not in ('admin', 'security', 'guard') and uid:
+        db_check = get_mongo_db()
+        if db_check is not None:
+            existing_active = db_check.bookings.find_one({
+                'user_id': uid,
+                'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+            })
+            if not existing_active:
+                existing_active = db_check.reservations.find_one({
+                    'user_id': uid,
+                    'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+                })
+            if existing_active:
+                act_id = existing_active.get('booking_id') or existing_active.get('reservation_id') or 'Active'
+                act_slot = existing_active.get('slot_number') or f"Slot {existing_active.get('slot_id', '')}"
+                return jsonify({
+                    'status': 'error',
+                    'message': f"Active booking limit reached: You already hold an active booking (#{act_id} for {act_slot}). Each person can only book one slot at a time. Please cancel your existing booking if you wish to choose another slot.",
+                    'active_booking_id': act_id
+                }), 409
+
     # 1. Validate Vehicle Ownership
     if not vehicle_plate and not current_app.config.get('TESTING'):
         return jsonify({'status': 'error', 'message': 'Please select a registered vehicle.'}), 400
@@ -448,6 +472,17 @@ def create_reservation():
         duration_hours = float(data.get('duration_hours', 2.0))
     except (ValueError, TypeError):
         duration_hours = 2.0
+
+    if data.get('end_time') and start_time:
+        try:
+            sp = [int(x) for x in str(start_time).strip()[:5].split(':')]
+            ep = [int(x) for x in str(data['end_time']).strip()[:5].split(':')]
+            s_m = sp[0] * 60 + (sp[1] if len(sp) > 1 else 0)
+            e_m = ep[0] * 60 + (ep[1] if len(ep) > 1 else 0)
+            if e_m > s_m:
+                duration_hours = round((e_m - s_m) / 60.0, 2)
+        except Exception:
+            pass
     selected_duration = str(data.get('selected_duration') or data.get('duration') or f"{int(duration_hours) if duration_hours.is_integer() else duration_hours} hours").strip()
     ai_recommended = bool(data.get('ai_recommended', False))
     suitability_score = float(data.get('suitability_score', 90.0))
@@ -488,6 +523,27 @@ def create_reservation():
             'status': 'error',
             'message': f"Cannot book for a past date or time ({date_str} {start_time}). Bookings are only permitted for today ({current_sys_date}) and advance future dates. Please select the current time or a future time. Please select a current or future date and time."
         }), 400
+
+    # Enforce: One person can book one at a time (no double booking)
+    if session.get('user_role') not in ('admin', 'security', 'guard'):
+        db_check = get_mongo_db()
+        if db_check is not None:
+            existing_active = db_check.bookings.find_one({
+                'user_id': user_id,
+                'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+            }) or db_check.reservations.find_one({
+                'user_id': user_id,
+                'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+            })
+            if existing_active:
+                act_id = existing_active.get('booking_id') or existing_active.get('reservation_id') or 'Active'
+                act_slot = existing_active.get('slot_number') or f"Slot {existing_active.get('slot_id', '')}"
+                conn.close()
+                return jsonify({
+                    'status': 'error',
+                    'message': f"Active booking limit reached: You already have an active booking (#{act_id} for {act_slot}). Each person can only book one slot at a time. Please cancel your existing booking to rebook another slot.",
+                    'active_booking_id': act_id
+                }), 409
 
     # Verify slot availability
     cursor.execute("SELECT slot_number, status, lot_id, floor, zone, slot_type FROM parking_slots WHERE slot_id = ?", (slot_id,))
@@ -704,15 +760,11 @@ def create_reservation():
 
 @booking_bp.route('/api/reservations/my', methods=['GET'])
 def get_my_reservations():
-    """Returns reservations for the active user from MongoDB (session-aware with ?user_id override)."""
+    """Returns reservations for the active user from MongoDB with strict user isolation."""
     req_uid = request.args.get('user_id')
-    if req_uid:
-        try:
-            user_id = int(req_uid)
-        except (ValueError, TypeError):
-            user_id = 1
-    else:
-        user_id = session.get('user_id', 1)
+    user_id, err = get_authenticated_user_id(req_uid)
+    if err:
+        return err
 
     bookings_data = mongo_get_user_bookings(user_id)
     upcoming = bookings_data.get('upcoming', [])
@@ -833,8 +885,9 @@ def get_facility_parking_history():
 
 @booking_bp.route('/api/reservations/cancel/<res_id>', methods=['POST'])
 @booking_bp.route('/api/reservations/cancel/<int:res_id>', methods=['POST'])
+@login_required
 def cancel_reservation(res_id):
-    """Cancels a reservation and frees the slot in MongoDB."""
+    """Cancels a reservation and frees the slot in MongoDB with user authorization checks."""
     uid = session.get('user_id')
     success, msg = mongo_cancel_booking(res_id, user_id=uid)
     if not success:
@@ -845,6 +898,9 @@ def cancel_reservation(res_id):
             cursor.execute("SELECT r.user_id, r.slot_id, r.vehicle_plate, r.date, s.slot_number FROM reservations r JOIN parking_slots s ON r.slot_id = s.slot_id WHERE r.reservation_id = ?", (res_id,))
             res = cursor.fetchone()
             if res:
+                if res['user_id'] != uid and session.get('user_role') != 'admin':
+                    conn.close()
+                    return jsonify({'status': 'error', 'message': 'Forbidden: You can only cancel your own booking.'}), 403
                 cursor.execute("UPDATE reservations SET status = 'cancelled' WHERE reservation_id = ?", (res_id,))
                 cursor.execute("UPDATE parking_slots SET status = 'available', current_reservation_id = NULL, current_plate = NULL WHERE slot_id = ?", (res['slot_id'],))
                 conn.commit()
@@ -969,8 +1025,9 @@ def modify_reservation(res_id):
     })
 
 @booking_bp.route('/api/reservations/<int:res_id>/pass', methods=['GET'])
+@login_required
 def get_reservation_pass(res_id):
-    """Generates digital QR parking pass metadata."""
+    """Generates digital QR parking pass metadata with ownership verification."""
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -988,6 +1045,9 @@ def get_reservation_pass(res_id):
 
     if not row:
         return jsonify({'status': 'error', 'message': 'Reservation not found'}), 404
+
+    if row['user_id'] != session.get('user_id') and session.get('user_role') != 'admin':
+        return jsonify({'status': 'error', 'message': 'Forbidden: You do not have permission to view this pass.'}), 403
 
     pass_data = dict(row)
     pass_data['pass_code'] = f"PK-{pass_data['reservation_id']:05d}-{pass_data['slot_number']}"
@@ -1025,6 +1085,29 @@ def booking_confirm():
 
     uid = session.get('user_id')
     user_role = session.get('user_role', 'user')
+
+    db = get_mongo_db()
+
+    # Enforce: One person can book one at a time (no double booking)
+    if user_role not in ('admin', 'security', 'guard') and uid:
+        existing_active = db.bookings.find_one({
+            'user_id': uid,
+            'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+        }) if db is not None else None
+        if not existing_active and db is not None:
+            existing_active = db.reservations.find_one({
+                'user_id': uid,
+                'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+            })
+        if existing_active:
+            act_id = existing_active.get('booking_id') or existing_active.get('reservation_id') or 'Active'
+            act_slot = existing_active.get('slot_number') or f"Slot {existing_active.get('slot_id', '')}"
+            return jsonify({
+                'status': 'error',
+                'message': f"Active booking limit reached: You already have an active booking (#{act_id} for {act_slot}). Each person can only book one slot at a time. Please cancel your existing booking if you wish to rebook.",
+                'active_booking_id': act_id
+            }), 409
+
     vehicle_plate = (data.get('vehicle_plate') or data.get('vehicle_number') or '').strip().upper()
     vehicle_type = normalize_vehicle_type(data.get('vehicle_type', 'Car'))
     vehicle_name = (data.get('vehicle_name') or data.get('make_model') or '').strip()
@@ -1061,7 +1144,10 @@ def booking_confirm():
         'booking_date': booking_date,
         'date': booking_date,
         'start_time': start_time,
+        'end_time': data.get('end_time'),
         'duration': data.get('duration', '2 Hours'),
+        'duration_hours': data.get('duration_hours'),
+        'total_amount': data.get('total_amount') or data.get('fee'),
         'vehicle_plate': vehicle_plate,
         'vehicle_type': vehicle_type,
         'vehicle_name': vehicle_name,
@@ -1199,14 +1285,10 @@ def booking_checkout_preview(booking_id):
     Booked Start Time, Booked End Time, Actual Entry Time, Current/Exit Time,
     Parking Duration, Current Parking Status, and Overstay duration/warning.
     """
-    uid = session.get('user_id') or request.args.get('user_id')
-    if uid:
-        try:
-            uid = int(uid)
-        except (ValueError, TypeError):
-            pass
     if session.get('user_role') == 'admin':
         uid = None
+    else:
+        uid = session.get('user_id')
 
     success, result = mongo_get_checkout_preview(booking_id, user_id=uid)
     if not success:
@@ -1234,14 +1316,10 @@ def booking_exit(booking_id=None):
     if not bid:
         return jsonify({'status': 'error', 'message': 'Booking ID is required.'}), 400
 
-    uid = session.get('user_id') or request.args.get('user_id') or data.get('user_id')
-    if uid:
-        try:
-            uid = int(uid)
-        except (ValueError, TypeError):
-            pass
     if session.get('user_role') == 'admin':
         uid = None
+    else:
+        uid = session.get('user_id')
 
     # Check if penalty was paid via Razorpay at checkout
     if data.get('payment_id'):
@@ -1282,14 +1360,10 @@ def booking_start_parking(booking_id=None):
     if not bid:
         return jsonify({'status': 'error', 'message': 'Booking ID is required.'}), 400
 
-    uid = session.get('user_id') or request.args.get('user_id') or data.get('user_id')
-    if uid:
-        try:
-            uid = int(uid)
-        except (ValueError, TypeError):
-            pass
     if session.get('user_role') == 'admin':
         uid = None
+    else:
+        uid = session.get('user_id')
 
     success, result = mongo_start_parking(bid, user_id=uid)
     if not success:
@@ -1314,6 +1388,10 @@ def booking_get_pass(booking_id):
 
     if not booking:
         return jsonify({'status': 'error', 'message': 'Pass not found.'}), 404
+
+    # Security check: owner or admin
+    if booking.get('user_id') and int(booking['user_id']) != int(session.get('user_id', -1)) and session.get('user_role') != 'admin':
+        return jsonify({'status': 'error', 'message': 'Forbidden: You do not have permission to view this pass.'}), 403
 
     b_id = booking.get('booking_id') or str(booking.get('reservation_id', booking_id))
     return jsonify({

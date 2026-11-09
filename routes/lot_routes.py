@@ -141,6 +141,7 @@ def get_lot_config():
     })
 
 @lot_bp.route('/api/lots/config/update', methods=['POST'])
+@admin_required
 def update_lot_config():
     """Updates lot pricing and rules."""
     data = request.get_json() or {}
@@ -592,6 +593,7 @@ def delete_slot(slot_id):
     return jsonify({'status': 'success', 'message': f"Slot '{slot['slot_number']}' deleted successfully."})
 
 @lot_bp.route('/api/slots/toggle-maintenance', methods=['POST'])
+@admin_required
 def toggle_slot_maintenance():
     """Toggles slot maintenance (disabled vs available)."""
     data = request.get_json() or {}

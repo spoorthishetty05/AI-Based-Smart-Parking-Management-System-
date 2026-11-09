@@ -41,9 +41,10 @@ exchange_bp = Blueprint('exchange', __name__)
 @exchange_bp.route('/api/exchange/user-active-booking', methods=['GET'])
 def get_user_active_booking_for_exchange():
     """Returns the user's latest confirmed future booking with exchange offer status."""
-    user_id = request.args.get('user_id', type=int)
-    if not user_id:
-        user_id = session.get('user_id', 1)
+    req_uid = request.args.get('user_id')
+    user_id, err = get_authenticated_user_id(req_uid)
+    if err:
+        return err
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -118,11 +119,9 @@ def get_user_active_booking_for_exchange():
 def offer_slot_for_exchange():
     """Allows a user to offer their confirmed future booking for exchange."""
     data = request.get_json() or {}
-    user_id = data.get('user_id') or session.get('user_id', 1)
-    try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        user_id = 1
+    user_id, err = get_authenticated_user_id(data.get('user_id'))
+    if err:
+        return err
     reservation_id = data.get('reservation_id')
     if not reservation_id:
         return jsonify({'status': 'error', 'message': 'Reservation ID is required.'}), 400
@@ -205,11 +204,9 @@ def offer_slot_for_exchange():
 def cancel_slot_exchange_offer():
     """Cancels an active exchange offer."""
     data = request.get_json() or {}
-    user_id = data.get('user_id') or session.get('user_id', 1)
-    try:
-        user_id = int(user_id)
-    except (ValueError, TypeError):
-        user_id = 1
+    user_id, err = get_authenticated_user_id(data.get('user_id'))
+    if err:
+        return err
     listing_id = data.get('listing_id')
     reservation_id = data.get('reservation_id')
 
@@ -665,7 +662,9 @@ def search_exchange_opportunities():
 def request_slot_exchange():
     """Allows a user to request an exchange for another user's offered slot."""
     data = request.get_json() or {}
-    requester_user_id = data.get('requester_user_id') or session.get('user_id', 1)
+    requester_user_id, err = get_authenticated_user_id(data.get('requester_user_id') or data.get('user_id'))
+    if err:
+        return err
     listing_id = data.get('listing_id')
     requester_reservation_id = data.get('requester_reservation_id')
 
@@ -804,7 +803,9 @@ def request_slot_exchange():
 def cancel_slot_exchange_request():
     """Allows a requester to cancel/withdraw their pending exchange request."""
     data = request.get_json() or {}
-    user_id = data.get('user_id') or session.get('user_id', 1)
+    user_id, err = get_authenticated_user_id(data.get('user_id'))
+    if err:
+        return err
     request_id = data.get('request_id')
 
     if not request_id:
@@ -843,7 +844,10 @@ def cancel_slot_exchange_request():
 @exchange_bp.route('/api/exchange/requests', methods=['GET'])
 def get_exchange_requests():
     """Returns received requests, sent requests, and exchange history for the user."""
-    user_id = request.args.get('user_id', type=int) or session.get('user_id', 1)
+    req_uid = request.args.get('user_id')
+    user_id, err = get_authenticated_user_id(req_uid)
+    if err:
+        return err
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -925,7 +929,9 @@ def get_exchange_requests():
 def respond_to_exchange_request():
     """Allows an owner to accept or reject an exchange request with atomic swap and final validation."""
     data = request.get_json() or {}
-    user_id = data.get('user_id') or session.get('user_id', 1)
+    user_id, err = get_authenticated_user_id(data.get('user_id'))
+    if err:
+        return err
     request_id = data.get('request_id')
     action = data.get('action', '').strip().lower() # 'accept' or 'reject'
 

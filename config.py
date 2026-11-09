@@ -56,6 +56,12 @@ class Config:
     DEBUG = False
     TESTING = False
 
+    # Security: Session Cookie Hardening (OWASP Compliance)
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = _str_to_bool(os.environ.get('SESSION_COOKIE_SECURE', 'false'))
+    PERMANENT_SESSION_LIFETIME = 86400 * 7  # 7 Days Session Lifetime
+
     # ------------------------------------------------------------------
     # Email Transport Configuration (Native Python SSL/TLS)
     # Nodemailer parity: 'secure: true' maps to SSL/TLS (port 465)

@@ -15,10 +15,11 @@ from .overstay_routes import overstay_bp
 from .simulation_routes import simulation_bp
 from .exchange_routes import exchange_bp
 from .email_routes import email_bp
+from .security_routes import security_bp
 
 
 def register_all_blueprints(app):
-    """Registers all 12 modular Flask Blueprints onto the main application."""
+    """Registers all 13 modular Flask Blueprints onto the main application."""
     # 1. Authentication & Security
     app.register_blueprint(auth_bp)
 
@@ -55,6 +56,9 @@ def register_all_blueprints(app):
     # 12. Secure Email Transport Diagnostics
     app.register_blueprint(email_bp)
 
+    # 13. Security Guard Gate Management & Walk-in Terminal
+    app.register_blueprint(security_bp)
+
     # Register root endpoint aliases for backward compatibility with url_for calls
     # (e.g. url_for('login_page'), url_for('index'), url_for('admin_panel'), url_for('booking_my_bookings'))
     aliases = [
@@ -64,6 +68,7 @@ def register_all_blueprints(app):
         ('/', 'index', web_bp.view_functions.get('index'), ['GET']),
         ('/admin', 'admin_panel', web_bp.view_functions.get('admin_panel'), ['GET']),
         ('/user', 'user_panel', web_bp.view_functions.get('user_panel'), ['GET']),
+        ('/security', 'security_dashboard', security_bp.view_functions.get('security_dashboard'), ['GET']),
         ('/booking', 'booking_panel', booking_bp.view_functions.get('booking_panel'), ['GET']),
         ('/booking/my-bookings', 'booking_my_bookings', booking_bp.view_functions.get('booking_my_bookings'), ['GET']),
     ]

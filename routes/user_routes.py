@@ -307,7 +307,11 @@ def api_delete_vehicle(vehicle_id):
 @user_bp.route('/api/notifications', methods=['GET'])
 def get_user_notifications():
     """Returns notifications for user with unread count and category breakdown."""
-    user_id = request.args.get('user_id', type=int) or session.get('user_id', 1)
+    req_uid = request.args.get('user_id')
+    user_id, err = get_authenticated_user_id(req_uid)
+    if err:
+        return err
+
     notif_type = request.args.get('type', '').strip()
     unread_only = request.args.get('unread_only', 'false').lower() == 'true'
     limit = int(request.args.get('limit', 50))
@@ -356,9 +360,22 @@ def get_user_notifications():
 
 @user_bp.route('/api/notifications/<int:notification_id>/read', methods=['POST'])
 def mark_notification_read(notification_id):
-    """Marks an individual notification as read."""
+    """Marks an individual notification as read with ownership validation."""
+    if 'user_id' not in session:
+        return jsonify({'status': 'error', 'message': 'Authentication required. Please log in.'}), 401
+
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute("SELECT user_id FROM notifications WHERE notification_id = ?", (notification_id,))
+    notif = cursor.fetchone()
+    if not notif:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'Notification not found.'}), 404
+
+    if notif['user_id'] != session['user_id'] and session.get('user_role') != 'admin':
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'Forbidden: You do not have permission to modify this notification.'}), 403
+
     cursor.execute("UPDATE notifications SET is_read = 1 WHERE notification_id = ?", (notification_id,))
     conn.commit()
     conn.close()
@@ -366,9 +383,13 @@ def mark_notification_read(notification_id):
 
 @user_bp.route('/api/notifications/mark-all-read', methods=['POST'])
 def mark_all_notifications_read():
-    """Marks all notifications for current user as read."""
+    """Marks all notifications for current user as read with ownership validation."""
     data = request.get_json() or {}
-    user_id = data.get('user_id') or session.get('user_id', 1)
+    req_uid = data.get('user_id')
+    user_id, err = get_authenticated_user_id(req_uid)
+    if err:
+        return err
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("UPDATE notifications SET is_read = 1 WHERE user_id = ?", (user_id,))
@@ -378,9 +399,13 @@ def mark_all_notifications_read():
 
 @user_bp.route('/api/notifications/clear', methods=['POST'])
 def clear_user_notifications():
-    """Clears notifications for current user."""
+    """Clears notifications for current user with ownership validation."""
     data = request.get_json() or {}
-    user_id = data.get('user_id') or session.get('user_id', 1)
+    req_uid = data.get('user_id')
+    user_id, err = get_authenticated_user_id(req_uid)
+    if err:
+        return err
+
     only_read = data.get('only_read', False)
     conn = get_db_connection()
     cursor = conn.cursor()

@@ -73,6 +73,7 @@ function switchAdminTab(tabId) {
   const titleMap = {
     'dashboard': 'System Overview & Monitoring',
     'users': 'User & Driver Management',
+    'guards': 'Security Guard & Gate Management',
     'lots': 'Parking Lot Management',
     'slots': 'Parking Slot & Live 2D Layout',
     'bookings': 'Master Booking Management',
@@ -113,6 +114,7 @@ function switchAdminTab(tabId) {
   // Load tab-specific data on activation
   if (tabId === 'dashboard') loadAdminDashboardKPIs();
   else if (tabId === 'users') loadAdminUsers();
+  else if (tabId === 'guards') loadAdminGuards();
   else if (tabId === 'lots') loadAdminLots();
   else if (tabId === 'slots') loadAdminSlots();
   else if (tabId === 'bookings') loadAdminBookings();
@@ -455,6 +457,296 @@ async function adminDeleteVehicle(vehicleId, userId, userName) {
 
 function closeUserVehiclesModal() {
   document.getElementById('userVehiclesModal').style.display = 'none';
+}
+
+/* ==========================================================================
+   MODULE: SECURITY GUARD MANAGEMENT
+   ========================================================================== */
+
+let allGuards = [];
+let allGuardsLots = [];
+
+async function loadAdminGuards() {
+  const tbody = document.getElementById('adminGuardsTableBody');
+  if (tbody) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;"><i class="fas fa-spinner fa-spin"></i> Loading security guards...</td></tr>';
+  }
+
+  try {
+    const res = await fetch('/api/admin/guards');
+    const data = await res.json();
+    if (data.status === 'success') {
+      allGuards = data.guards || [];
+      allGuardsLots = data.lots || [];
+
+      // Update KPI counters
+      const kpiTotal = document.getElementById('kpiTotalGuards');
+      const kpiActive = document.getElementById('kpiActiveGuards');
+      const kpiGates = document.getElementById('kpiAssignedGates');
+
+      if (kpiTotal) kpiTotal.textContent = allGuards.length;
+      if (kpiActive) kpiActive.textContent = allGuards.filter(g => g.is_active === 1).length;
+      if (kpiGates) {
+        const uniqueGates = new Set(allGuards.map(g => g.gate).filter(Boolean));
+        kpiGates.textContent = uniqueGates.size || allGuards.length;
+      }
+
+      // Populate facility filter and modal lot selects
+      populateGuardLotDropdowns(allGuardsLots);
+
+      // Render table
+      renderGuardsTable(allGuards);
+    } else {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:30px;">${escapeHtml(data.message || 'Failed to load guards.')}</td></tr>`;
+    }
+  } catch (err) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:30px;">Error communicating with server.</td></tr>';
+  }
+}
+
+function populateGuardLotDropdowns(lots) {
+  const lotFilter = document.getElementById('guardLotFilter');
+  const addLotSelect = document.getElementById('addGuardLot');
+  const editLotSelect = document.getElementById('editGuardLot');
+
+  if (lotFilter) {
+    const currentVal = lotFilter.value;
+    lotFilter.innerHTML = '<option value="all">All Facilities</option>' +
+      lots.map(l => `<option value="${escapeHtml(l.name)}">${escapeHtml(l.name)}</option>`).join('');
+    if (currentVal) lotFilter.value = currentVal;
+  }
+
+  const optionsHtml = lots.map(l => `<option value="${l.lot_id}" data-name="${escapeHtml(l.name)}">${escapeHtml(l.name)} (${l.total_slots || 0} slots)</option>`).join('');
+
+  if (addLotSelect) addLotSelect.innerHTML = optionsHtml;
+  if (editLotSelect) editLotSelect.innerHTML = optionsHtml;
+}
+
+function renderGuardsTable(guards) {
+  const tbody = document.getElementById('adminGuardsTableBody');
+  if (!tbody) return;
+
+  if (!guards || guards.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:30px;">No security guards found matching criteria.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = guards.map(g => {
+    const isActive = (g.is_active === 1 || g.is_active === null || g.is_active === undefined);
+    const statusBadge = isActive
+      ? '<span class="status-badge active" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);"><i class="fas fa-check-circle"></i> On Duty</span>'
+      : '<span class="status-badge deactivated"><i class="fas fa-ban"></i> Off Duty</span>';
+
+    return `
+      <tr>
+        <td style="font-family:var(--font-mono); color:#10b981; font-weight:700;">#SG-${g.user_id}</td>
+        <td>
+          <div style="font-weight:700; color:#ffffff; font-size:14px;">
+            <i class="fas fa-user-shield" style="color:#10b981; margin-right:6px;"></i>${escapeHtml(g.name)}
+          </div>
+          <div style="font-size:11px; color:#94a3b8; margin-top:2px;">
+            <i class="far fa-clock"></i> ${escapeHtml(g.shift || 'Day Shift')}
+          </div>
+        </td>
+        <td>
+          <div style="color:#e2e8f0; font-size:13px;">${escapeHtml(g.email)}</div>
+          <div style="font-size:11px; color:#64748b;">${escapeHtml(g.phone || '—')}</div>
+        </td>
+        <td>
+          <span style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(96,165,250,0.3); padding:3px 8px; border-radius:6px; font-weight:600; font-size:12px;">
+            <i class="fas fa-warehouse"></i> ${escapeHtml(g.assigned_lot || 'Main Facility')}
+          </span>
+        </td>
+        <td>
+          <span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.3); padding:3px 8px; border-radius:6px; font-weight:600; font-size:12px;">
+            <i class="fas fa-door-open"></i> ${escapeHtml(g.gate || 'Gate 1')}
+          </span>
+        </td>
+        <td>${statusBadge}</td>
+        <td>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn-admin btn-admin-secondary btn-admin-sm" onclick="openEditGuardModal(${g.user_id})" title="Edit Guard Info">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn-admin ${isActive ? 'btn-admin-danger' : 'btn-admin-success'} btn-admin-sm" onclick="toggleGuardStatus(${g.user_id})" title="${isActive ? 'Set Off Duty' : 'Set On Duty'}">
+              <i class="fas ${isActive ? 'fa-user-slash' : 'fa-user-check'}"></i> ${isActive ? 'Deactivate' : 'Activate'}
+            </button>
+            ${g.email.toLowerCase() !== 'security@smartparking.ai' ? `
+              <button class="btn-admin btn-admin-danger btn-admin-sm" onclick="deleteGuard(${g.user_id}, '${escapeHtml(g.name)}')" title="Remove Guard">
+                <i class="fas fa-trash"></i>
+              </button>
+            ` : ''}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterGuards() {
+  const query = (document.getElementById('guardSearchInput')?.value || '').toLowerCase().trim();
+  const lotFilter = document.getElementById('guardLotFilter')?.value || 'all';
+  const statusFilter = document.getElementById('guardStatusFilter')?.value || 'all';
+
+  const filtered = allGuards.filter(g => {
+    const matchesQuery = !query ||
+      (g.name && g.name.toLowerCase().includes(query)) ||
+      (g.email && g.email.toLowerCase().includes(query)) ||
+      (g.gate && g.gate.toLowerCase().includes(query)) ||
+      (g.assigned_lot && g.assigned_lot.toLowerCase().includes(query));
+
+    const matchesLot = lotFilter === 'all' || (g.assigned_lot && g.assigned_lot === lotFilter);
+    const isActive = (g.is_active === 1 || g.is_active === null || g.is_active === undefined);
+    const matchesStatus = statusFilter === 'all' ||
+      (statusFilter === 'active' && isActive) ||
+      (statusFilter === 'deactivated' && !isActive);
+
+    return matchesQuery && matchesLot && matchesStatus;
+  });
+
+  renderGuardsTable(filtered);
+}
+
+function openAddGuardModal() {
+  document.getElementById('addGuardForm').reset();
+  document.getElementById('addGuardModal').style.display = 'flex';
+}
+
+function closeAddGuardModal() {
+  document.getElementById('addGuardModal').style.display = 'none';
+}
+
+async function submitAddGuard(e) {
+  e.preventDefault();
+  const name = document.getElementById('addGuardName').value.trim();
+  const email = document.getElementById('addGuardEmail').value.trim();
+  const phone = document.getElementById('addGuardPhone').value.trim();
+  const password = document.getElementById('addGuardPassword').value;
+  const lotSelect = document.getElementById('addGuardLot');
+  const lot_id = lotSelect ? lotSelect.value : 1;
+  const assigned_lot = lotSelect && lotSelect.selectedOptions[0] ? lotSelect.selectedOptions[0].getAttribute('data-name') : 'Institutions';
+  const gate = document.getElementById('addGuardGate').value.trim();
+  const shift = document.getElementById('addGuardShift').value;
+
+  try {
+    const res = await fetch('/api/admin/guards/create', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name, email, phone, password, lot_id, assigned_lot, gate, shift })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(data.message, 'success');
+      closeAddGuardModal();
+      loadAdminGuards();
+      loadAdminDashboardKPIs();
+    } else {
+      showToast(data.message || 'Creation failed', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to create security guard', 'error');
+  }
+}
+
+function openEditGuardModal(guardId) {
+  const guard = allGuards.find(g => g.user_id === guardId);
+  if (!guard) return;
+
+  document.getElementById('editGuardId').value = guard.user_id;
+  document.getElementById('editGuardName').value = guard.name || '';
+  document.getElementById('editGuardEmail').value = guard.email || '';
+  document.getElementById('editGuardPhone').value = guard.phone || '';
+  document.getElementById('editGuardGate').value = guard.gate || '';
+  document.getElementById('editGuardShift').value = guard.shift || 'Day Shift (08:00 - 20:00)';
+  document.getElementById('editGuardStatus').value = (guard.is_active === 0 ? '0' : '1');
+  document.getElementById('editGuardPassword').value = '';
+
+  const lotSelect = document.getElementById('editGuardLot');
+  if (lotSelect && guard.lot_id) {
+    lotSelect.value = guard.lot_id;
+  }
+
+  document.getElementById('editGuardModal').style.display = 'flex';
+}
+
+function closeEditGuardModal() {
+  document.getElementById('editGuardModal').style.display = 'none';
+}
+
+async function submitEditGuard(e) {
+  e.preventDefault();
+  const user_id = document.getElementById('editGuardId').value;
+  const name = document.getElementById('editGuardName').value.trim();
+  const email = document.getElementById('editGuardEmail').value.trim();
+  const phone = document.getElementById('editGuardPhone').value.trim();
+  const lotSelect = document.getElementById('editGuardLot');
+  const lot_id = lotSelect ? lotSelect.value : 1;
+  const assigned_lot = lotSelect && lotSelect.selectedOptions[0] ? lotSelect.selectedOptions[0].getAttribute('data-name') : '';
+  const gate = document.getElementById('editGuardGate').value.trim();
+  const shift = document.getElementById('editGuardShift').value;
+  const is_active = document.getElementById('editGuardStatus').value === '1';
+  const password = document.getElementById('editGuardPassword').value;
+
+  const payload = { user_id, name, email, phone, lot_id, assigned_lot, gate, shift, is_active };
+  if (password) payload.password = password;
+
+  try {
+    const res = await fetch('/api/admin/guards/update', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(data.message, 'success');
+      closeEditGuardModal();
+      loadAdminGuards();
+      loadAdminDashboardKPIs();
+    } else {
+      showToast(data.message || 'Update failed', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to update guard', 'error');
+  }
+}
+
+async function toggleGuardStatus(guardId) {
+  try {
+    const res = await fetch('/api/admin/guards/toggle-status', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ user_id: guardId })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(data.message, 'success');
+      loadAdminGuards();
+      loadAdminDashboardKPIs();
+    } else {
+      showToast(data.message || 'Status toggle failed', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to toggle guard status', 'error');
+  }
+}
+
+async function deleteGuard(guardId, guardName) {
+  if (!confirm(`Are you sure you want to remove Security Guard '${guardName}' (#SG-${guardId})?`)) {
+    return;
+  }
+  try {
+    const res = await fetch(`/api/admin/guards/${guardId}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(data.message, 'success');
+      loadAdminGuards();
+      loadAdminDashboardKPIs();
+    } else {
+      showToast(data.message || 'Delete failed', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to remove guard', 'error');
+  }
 }
 
 /* ==========================================================================

@@ -3,13 +3,15 @@ Authentication & Authorization Middleware for AI-Based Smart Parking System.
 Provides decorators and security helpers across all Flask Blueprints.
 """
 
+import hmac
 from functools import wraps
+from urllib.parse import urlparse
 from flask import session, request, jsonify, redirect, url_for, flash
 from werkzeug.security import check_password_hash
 
 
 def verify_password_hash(stored_hash, password):
-    """Verifies password hash with backward compatibility for legacy records."""
+    """Verifies password hash using constant-time comparison to prevent timing attacks."""
     if not stored_hash or not password:
         return False
     try:
@@ -17,7 +19,30 @@ def verify_password_hash(stored_hash, password):
             return True
     except Exception:
         pass
-    return stored_hash == password
+    # Backward compatibility constant-time verification for non-standard legacy entries
+    if isinstance(stored_hash, str) and not stored_hash.startswith(('scrypt:', 'pbkdf2:')):
+        return hmac.compare_digest(stored_hash, password)
+    return False
+
+
+def is_safe_redirect_url(target):
+    """
+    Validates redirect URLs against Open Redirect attacks.
+    Ensures URL is strictly local (relative path) and does not point to external hosts.
+    """
+    if not target or not isinstance(target, str):
+        return False
+    # Must start with a single '/' and not '//' or '/\'
+    if not target.startswith('/') or target.startswith('//') or target.startswith('/\\'):
+        return False
+    # Verify hostname component is empty
+    try:
+        parsed = urlparse(target)
+        if parsed.scheme or parsed.netloc:
+            return False
+    except Exception:
+        return False
+    return True
 
 
 def login_required(f):
@@ -52,6 +77,31 @@ def admin_required(f):
             if request.is_json or request.path.startswith('/api/'):
                 return jsonify({'status': 'error', 'message': 'Access Denied: Administrator privileges required.'}), 403
             flash('Access Denied: Administrator privileges required.', 'error')
+            try:
+                home_url = url_for('web.index')
+            except Exception:
+                home_url = url_for('web.index')
+            return redirect(home_url)
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def security_required(f):
+    """Session and role-based route protection decorator for Security Personnel & Admins."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            if request.is_json or request.path.startswith('/api/'):
+                return jsonify({'status': 'error', 'message': 'Authentication required. Please log in as Security Guard.'}), 401
+            try:
+                target_url = url_for('auth.login_page', tab='security', next=request.path)
+            except Exception:
+                target_url = url_for('auth.login_page', tab='security', next=request.path)
+            return redirect(target_url)
+        if session.get('user_role') not in ('security', 'guard', 'admin'):
+            if request.is_json or request.path.startswith('/api/'):
+                return jsonify({'status': 'error', 'message': 'Access Denied: Security Guard privileges required.'}), 403
+            flash('Access Denied: Security Guard privileges required.', 'error')
             try:
                 home_url = url_for('web.index')
             except Exception:

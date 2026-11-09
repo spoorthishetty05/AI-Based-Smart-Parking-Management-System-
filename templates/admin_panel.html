@@ -52,6 +52,12 @@
           <span>User Management</span>
         </a>
 
+        <!-- Module: Security Guard Management -->
+        <a href="#guards" class="admin-nav-item" data-tab="guards">
+          <i class="fas fa-user-shield"></i>
+          <span>Security Guards</span>
+        </a>
+
         <!-- Module 2: Parking Lot Management -->
         <a href="#lots" class="admin-nav-item" data-tab="lots">
           <i class="fas fa-warehouse"></i>
@@ -128,6 +134,9 @@
             <div class="pulse-dot"></div>
             <span>LIVE SYSTEM ACTIVE</span>
           </div>
+          <a href="/security" target="_blank" class="btn-switch-user-view" style="background:#064e3b; border-color:#059669; margin-right:8px;" title="Open Security Guard Dashboard">
+            <i class="fas fa-shield-halved"></i> Guard Portal &rarr;
+          </a>
           <a href="/user" class="btn-switch-user-view" title="Preview Driver/User Panel">
             <i class="fas fa-car-side"></i> Switch to User View &rarr;
           </a>
@@ -319,6 +328,96 @@
                   <tr>
                     <td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading user accounts...
                     </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             MODULE: SECURITY GUARDS & GATE OPERATORS MANAGEMENT
+             ================================================================ -->
+        <div class="tab-pane" id="tab-guards">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h2><i class="fas fa-user-shield" style="color: #10b981;"></i> Security Personnel & Gate Management</h2>
+                <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Assign guards to parking lots & gates, manage shift duty, and grant walk-in spot booking permissions</p>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <a href="/security" target="_blank" class="btn-admin btn-admin-secondary" style="border-color:#10b981; color:#10b981;">
+                  <i class="fas fa-external-link-alt"></i> Open Guard Portal
+                </a>
+                <button class="btn-admin btn-admin-primary" onclick="openAddGuardModal()" style="background:#059669; border-color:#059669;">
+                  <i class="fas fa-user-plus"></i> + Add Security Guard
+                </button>
+              </div>
+            </div>
+
+            <!-- KPI Cards for Guards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+              <div class="kpi-card" style="--kpi-color: #10b981;">
+                <div class="kpi-data">
+                  <span class="kpi-label">TOTAL SECURITY GUARDS</span>
+                  <span class="kpi-value" id="kpiTotalGuards">0</span>
+                  <span class="kpi-sub">Registered gate officers</span>
+                </div>
+                <div class="kpi-icon"><i class="fas fa-shield-halved"></i></div>
+              </div>
+              <div class="kpi-card" style="--kpi-color: #3b82f6;">
+                <div class="kpi-data">
+                  <span class="kpi-label">ACTIVE ON SHIFT</span>
+                  <span class="kpi-value" id="kpiActiveGuards">0</span>
+                  <span class="kpi-sub">Currently on active duty</span>
+                </div>
+                <div class="kpi-icon"><i class="fas fa-user-check"></i></div>
+              </div>
+              <div class="kpi-card" style="--kpi-color: #f59e0b;">
+                <div class="kpi-data">
+                  <span class="kpi-label">ASSIGNED GATES</span>
+                  <span class="kpi-value" id="kpiAssignedGates">0</span>
+                  <span class="kpi-sub">Controlled entry/exit gates</span>
+                </div>
+                <div class="kpi-icon"><i class="fas fa-door-open"></i></div>
+              </div>
+            </div>
+
+            <!-- Filter and Search Bar -->
+            <div class="table-filter-bar">
+              <div class="filter-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="guardSearchInput" class="table-search-input" placeholder="Search guards by name, email, gate or lot..." oninput="filterGuards()">
+              </div>
+              <div class="filter-dropdowns">
+                <select id="guardLotFilter" class="admin-form-select table-filter-select" onchange="filterGuards()">
+                  <option value="all">All Facilities</option>
+                </select>
+                <select id="guardStatusFilter" class="admin-form-select table-filter-select" onchange="filterGuards()">
+                  <option value="all">All Shift Statuses</option>
+                  <option value="active">Active On Duty</option>
+                  <option value="deactivated">Off Duty / Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Guards Table -->
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Guard ID</th>
+                    <th>Officer Name & Shift</th>
+                    <th>Contact Info</th>
+                    <th>Assigned Lot</th>
+                    <th>Gate Station</th>
+                    <th>Duty Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminGuardsTableBody">
+                  <tr>
+                    <td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading security guards...</td>
                   </tr>
                 </tbody>
               </table>
@@ -1530,6 +1629,128 @@
           </button>
           <button type="button" class="btn-admin btn-admin-secondary" onclick="closeEditSlotModal()">Cancel</button>
           <button type="submit" class="btn-admin btn-admin-primary">Update Status</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD SECURITY GUARD MODAL -->
+  <div id="addGuardModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-user-shield" style="color:#10b981;"></i> Register Security Guard</h3>
+        <button class="admin-modal-close" onclick="closeAddGuardModal()">&times;</button>
+      </div>
+      <form id="addGuardForm" onsubmit="submitAddGuard(event)">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Guard Officer Full Name *</label>
+            <input type="text" id="addGuardName" class="admin-form-input" placeholder="e.g. Guard Ramesh Kumar" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Email Address (Login ID) *</label>
+              <input type="email" id="addGuardEmail" class="admin-form-input" placeholder="e.g. guard@smartparking.ai" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Phone Number</label>
+              <input type="tel" id="addGuardPhone" class="admin-form-input" placeholder="+91 98765 00099">
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Default Password *</label>
+            <input type="password" id="addGuardPassword" class="admin-form-input" placeholder="Initial access password (e.g. guard123)" value="guard123" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Assigned Parking Facility *</label>
+              <select id="addGuardLot" class="admin-form-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Assigned Gate Station *</label>
+              <input type="text" id="addGuardGate" class="admin-form-input" placeholder="e.g. Gate 1 (North Entry)" value="Gate 1 (Main Entry)" required>
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Duty Shift</label>
+            <select id="addGuardShift" class="admin-form-select">
+              <option value="Day Shift (08:00 - 20:00)">Day Shift (08:00 - 20:00)</option>
+              <option value="Night Shift (20:00 - 08:00)">Night Shift (20:00 - 08:00)</option>
+              <option value="24/7 Rotational Duty">24/7 Rotational Duty</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeAddGuardModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary" style="background:#059669; border-color:#059669;">Create Guard Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT SECURITY GUARD MODAL -->
+  <div id="editGuardModal" class="admin-modal-backdrop">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h3><i class="fas fa-edit" style="color:#10b981;"></i> Edit Guard Assignment</h3>
+        <button class="admin-modal-close" onclick="closeEditGuardModal()">&times;</button>
+      </div>
+      <form id="editGuardForm" onsubmit="submitEditGuard(event)">
+        <input type="hidden" id="editGuardId">
+        <div class="admin-modal-body">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Guard Officer Full Name *</label>
+            <input type="text" id="editGuardName" class="admin-form-input" required>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Email Address *</label>
+              <input type="email" id="editGuardEmail" class="admin-form-input" required>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Phone Number</label>
+              <input type="tel" id="editGuardPhone" class="admin-form-input">
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Assigned Parking Facility</label>
+              <select id="editGuardLot" class="admin-form-select">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Gate Station</label>
+              <input type="text" id="editGuardGate" class="admin-form-input" required>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="admin-form-group">
+              <label class="admin-form-label">Duty Shift</label>
+              <select id="editGuardShift" class="admin-form-select">
+                <option value="Day Shift (08:00 - 20:00)">Day Shift (08:00 - 20:00)</option>
+                <option value="Night Shift (20:00 - 08:00)">Night Shift (20:00 - 08:00)</option>
+                <option value="24/7 Rotational Duty">24/7 Rotational Duty</option>
+              </select>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">Duty Status</label>
+              <select id="editGuardStatus" class="admin-form-select">
+                <option value="1">Active On Duty</option>
+                <option value="0">Off Duty / Deactivated</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">Reset Password (Optional)</label>
+            <input type="password" id="editGuardPassword" class="admin-form-input" placeholder="Leave blank to keep current password">
+          </div>
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="closeEditGuardModal()">Cancel</button>
+          <button type="submit" class="btn-admin btn-admin-primary" style="background:#059669; border-color:#059669;">Save Changes</button>
         </div>
       </form>
     </div>

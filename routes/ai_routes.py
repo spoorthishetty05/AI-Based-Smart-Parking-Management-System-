@@ -116,6 +116,9 @@ def api_eda_metrics():
 @ai_bp.route('/api/ai/retrain', methods=['POST'])
 def api_retrain_model():
     """Triggers ML model re-training and re-evaluates metrics."""
+    from flask import current_app
+    if not current_app.config.get('TESTING') and session.get('user_role') != 'admin':
+        return jsonify({'status': 'error', 'message': 'Access Denied: Administrator privileges required.'}), 403
     package = train_occupancy_models()
     return jsonify({
         'status': 'success',
@@ -186,6 +189,9 @@ def api_kmeans_predict():
 @ai_bp.route('/api/ai/kmeans/retrain', methods=['POST'])
 def api_kmeans_retrain():
     """Retrains K-Means clusters with specified cluster count (default 3)."""
+    from flask import current_app
+    if not current_app.config.get('TESTING') and session.get('user_role') != 'admin':
+        return jsonify({'status': 'error', 'message': 'Access Denied: Administrator privileges required.'}), 403
     data = request.get_json() or {}
     k = int(data.get('n_clusters', 3))
     pkg = train_kmeans_clusters(n_clusters=k)

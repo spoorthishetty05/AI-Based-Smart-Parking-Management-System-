@@ -521,6 +521,92 @@ body.admin-body {
 .status-badge.completed { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
 .status-badge.cancelled { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
 
+/* Table Filter & Search Bars */
+.table-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-search {
+  position: relative;
+  flex: 1.5;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+}
+
+.filter-search i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.filter-search input,
+.filter-search input[type="text"],
+.table-search-input {
+  width: 100%;
+  padding: 10px 14px 10px 40px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: var(--admin-radius-sm, 8px);
+  color: #ffffff;
+  font-size: 13.5px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-search input::placeholder,
+.table-search-input::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.filter-search input:focus,
+.table-search-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.filter-dropdowns {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-dropdowns .admin-form-select,
+.filter-dropdowns select,
+.table-filter-select {
+  width: auto;
+  min-width: 170px;
+  padding: 10px 14px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: var(--admin-radius-sm, 8px);
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filter-dropdowns .admin-form-select:focus,
+.filter-dropdowns select:focus,
+.table-filter-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
 /* Buttons */
 .btn-admin {
   display: inline-flex;
@@ -778,6 +864,13 @@ body.admin-body {
 .admin-form-input:focus, .admin-form-select:focus {
   border-color: #38bdf8;
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+select option,
+.admin-form-select option,
+.table-filter-select option {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
 }
 
 .admin-modal-footer {

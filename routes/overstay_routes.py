@@ -69,6 +69,7 @@ def list_overstays():
     })
 
 @overstay_bp.route('/api/overstays/resolve/<int:overstay_id>', methods=['POST'])
+@admin_required
 def api_resolve_overstay(overstay_id):
     """Settle or waive an overstay incident and record vehicle exit."""
     data = request.get_json() or {}
@@ -77,6 +78,7 @@ def api_resolve_overstay(overstay_id):
     return jsonify({'status': 'success' if success else 'error', 'message': msg})
 
 @overstay_bp.route('/api/overstays/<int:overstay_id>/exit', methods=['POST'])
+@admin_required
 def api_overstay_record_exit(overstay_id):
     """Admin action to record vehicle exit directly from Overstay Management table."""
     data = request.get_json() or {}
@@ -85,6 +87,7 @@ def api_overstay_record_exit(overstay_id):
     return jsonify({'status': 'success' if success else 'error', 'message': msg})
 
 @overstay_bp.route('/api/overstays/<int:overstay_id>/mark-paid', methods=['POST'])
+@admin_required
 def api_overstay_mark_paid(overstay_id):
     """Admin action to mark an overstay penalty payment status as Paid."""
     success, msg = mark_overstay_paid(overstay_id)
@@ -93,13 +96,9 @@ def api_overstay_mark_paid(overstay_id):
 @overstay_bp.route('/api/user/active-overstay', methods=['GET'])
 def api_user_active_overstay():
     """Returns active overstay details for the authenticated user for real-time warning card."""
-    uid = session.get('user_id') or request.args.get('user_id')
-    if uid:
-        try:
-            uid = int(uid)
-        except (ValueError, TypeError):
-            pass
-    if not uid:
+    req_uid = request.args.get('user_id')
+    uid, err = get_authenticated_user_id(req_uid)
+    if err:
         return jsonify({'status': 'success', 'has_overstay': False, 'overstay': None})
 
     ov = get_user_active_overstay(uid)
@@ -601,6 +600,7 @@ def update_system_settings():
     return jsonify({'status': 'success', 'message': 'System settings saved.'})
 
 @overstay_bp.route('/api/reports/export-csv', methods=['GET'])
+@admin_required
 def export_reports_csv():
     """Exports system reservations and parking utilization from MongoDB as a downloadable CSV."""
     db = get_mongo_db()

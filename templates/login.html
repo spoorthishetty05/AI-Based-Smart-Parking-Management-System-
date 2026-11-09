@@ -101,8 +101,11 @@
 
       <!-- ROLE SWITCHER TABS -->
       <div class="auth-role-tabs">
-        <button type="button" class="auth-role-tab {% if active_tab != 'admin' %}active{% endif %}" id="tabUserBtn" onclick="switchLoginTab('user')">
+        <button type="button" class="auth-role-tab {% if active_tab not in ('admin', 'security') %}active{% endif %}" id="tabUserBtn" onclick="switchLoginTab('user')">
           <i class="fas fa-user"></i> User Login
+        </button>
+        <button type="button" class="auth-role-tab security-tab {% if active_tab == 'security' %}active{% endif %}" id="tabSecurityBtn" onclick="switchLoginTab('security')">
+          <i class="fas fa-user-shield"></i> Security Guard
         </button>
         <button type="button" class="auth-role-tab admin-tab {% if active_tab == 'admin' %}active{% endif %}" id="tabAdminBtn" onclick="switchLoginTab('admin')">
           <i class="fas fa-shield-halved"></i> Admin Portal
@@ -110,10 +113,10 @@
       </div>
 
       <h2 class="auth-form-title" id="authFormTitle">
-        {% if active_tab == 'admin' %}Administrator Gateway 🔒{% else %}Welcome Back &#x1F44B;{% endif %}
+        {% if active_tab == 'admin' %}Administrator Gateway 🔒{% elif active_tab == 'security' %}Gate Security Gateway 🛡️{% else %}Welcome Back &#x1F44B;{% endif %}
       </h2>
       <p class="auth-form-subtitle" id="authFormSubtitle">
-        {% if active_tab == 'admin' %}Sign in with permanent administrator credentials{% else %}Login with your registered account{% endif %}
+        {% if active_tab == 'admin' %}Sign in with permanent administrator credentials{% elif active_tab == 'security' %}Sign in with Security Officer / Gate Operator credentials{% else %}Login with your registered account{% endif %}
       </p>
 
       <!-- Flash Messages -->
@@ -145,7 +148,7 @@
         <!-- Email / Username Field -->
         <div class="form-group">
           <label for="loginEmail" class="form-label" id="emailLabelText">
-            {% if active_tab == 'admin' %}Admin Email Address{% else %}Registered Email or Username{% endif %}
+            {% if active_tab == 'admin' %}Admin Email Address{% elif active_tab == 'security' %}Security Email Address or Guard ID{% else %}Registered Email or Username{% endif %}
           </label>
           <div class="input-wrapper has-left-icon">
             <i class="far fa-user input-icon-left"></i>
@@ -154,7 +157,7 @@
               id="loginEmail" 
               name="email" 
               class="auth-input" 
-              placeholder="{% if active_tab == 'admin' %}admin@smartparking.ai{% else %}Enter your registered email or username{% endif %}" 
+              placeholder="{% if active_tab == 'admin' %}admin@smartparking.ai{% elif active_tab == 'security' %}security@smartparking.ai{% else %}Enter your registered email or username{% endif %}" 
               value="{{ email if email else '' }}" 
               autocomplete="username"
               required
@@ -166,7 +169,7 @@
         <!-- Password Field -->
         <div class="form-group">
           <label for="loginPassword" class="form-label" id="passwordLabelText">
-            {% if active_tab == 'admin' %}Admin Password{% else %}Password{% endif %}
+            {% if active_tab == 'admin' %}Admin Password{% elif active_tab == 'security' %}Security Password{% else %}Password{% endif %}
           </label>
           <div class="input-wrapper has-left-icon has-right-icon">
             <i class="fas fa-lock input-icon-left" style="color: #f59e0b;"></i>
@@ -175,7 +178,7 @@
               id="loginPassword" 
               name="password" 
               class="auth-input" 
-              placeholder="{% if active_tab == 'admin' %}Enter admin password{% else %}Enter your password{% endif %}" 
+              placeholder="{% if active_tab == 'admin' %}Enter admin password{% elif active_tab == 'security' %}Enter security password{% else %}Enter your password{% endif %}" 
               autocomplete="current-password"
               required
             >
@@ -198,7 +201,7 @@
         <!-- Submit Button -->
         <button type="submit" class="btn-auth-submit" id="loginSubmitBtn">
           <span id="submitBtnText">
-            {% if active_tab == 'admin' %}SIGN IN TO ADMIN CONSOLE &rarr;{% else %}LOGIN TO ACCOUNT &rarr;{% endif %}
+            {% if active_tab == 'admin' %}SIGN IN TO ADMIN CONSOLE &rarr;{% elif active_tab == 'security' %}ACCESS SECURITY DASHBOARD &rarr;{% else %}LOGIN TO ACCOUNT &rarr;{% endif %}
           </span>
         </button>
 
@@ -213,13 +216,22 @@
         <button type="button" class="btn-use-admin" onclick="fillAdminCredentials()">Auto-Fill</button>
       </div>
 
+      <!-- Security Guard Credentials Helper (Shown on Security Tab) -->
+      <div class="admin-cred-helper security-cred-helper" id="securityCredHelper" {% if active_tab != 'security' %}style="display:none;"{% endif %}>
+        <div>
+          <i class="fas fa-shield-halved" style="color: #059669; margin-right: 4px;"></i>
+          Security Guard: <code>security@smartparking.ai</code> &bull; <code>security123</code>
+        </div>
+        <button type="button" class="btn-use-security" onclick="fillSecurityCredentials()">Auto-Fill</button>
+      </div>
+
       <!-- OR Divider (User Tab) -->
-      <div class="auth-divider" id="userDivider" {% if active_tab == 'admin' %}style="display:none;"{% endif %}>
+      <div class="auth-divider" id="userDivider" {% if active_tab in ('admin', 'security') %}style="display:none;"{% endif %}>
         <span>OR</span>
       </div>
 
       <!-- Register Link (User Tab) -->
-      <div class="auth-footer" id="userRegisterFooter" {% if active_tab == 'admin' %}style="display:none;"{% endif %}>
+      <div class="auth-footer" id="userRegisterFooter" {% if active_tab in ('admin', 'security') %}style="display:none;"{% endif %}>
         Don't have an account? 
         <a href="/register" class="auth-link-bold">Register First &rarr;</a>
       </div>
@@ -232,10 +244,12 @@
     // Tab switching logic
     function switchLoginTab(type) {
       const isAdm = type === 'admin';
+      const isSec = type === 'security';
       document.getElementById('loginTypeInput').value = type;
       
       const tabUser = document.getElementById('tabUserBtn');
       const tabAdmin = document.getElementById('tabAdminBtn');
+      const tabSec = document.getElementById('tabSecurityBtn');
       const title = document.getElementById('authFormTitle');
       const subtitle = document.getElementById('authFormSubtitle');
       const emailLabel = document.getElementById('emailLabelText');
@@ -244,11 +258,15 @@
       const passInput = document.getElementById('loginPassword');
       const submitText = document.getElementById('submitBtnText');
       const adminHelper = document.getElementById('adminCredHelper');
+      const securityHelper = document.getElementById('securityCredHelper');
       const userDivider = document.getElementById('userDivider');
       const userFooter = document.getElementById('userRegisterFooter');
 
+      tabUser.classList.remove('active');
+      tabAdmin.classList.remove('active');
+      tabSec.classList.remove('active');
+
       if (isAdm) {
-        tabUser.classList.remove('active');
         tabAdmin.classList.add('active');
         title.innerHTML = 'Administrator Gateway 🔒';
         subtitle.textContent = 'Sign in with permanent administrator credentials';
@@ -258,10 +276,23 @@
         passInput.placeholder = 'Enter admin password';
         submitText.innerHTML = 'SIGN IN TO ADMIN CONSOLE &rarr;';
         if (adminHelper) adminHelper.style.display = 'flex';
+        if (securityHelper) securityHelper.style.display = 'none';
+        if (userDivider) userDivider.style.display = 'none';
+        if (userFooter) userFooter.style.display = 'none';
+      } else if (isSec) {
+        tabSec.classList.add('active');
+        title.innerHTML = 'Gate Security Gateway 🛡️';
+        subtitle.textContent = 'Sign in with Security Officer / Gate Operator credentials';
+        emailLabel.textContent = 'Security Email Address or Guard ID';
+        passLabel.textContent = 'Security Password';
+        emailInput.placeholder = 'security@smartparking.ai';
+        passInput.placeholder = 'Enter security password';
+        submitText.innerHTML = 'ACCESS SECURITY DASHBOARD &rarr;';
+        if (adminHelper) adminHelper.style.display = 'none';
+        if (securityHelper) securityHelper.style.display = 'flex';
         if (userDivider) userDivider.style.display = 'none';
         if (userFooter) userFooter.style.display = 'none';
       } else {
-        tabAdmin.classList.remove('active');
         tabUser.classList.add('active');
         title.innerHTML = 'Welcome Back &#x1F44B;';
         subtitle.textContent = 'Login with your registered account';
@@ -271,6 +302,7 @@
         passInput.placeholder = 'Enter your password';
         submitText.innerHTML = 'LOGIN TO ACCOUNT &rarr;';
         if (adminHelper) adminHelper.style.display = 'none';
+        if (securityHelper) securityHelper.style.display = 'none';
         if (userDivider) userDivider.style.display = 'flex';
         if (userFooter) userFooter.style.display = 'block';
       }
@@ -281,6 +313,13 @@
     function fillAdminCredentials() {
       document.getElementById('loginEmail').value = 'admin@smartparking.ai';
       document.getElementById('loginPassword').value = 'admin123';
+      clearErrors();
+    }
+
+    // Security Guard Auto-fill Helper
+    function fillSecurityCredentials() {
+      document.getElementById('loginEmail').value = 'security@smartparking.ai';
+      document.getElementById('loginPassword').value = 'security123';
       clearErrors();
     }
 
@@ -323,11 +362,18 @@
 
       // Validate email or username
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const isAdminTab = document.getElementById('loginTypeInput').value === 'admin';
-      if (isAdminTab) {
+      const roleTab = document.getElementById('loginTypeInput').value;
+      if (roleTab === 'admin') {
         if (!emailVal || !emailRegex.test(emailVal)) {
           emailInput.classList.add('is-invalid');
           emailError.textContent = 'Please enter a valid administrator email.';
+          emailError.classList.add('visible');
+          hasError = true;
+        }
+      } else if (roleTab === 'security') {
+        if (!emailVal) {
+          emailInput.classList.add('is-invalid');
+          emailError.textContent = 'Please enter your security guard email or username.';
           emailError.classList.add('visible');
           hasError = true;
         }

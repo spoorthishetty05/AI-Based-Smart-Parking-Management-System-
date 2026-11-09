@@ -861,29 +861,53 @@ function onBookingEndTimeManualChange() {
 
 function getSelectedDurationHours() {
   const durSelect = document.getElementById('bookingDurationSelect');
-  if (!durSelect) return 2.0;
-  if (durSelect.value === 'custom') {
-    const customInp = document.getElementById('customDurationInput');
-    const val = parseFloat(customInp?.value || '2.0');
+  if (durSelect) {
+    if (durSelect.value === 'custom') {
+      const customInp = document.getElementById('customDurationInput');
+      const val = parseFloat(customInp?.value || '2.0');
+      return isNaN(val) || val <= 0 ? 2.0 : val;
+    }
+    const val = parseFloat(durSelect.value);
     return isNaN(val) || val <= 0 ? 2.0 : val;
   }
-  const val = parseFloat(durSelect.value);
-  return isNaN(val) || val <= 0 ? 2.0 : val;
+
+  // If in Quick Booking mode, compute dynamically from start & end time inputs
+  const startInp = document.getElementById('bookingStartTime');
+  const endInp = document.getElementById('bookingEndTime');
+  if (startInp && endInp && startInp.value && endInp.value) {
+    const sParts = startInp.value.split(':').map(Number);
+    const eParts = endInp.value.split(':').map(Number);
+    const sMins = (sParts[0] || 0) * 60 + (sParts[1] || 0);
+    let eMins = (eParts[0] || 0) * 60 + (eParts[1] || 0);
+    if (eMins > sMins) {
+      return Math.round(((eMins - sMins) / 60.0) * 100) / 100;
+    }
+  }
+
+  return 2.0;
 }
 
 function getSelectedDurationText() {
   const durSelect = document.getElementById('bookingDurationSelect');
-  if (!durSelect) return '2 hours';
-  if (durSelect.value === '0.5') return '30 minutes';
-  if (durSelect.value === '1') return '1 hour';
-  if (durSelect.value === '2') return '2 hours';
-  if (durSelect.value === '3') return '3 hours';
-  if (durSelect.value === '4') return '4 hours';
-  if (durSelect.value === 'custom') {
-    const h = getSelectedDurationHours();
-    return `${h} hours (Custom)`;
+  if (durSelect) {
+    if (durSelect.value === '0.5') return '30 minutes';
+    if (durSelect.value === '1') return '1 hour';
+    if (durSelect.value === '2') return '2 hours';
+    if (durSelect.value === '3') return '3 hours';
+    if (durSelect.value === '4') return '4 hours';
+    if (durSelect.value === 'custom') {
+      const h = getSelectedDurationHours();
+      return `${h} hours (Custom)`;
+    }
+    return `${durSelect.value} hours`;
   }
-  return `${durSelect.value} hours`;
+
+  const h = getSelectedDurationHours();
+  const hrs = Math.floor(h);
+  const mins = Math.round((h - hrs) * 60);
+  if (hrs > 0 && mins > 0) return `${hrs} Hours ${mins} Mins`;
+  if (hrs > 0) return `${hrs} ${hrs === 1 ? 'Hour' : 'Hours'}`;
+  return `${mins} Mins`;
 }
 
 function calculateExpectedEndTime() {
@@ -929,15 +953,36 @@ function updateEstimatedFare() {
   const lotSel = document.getElementById('bookingLotSelect');
   let rate = 40.0;
   if (lotSel && lotSel.selectedOptions && lotSel.selectedOptions[0]) {
-    rate = parseFloat(lotSel.selectedOptions[0].getAttribute('data-rate') || '40.0');
+    const opt = lotSel.selectedOptions[0];
+    const rAttr = opt.getAttribute('data-rate');
+    if (rAttr && !isNaN(parseFloat(rAttr))) {
+      rate = parseFloat(rAttr);
+    } else {
+      const match = opt.textContent.match(/₹\s*([0-9.]+)/);
+      if (match) rate = parseFloat(match[1]);
+    }
   }
 
   const durationHours = getSelectedDurationHours();
   const fareDisplay = document.getElementById('bookingEstimatedFare');
-  if (!fareDisplay) return;
+  const rateSubtext = document.getElementById('bookingRateSubtext');
 
   const total = (durationHours * rate).toFixed(2);
-  fareDisplay.textContent = `₹${total}`;
+  if (fareDisplay) {
+    fareDisplay.textContent = `₹${total}`;
+  }
+
+  if (rateSubtext) {
+    const diffMinutes = Math.round(durationHours * 60);
+    const hrs = Math.floor(diffMinutes / 60);
+    const mins = diffMinutes % 60;
+    let durLabel = '';
+    if (hrs > 0 && mins > 0) durLabel = `${hrs} hr ${mins} min`;
+    else if (hrs > 0) durLabel = `${hrs} ${hrs === 1 ? 'hour' : 'hours'}`;
+    else durLabel = `${mins} min`;
+
+    rateSubtext.innerHTML = `Standard tariff: ₹${rate}/hr &bull; Duration: ${durLabel} &bull; Overstay grace: 15m`;
+  }
 }
 
 async function submitSlotBooking(e) {

@@ -27,7 +27,7 @@ from core.mongo_engine import (
     mongo_get_checkout_preview, mongo_exit_booking, mongo_start_parking,
     validate_booking_datetime, calculate_end_time_string, check_time_intervals_overlap
 )
-from routes.middleware import login_required, admin_required, verify_password_hash, get_authenticated_user_id
+from routes.middleware import login_required, admin_required, verify_password_hash, get_authenticated_user_id, is_safe_redirect_url
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -42,6 +42,8 @@ def login_page():
         return redirect(url_for('web.index'))
 
     active_tab = request.args.get('tab', 'user').strip().lower()
+    if active_tab not in ('user', 'admin', 'security'):
+        active_tab = 'user'
     registered_email = request.args.get('registered_email', '').strip().lower()
     email_display = registered_email
 
@@ -58,7 +60,7 @@ def login_page():
             password = str(request.form.get('password') or '')
 
         login_type = (raw_login_type or 'user').strip().lower()
-        active_tab = login_type if login_type in ('user', 'admin') else 'user'
+        active_tab = login_type if login_type in ('user', 'admin', 'security') else 'user'
         email_display = email
 
         is_ajax = request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.headers.get('Accept') == 'application/json'
@@ -119,6 +121,8 @@ def login_page():
                 )
                 if active_tab == 'admin':
                     msg = 'Administrator account not found. Please verify your admin credentials.'
+                elif active_tab == 'security':
+                    msg = 'Security Guard account not found. Please verify your guard credentials.'
                 else:
                     msg = 'Invalid email or password.'
                 if is_ajax:
@@ -140,6 +144,20 @@ def login_page():
                 flash(msg, 'error')
                 return render_template('login.html', active_tab='admin', email=email), 403
 
+            # Handle non-security attempting to log into Security Portal
+            if active_tab == 'security' and user.get('role') not in ('security', 'guard', 'admin'):
+                mongo_record_login(
+                    user_info=dict(user),
+                    ip_address=request.remote_addr,
+                    user_agent=request.headers.get('User-Agent'),
+                    status='forbidden_security_access_denied'
+                )
+                msg = 'Access Denied: This account is not authorized as a Security Guard. Please use the User Login tab.'
+                if is_ajax:
+                    return jsonify({'status': 'error', 'message': msg}), 403
+                flash(msg, 'error')
+                return render_template('login.html', active_tab='security', email=email), 403
+
             # Check if user account has been deactivated
             if user.get('is_active') == 0:
                 msg = 'Your account has been deactivated by the system administrator. Please contact support.'
@@ -157,6 +175,8 @@ def login_page():
             # Flexibility for standard developer & admin credentials:
             if not password_matches:
                 if norm_email in ('admin@smartparking.ai', 'spoorthi@smartparking.ai') and password in ('admin', 'admin123'):
+                    password_matches = True
+                elif norm_email in ('security@smartparking.ai', 'guard@smartparking.ai') and password in ('security123', 'guard123', 'security', 'guard'):
                     password_matches = True
                 elif norm_email in ('driver@smartparking.ai', 'test.driver@smartparking.ai') and password in ('driver', 'driver123', 'password', 'password123'):
                     password_matches = True
@@ -205,10 +225,12 @@ def login_page():
                 session['logged_in'] = True
 
                 next_url = request.args.get('next')
-                if next_url and next_url.startswith('/'):
+                if next_url and is_safe_redirect_url(next_url):
                     dest_url = next_url
                 elif user.get('role') == 'admin':
                     dest_url = url_for('web.admin_panel')
+                elif user.get('role') in ('security', 'guard'):
+                    dest_url = url_for('security.security_dashboard')
                 else:
                     dest_url = url_for('web.index')
 

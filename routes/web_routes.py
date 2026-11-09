@@ -75,9 +75,11 @@ def user_panel():
 @web_bp.route('/dashboard')
 @login_required
 def index():
-    """Main application shell that directs to Admin or User Panel based on authenticated role."""
+    """Main application shell that directs to Admin, Security or User Panel based on authenticated role."""
     if session.get('user_role') == 'admin':
         return render_template('admin_panel.html', current_user=session)
+    if session.get('user_role') in ('security', 'guard'):
+        return redirect(url_for('security.security_dashboard'))
     db = get_mongo_db()
     import parking_places_config
     if db is not None:

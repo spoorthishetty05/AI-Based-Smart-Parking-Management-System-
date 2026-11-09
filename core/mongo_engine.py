@@ -730,6 +730,45 @@ def mongo_create_booking(booking_data):
         return False, {'message': 'Vehicle registration number is required.'}
 
     user_role = booking_data.get('user_role', 'user')
+
+    # ------------------------------------------------------------------
+    # ENFORCE SINGLE ACTIVE BOOKING PER PERSON (NO DOUBLE BOOKING)
+    # A person can only hold ONE active or ongoing booking at a time.
+    # Active statuses: 'confirmed', 'checked_in', 'active', 'parked', 'reserved'.
+    # Cancelled and completed sessions are excluded, permitting immediate rebooking.
+    # ------------------------------------------------------------------
+    if user_role not in ('admin', 'security', 'guard'):
+        active_booking = db.bookings.find_one({
+            'user_id': user_id,
+            'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+        })
+        if not active_booking:
+            active_booking = db.reservations.find_one({
+                'user_id': user_id,
+                'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+            })
+
+        if active_booking:
+            act_id = active_booking.get('booking_id') or active_booking.get('reservation_id') or 'Active'
+            act_slot = active_booking.get('slot_number') or f"Slot {active_booking.get('slot_id', '')}"
+            return False, {
+                'status_code': 409,
+                'message': f"Active booking limit reached: You already hold an active booking (#{act_id} for {act_slot}). Each person can only book one slot at a time. Please cancel your existing booking if you wish to choose another slot."
+            }
+
+        # Prevent double booking of the exact same vehicle
+        if vehicle_plate:
+            veh_active = db.bookings.find_one({
+                'vehicle_plate': vehicle_plate,
+                'status': {'$in': ['confirmed', 'checked_in', 'active', 'parked', 'reserved']}
+            })
+            if veh_active:
+                v_bid = veh_active.get('booking_id') or veh_active.get('reservation_id') or 'Active'
+                return False, {
+                    'status_code': 409,
+                    'message': f"Vehicle '{vehicle_plate}' already has an active booking (#{v_bid}). No double booking is permitted for the same vehicle."
+                }
+
     # Check vehicle in vehicles collection or embedded user vehicles
     veh_owned = db.vehicles.find_one({'user_id': user_id, 'license_plate': vehicle_plate})
     vehicle_name = str(booking_data.get('vehicle_name') or booking_data.get('make_model') or (veh_owned.get('make_model') if veh_owned else '') or '').strip()
@@ -760,8 +799,32 @@ def mongo_create_booking(booking_data):
         duration_hours = 2.0
         duration_str = "2 Hours"
 
+    if booking_data.get('duration_hours'):
+        try:
+            dh = float(booking_data['duration_hours'])
+            if dh > 0:
+                duration_hours = dh
+                duration_str = f"{int(duration_hours)} Hours" if duration_hours.is_integer() else f"{duration_hours} Hours"
+        except (ValueError, TypeError):
+            pass
+
+    if booking_data.get('end_time') and start_time:
+        try:
+            sp = [int(x) for x in str(start_time).strip()[:5].split(':')]
+            ep = [int(x) for x in str(booking_data['end_time']).strip()[:5].split(':')]
+            s_mins = sp[0] * 60 + (sp[1] if len(sp) > 1 else 0)
+            e_mins = ep[0] * 60 + (ep[1] if len(ep) > 1 else 0)
+            if e_mins > s_mins:
+                computed_hours = round((e_mins - s_mins) / 60.0, 2)
+                duration_hours = computed_hours
+                hrs = int(duration_hours)
+                mins = int(round((duration_hours - hrs) * 60))
+                duration_str = f"{hrs}h {mins}m" if mins > 0 else f"{hrs} Hours"
+        except Exception:
+            pass
+
     # Calculate end time
-    end_time_str = calculate_end_time_string(start_time, duration_hours)
+    end_time_str = booking_data.get('end_time') or calculate_end_time_string(start_time, duration_hours)
 
     # Fetch slot details
     slot = db.parking_slots.find_one({'slot_id': slot_id})

@@ -312,6 +312,9 @@
       } else if (typeof window.loadAvailableSlotsForQuickBooking === 'function') {
         window.loadAvailableSlotsForQuickBooking();
       }
+      if (typeof window.updateQuickBookingFare === 'function') {
+        window.updateQuickBookingFare();
+      }
     } else {
       if (wizardView) wizardView.style.display = 'block';
       if (quickView) quickView.style.display = 'none';
@@ -1401,12 +1404,93 @@
   // ============================================================
   // QUICK BOOKING MODE CONTROLLERS
   // ============================================================
+  window.updateQuickBookingFare = function () {
+    const lotSelect = document.getElementById('bookingLotSelect');
+    const startInput = document.getElementById('bookingStartTime');
+    const endInput = document.getElementById('bookingEndTime');
+    const fareDisplay = document.getElementById('bookingEstimatedFare');
+    const rateSubtext = document.getElementById('bookingRateSubtext');
+
+    if (!fareDisplay) return null;
+
+    // 1. Determine hourly rate from selected lot
+    let rate = 40.0;
+    if (lotSelect && lotSelect.selectedOptions && lotSelect.selectedOptions[0]) {
+      const opt = lotSelect.selectedOptions[0];
+      const rAttr = opt.getAttribute('data-rate');
+      if (rAttr && !isNaN(parseFloat(rAttr))) {
+        rate = parseFloat(rAttr);
+      } else {
+        const match = opt.textContent.match(/₹\s*([0-9.]+)/);
+        if (match) rate = parseFloat(match[1]);
+      }
+    }
+
+    // 2. Parse start & end times
+    let startVal = startInput ? startInput.value : '10:00';
+    let endVal = endInput ? endInput.value : '12:00';
+    if (!startVal) startVal = '10:00';
+    if (!endVal) endVal = '12:00';
+
+    const sParts = startVal.split(':').map(Number);
+    const eParts = endVal.split(':').map(Number);
+    const startMins = (sParts[0] || 0) * 60 + (sParts[1] || 0);
+    let endMins = (eParts[0] || 0) * 60 + (eParts[1] || 0);
+
+    // If end is before or equal to start, auto-advance end time to start + 2 hours
+    if (endMins <= startMins) {
+      endMins = (startMins + 120) % (24 * 60);
+      const eh = Math.floor(endMins / 60);
+      const em = endMins % 60;
+      if (endInput) {
+        endInput.value = `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
+      }
+      endMins = startMins + 120;
+    }
+
+    const diffMinutes = Math.max(15, endMins - startMins);
+    const durationHours = diffMinutes / 60.0;
+    const totalFare = Math.round(durationHours * rate * 100) / 100;
+
+    // Display formatted fare with rupee symbol
+    fareDisplay.textContent = `₹${totalFare.toFixed(2)}`;
+
+    // Display formatted rate & duration in subtext
+    if (rateSubtext) {
+      const hrs = Math.floor(diffMinutes / 60);
+      const mins = diffMinutes % 60;
+      let durLabel = '';
+      if (hrs > 0 && mins > 0) durLabel = `${hrs} hr ${mins} min`;
+      else if (hrs > 0) durLabel = `${hrs} ${hrs === 1 ? 'hour' : 'hours'}`;
+      else durLabel = `${mins} min`;
+
+      rateSubtext.innerHTML = `Standard tariff: ₹${rate}/hr &bull; ${durLabel} &bull; Overstay grace: 15m`;
+    }
+
+    return {
+      rate,
+      diffMinutes,
+      durationHours: Math.round(durationHours * 100) / 100,
+      totalFare,
+      startTime: startVal,
+      endTime: endInput ? endInput.value : endVal
+    };
+  };
+
+  // Expose alias for cross-script compatibility
+  window.updateEstimatedFare = window.updateQuickBookingFare;
+
   window.loadAvailableSlotsForQuickBooking = async function () {
     const lotSelect = document.getElementById('bookingLotSelect');
     const slotSelect = document.getElementById('bookingSlotSelect');
     if (!slotSelect) return;
     const lotId = lotSelect ? (lotSelect.value || 1) : 1;
     slotSelect.innerHTML = '<option value="">Loading available slots...</option>';
+
+    // Update estimated fare immediately when facility changes
+    if (typeof window.updateQuickBookingFare === 'function') {
+      window.updateQuickBookingFare();
+    }
 
     try {
       const res = await fetch(`/booking/search?lot_id=${lotId}&date=${getLocalDateStr()}&start_time=${getLocalTimeStr()}&duration=2%20Hours`);
@@ -1462,6 +1546,12 @@
     const vType = selectedOpt ? (selectedOpt.getAttribute('data-type') || 'Car') : 'Car';
     const vName = selectedOpt ? (selectedOpt.getAttribute('data-name') || '') : '';
 
+    const fareInfo = (typeof window.updateQuickBookingFare === 'function') ? window.updateQuickBookingFare() : null;
+    const rate = fareInfo ? fareInfo.rate : 40.0;
+    const durHours = fareInfo ? fareInfo.durationHours : 2.0;
+    const totalAmt = fareInfo ? fareInfo.totalFare : (durHours * rate);
+    const durText = `${durHours} Hours`;
+
     const quickPayload = {
       slot_id: parseInt(slotId),
       lot_id: parseInt(lotId),
@@ -1469,7 +1559,12 @@
       booking_date: dateVal,
       date: dateVal,
       start_time: startTime,
-      duration: '2 Hours',
+      end_time: endInput ? endInput.value : calculateEndTimeStr(startTime, durHours),
+      duration: durText,
+      duration_hours: durHours,
+      total_amount: totalAmt,
+      fee: totalAmt,
+      hourly_rate: rate,
       vehicle_plate: plate.toUpperCase().trim(),
       vehicle_number: plate.toUpperCase().trim(),
       vehicle_type: vType,
@@ -1479,9 +1574,9 @@
 
     if (typeof window.openRazorpayModal === 'function') {
       window.openRazorpayModal({
-        amount: 80.0,
+        amount: totalAmt,
         title: 'Smart Parking AI',
-        description: `Quick Booking (Slot ${slotId})`,
+        description: `Quick Booking (${durHours}h at ₹${rate}/hr)`,
         type: 'booking',
         onSuccess: async function (paymentResult) {
           quickPayload.payment_id = paymentResult.razorpay_payment_id;
@@ -1489,7 +1584,7 @@
           quickPayload.payment_signature = paymentResult.razorpay_signature;
           quickPayload.payment_method = paymentResult.method || 'Razorpay';
           quickPayload.payment_status = 'Paid';
-          await executeQuickBookingSubmit(quickPayload, dateVal, startTime, plate);
+          await executeQuickBookingSubmit(quickPayload, dateVal, startTime, plate, totalAmt);
         },
         onFailure: function () {
           showWizardToast('Payment cancelled.', 'error');
@@ -1498,10 +1593,10 @@
       return;
     }
 
-    await executeQuickBookingSubmit(quickPayload, dateVal, startTime, plate);
+    await executeQuickBookingSubmit(quickPayload, dateVal, startTime, plate, totalAmt);
   };
 
-  async function executeQuickBookingSubmit(payload, dateVal, startTime, plate) {
+  async function executeQuickBookingSubmit(payload, dateVal, startTime, plate, totalAmt) {
     try {
       const res = await fetch('/booking/confirm', {
         method: 'POST',
@@ -1524,8 +1619,8 @@
             vehicle_plate: plate.toUpperCase().trim(),
             booking_date: dateVal,
             start_time: startTime,
-            end_time: calculateEndTimeStr(startTime, 2.0),
-            total_amount: data.fee || 80.0
+            end_time: payload.end_time || calculateEndTimeStr(startTime, 2.0),
+            total_amount: data.fee || totalAmt || 80.0
           });
         } else {
           window.location.href = '/booking/my-bookings';
@@ -1558,5 +1653,20 @@
   function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[m]);
+  }
+
+  // Initialize Quick Booking fare on startup
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.updateQuickBookingFare === 'function') {
+        window.updateQuickBookingFare();
+      }
+    });
+  } else {
+    setTimeout(() => {
+      if (typeof window.updateQuickBookingFare === 'function') {
+        window.updateQuickBookingFare();
+      }
+    }, 50);
   }
 })();
