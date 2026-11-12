@@ -781,12 +781,49 @@
       loadSecurityStats();
       loadAvailableSlotsForSpot();
       loadSecurityBookings();
+      refreshLotDropdowns();  // Dynamically populate lot dropdowns from API
 
       // Auto-poll telemetry every 10 seconds
       setInterval(() => {
         loadSecurityStats();
       }, 10000);
     });
+
+    /**
+     * Dynamically refresh lot dropdowns from API in case Jinja lots context was empty.
+     * This guarantees dropdowns are always populated regardless of template context.
+     */
+    async function refreshLotDropdowns() {
+      try {
+        const res = await fetch('/api/lots');
+        const data = await res.json();
+        const lots = data.lots || data.parking_lots || [];
+        if (lots.length === 0) return;
+
+        // Populate bookingLotFilter dropdown
+        const lotFilter = document.getElementById('bookingLotFilter');
+        if (lotFilter) {
+          const currentVal = lotFilter.value;
+          lotFilter.innerHTML = '<option value="all" selected>All Facilities</option>' +
+            lots.map(l => `<option value="${l.lot_id}">${escapeHtml(l.lot_name || l.name || 'Lot #' + l.lot_id)}</option>`).join('');
+          if (currentVal && currentVal !== 'all') lotFilter.value = currentVal;
+        }
+
+        // Populate spotLotSelect dropdown (spot booking form)
+        const spotLot = document.getElementById('spotLotSelect');
+        if (spotLot) {
+          const curSpot = spotLot.value;
+          spotLot.innerHTML = lots.map(l =>
+            `<option value="${l.lot_id}" data-rate="${l.hourly_rate || 40}">${escapeHtml(l.lot_name || l.name)} (₹${l.hourly_rate || 40}/hr)</option>`
+          ).join('');
+          if (curSpot) spotLot.value = curSpot;
+          updateSpotEstimate();
+          loadAvailableSlotsForSpot();
+        }
+      } catch (err) {
+        console.warn('Could not refresh lot dropdowns:', err);
+      }
+    }
 
     // Helper: Toast notification
     function showToast(msg, type = 'success') {

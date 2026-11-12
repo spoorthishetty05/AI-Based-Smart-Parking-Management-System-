@@ -604,6 +604,20 @@ async function deleteUserVehicle(vehicleId) {
    MODULE 3: FIND PARKING
    ========================================================================== */
 
+/**
+ * Converts raw minutes to a human-readable "Xh Ym" or "Ym" format.
+ * e.g., 4021 → "67h 1m", 307 → "5h 7m", 7 → "7m"
+ */
+function formatOverstayDuration(minutes) {
+  const mins = parseInt(minutes, 10) || 0;
+  if (mins <= 0) return '0m';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
 async function searchParkingLots() {
   const query = (document.getElementById('lotSearchInput')?.value || '').trim();
   const container = document.getElementById('findParkingLotsContainer');
@@ -993,28 +1007,57 @@ async function submitSlotBooking(e) {
   const endTime = document.getElementById('bookingEndTime')?.value;
   let plate = document.getElementById('bookingVehicleSelect')?.value;
 
-  if (!plate || plate === '__custom__') {
-    plate = prompt('Enter vehicle license plate (e.g. KA01AB1234):');
-    if (!plate) return;
-  }
-
-  if (!slotId) {
-    showUserToast('Please choose an available parking slot.', 'error');
+  // ── Validation ────────────────────────────────────────────────────
+  if (!slotId || slotId === '') {
+    showUserToast('⚠️ Please select an available parking slot.', 'error');
     return;
   }
 
-  // Real-time validation: prevent past dates and times
+  if (!plate || plate === '__custom__') {
+    plate = prompt('Enter vehicle license plate (e.g. KA01AB1234):');
+    if (!plate || !plate.trim()) {
+      showUserToast('⚠️ Vehicle license plate is required.', 'error');
+      return;
+    }
+  }
+
+  // Date/time validation
   const pad = (n) => String(n).padStart(2, '0');
   const dNow = new Date();
   const todayStr = `${dNow.getFullYear()}-${pad(dNow.getMonth() + 1)}-${pad(dNow.getDate())}`;
   const nowTime = `${pad(dNow.getHours())}:${pad(dNow.getMinutes())}`;
 
-  if (!dateVal || dateVal < todayStr) {
-    showUserToast('Please select the current time or a future time. (Please select a current or future date and time.)', 'error');
+  if (!dateVal) {
+    showUserToast('⚠️ Please select a booking date.', 'error');
     return;
   }
-  if (dateVal === todayStr && startTime && startTime < nowTime) {
-    showUserToast('Please select the current time or a future time. (Please select a current or future date and time.)', 'error');
+  if (dateVal < todayStr) {
+    showUserToast('⚠️ Booking date cannot be in the past. Please select today or a future date.', 'error');
+    return;
+  }
+  if (!startTime) {
+    showUserToast('⚠️ Please select a start time.', 'error');
+    return;
+  }
+  if (!endTime) {
+    showUserToast('⚠️ Please select an end time.', 'error');
+    return;
+  }
+  if (dateVal === todayStr && startTime < nowTime) {
+    showUserToast('⚠️ Start time cannot be in the past. Please select a current or future time.', 'error');
+    return;
+  }
+  if (endTime <= startTime) {
+    showUserToast('⚠️ End time must be after start time.', 'error');
+    return;
+  }
+
+  // Minimum duration check (at least 30 minutes)
+  const [sh, sm] = startTime.split(':').map(Number);
+  const [eh, em] = endTime.split(':').map(Number);
+  const durationMins = (eh * 60 + em) - (sh * 60 + sm);
+  if (durationMins < 30) {
+    showUserToast('⚠️ Minimum booking duration is 30 minutes.', 'error');
     return;
   }
 
@@ -2857,7 +2900,7 @@ async function loadParkingHistory(scope = currentHistoryScope) {
           const isOverstay = h.is_overstay || (h.final_status && h.final_status.includes('Overstay'));
           let badgeHtml = '';
           if (isOverstay) {
-            badgeHtml = `<span class="status-badge occupied" style="background:#fff1f2; color:#be123c; border:1px solid #fda4af; font-weight:700;"><i class="fas fa-triangle-exclamation"></i> Completed + Overstay</span>`;
+            badgeHtml = `<span class="status-badge occupied" style="background:#fff1f2; color:#be123c; border:1px solid #fda4af; font-weight:700;"><i class="fas fa-triangle-exclamation"></i> Overstay</span>`;
           } else if (st === 'completed') {
             badgeHtml = `<span class="status-badge completed">Completed</span>`;
           } else if (st === 'cancelled') {
@@ -2871,7 +2914,7 @@ async function loadParkingHistory(scope = currentHistoryScope) {
           const entryDisp = h.actual_entry_time ? formatHistoryTime(h.actual_entry_time) : (h.start_time || '—');
           const exitDisp = h.actual_exit_time ? formatHistoryTime(h.actual_exit_time) : (st === 'completed' ? (h.end_time || '—') : (st === 'cancelled' ? 'Cancelled' : 'In Session'));
           const durationDisp = h.parking_duration || h.duration || '—';
-          const overstayDisp = isOverstay ? `<span style="color:#e11d48; font-weight:700;">⚠️ ${h.overstay_duration_minutes || 0}m</span>` : '<span style="color:#94a3b8;">—</span>';
+          const overstayDisp = isOverstay ? `<span style="color:#e11d48; font-weight:700;">⚠️ ${formatOverstayDuration(h.overstay_duration_minutes || 0)}</span>` : '<span style="color:#94a3b8;">—</span>';
 
           return `
             <tr>
@@ -2920,7 +2963,7 @@ async function loadParkingHistory(scope = currentHistoryScope) {
           const isOverstay = h.is_overstay || (h.final_status && h.final_status.includes('Overstay'));
           let badgeHtml = '';
           if (isOverstay) {
-            badgeHtml = `<span class="status-badge occupied" style="background:#fff1f2; color:#be123c; border:1px solid #fda4af; font-weight:700;"><i class="fas fa-triangle-exclamation"></i> Completed + Overstay</span>`;
+            badgeHtml = `<span class="status-badge occupied" style="background:#fff1f2; color:#be123c; border:1px solid #fda4af; font-weight:700;"><i class="fas fa-triangle-exclamation"></i> Overstay</span>`;
           } else if (st === 'completed') {
             badgeHtml = `<span class="status-badge completed">Completed</span>`;
           } else if (st === 'cancelled') {
@@ -2934,7 +2977,7 @@ async function loadParkingHistory(scope = currentHistoryScope) {
           const entryDisp = h.actual_entry_time ? formatHistoryTime(h.actual_entry_time) : (h.start_time || '—');
           const exitDisp = h.actual_exit_time ? formatHistoryTime(h.actual_exit_time) : (st === 'completed' ? (h.end_time || '—') : (st === 'cancelled' ? 'Cancelled' : 'In Session'));
           const durationDisp = h.parking_duration || h.duration || '—';
-          const overstayDisp = isOverstay ? `<span style="color:#e11d48; font-weight:700;">⚠️ ${h.overstay_duration_minutes || 0}m</span>` : '<span style="color:#94a3b8;">—</span>';
+          const overstayDisp = isOverstay ? `<span style="color:#e11d48; font-weight:700;">⚠️ ${formatOverstayDuration(h.overstay_duration_minutes || 0)}</span>` : '<span style="color:#94a3b8;">—</span>';
 
           return `
             <tr>

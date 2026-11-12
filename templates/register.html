@@ -329,6 +329,52 @@
     const vehicleTypeInput = document.getElementById('regVehicleType');
     const termsCheckbox = document.getElementById('regTerms');
 
+    // Real-time blur validation helpers
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const pwdStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    function showFieldError(input, errorEl, msg) {
+      input.classList.add('is-invalid');
+      errorEl.textContent = msg;
+      errorEl.classList.add('visible');
+    }
+    function clearFieldError(input, errorEl) {
+      input.classList.remove('is-invalid');
+      errorEl.classList.remove('visible');
+    }
+
+    // Blur validators for real-time feedback
+    emailInput.addEventListener('blur', () => {
+      const v = emailInput.value.trim();
+      if (!v) showFieldError(emailInput, document.getElementById('emailError'), 'Email address is required.');
+      else if (!emailRegex.test(v)) showFieldError(emailInput, document.getElementById('emailError'), 'Please enter a valid email address.');
+      else clearFieldError(emailInput, document.getElementById('emailError'));
+    });
+
+    nameInput.addEventListener('blur', () => {
+      const v = nameInput.value.trim();
+      if (!v || v.length < 2) showFieldError(nameInput, document.getElementById('nameError'), 'Full name must be at least 2 characters.');
+      else clearFieldError(nameInput, document.getElementById('nameError'));
+    });
+
+    phoneInput.addEventListener('blur', () => {
+      const digits = phoneInput.value.replace(/\D/g, '');
+      if (digits.length < 10) showFieldError(phoneInput, document.getElementById('phoneError'), 'Enter a valid phone number with at least 10 digits.');
+      else clearFieldError(phoneInput, document.getElementById('phoneError'));
+    });
+
+    passwordInput.addEventListener('blur', () => {
+      const v = passwordInput.value;
+      if (!v || v.length < 8) showFieldError(passwordInput, document.getElementById('passwordError'), 'Password must be at least 8 characters.');
+      else if (!pwdStrong.test(v)) showFieldError(passwordInput, document.getElementById('passwordError'), 'Include uppercase, lowercase, number and special character.');
+      else clearFieldError(passwordInput, document.getElementById('passwordError'));
+    });
+
+    confirmInput.addEventListener('blur', () => {
+      if (confirmInput.value !== passwordInput.value) showFieldError(confirmInput, document.getElementById('confirmPasswordError'), 'Passwords do not match.');
+      else clearFieldError(confirmInput, document.getElementById('confirmPasswordError'));
+    });
+
     const nameError = document.getElementById('nameError');
     const emailError = document.getElementById('emailError');
     const phoneError = document.getElementById('phoneError');
@@ -355,42 +401,62 @@
       clearErrors();
       let hasError = false;
 
-      // Validate Email (auto-append domain if simple username provided)
+      // ── Email validation ──────────────────────────────────────────
       let emailVal = emailInput.value.trim().toLowerCase();
-      if (emailVal && !emailVal.includes('@')) {
-        emailVal = emailVal + '@smartparking.ai';
-        emailInput.value = emailVal;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailVal) {
+        emailInput.classList.add('is-invalid');
+        emailError.textContent = 'Email address is required.';
+        emailError.classList.add('visible');
+        hasError = true;
+      } else if (!emailRegex.test(emailVal)) {
+        emailInput.classList.add('is-invalid');
+        emailError.textContent = 'Please enter a valid email address (e.g. user@example.com).';
+        emailError.classList.add('visible');
+        hasError = true;
       }
 
-      // Validate Name (Required, reject empty or whitespace only)
-      let nameVal = nameInput.value.trim();
-      if (!nameVal) {
-        nameVal = emailVal ? emailVal.split('@')[0] : 'Test User';
-        nameInput.value = nameVal;
+      // ── Name validation ───────────────────────────────────────────
+      const nameVal = nameInput.value.trim();
+      if (!nameVal || nameVal.length < 2) {
+        nameInput.classList.add('is-invalid');
+        nameError.textContent = 'Full name must be at least 2 characters.';
+        nameError.classList.add('visible');
+        hasError = true;
       }
 
-      // Validate Phone (auto-default if missing or short)
-      let phoneVal = phoneInput.value.trim();
-      let digitsOnly = phoneVal.replace(/\D/g, '');
+      // ── Phone validation ──────────────────────────────────────────
+      const phoneVal = phoneInput.value.trim();
+      const digitsOnly = phoneVal.replace(/\D/g, '');
       if (!phoneVal || digitsOnly.length < 10) {
-        phoneInput.value = '9876543210';
-        phoneVal = '9876543210';
+        phoneInput.classList.add('is-invalid');
+        phoneError.textContent = 'Enter a valid phone number with at least 10 digits.';
+        phoneError.classList.add('visible');
+        hasError = true;
       }
 
-      // Validate Password: allow simple developer/test passwords (min 4 chars)
+      // ── Password validation ───────────────────────────────────────
       const pwdVal = passwordInput.value;
-      if (!pwdVal || pwdVal.length < 4) {
+      const pwdStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      if (!pwdVal || pwdVal.length < 8) {
         passwordInput.classList.add('is-invalid');
-        passwordError.textContent = 'Password must be at least 4 characters long.';
+        passwordError.textContent = 'Password must be at least 8 characters long.';
+        passwordError.classList.add('visible');
+        hasError = true;
+      } else if (!pwdStrong.test(pwdVal)) {
+        passwordInput.classList.add('is-invalid');
+        passwordError.textContent = 'Password must include uppercase, lowercase, a number, and a special character.';
         passwordError.classList.add('visible');
         hasError = true;
       }
 
-      // Validate Confirm Password (auto-fill if empty)
-      let confirmVal = confirmInput.value;
-      if (!confirmVal && pwdVal) {
-        confirmInput.value = pwdVal;
-        confirmVal = pwdVal;
+      // ── Confirm Password validation ───────────────────────────────
+      const confirmVal = confirmInput.value;
+      if (!confirmVal) {
+        confirmInput.classList.add('is-invalid');
+        confirmPasswordError.textContent = 'Please confirm your password.';
+        confirmPasswordError.classList.add('visible');
+        hasError = true;
       } else if (confirmVal !== pwdVal) {
         confirmInput.classList.add('is-invalid');
         confirmPasswordError.textContent = 'Passwords do not match.';
@@ -398,21 +464,32 @@
         hasError = true;
       }
 
-      // If vehicle number is provided, ensure vehicle type is selected
+      // ── Vehicle number validation (optional field) ────────────────
       const vehicleNumVal = vehicleNumInput.value.trim();
-      if (vehicleNumVal && !vehicleTypeInput.value) {
-        vehicleTypeInput.value = 'Car';
+      if (vehicleNumVal) {
+        // Allow formats like KA01AB1234, KA 01 AB 1234, MH12CD3456
+        const vehicleRegex = /^[A-Z]{2}[\s-]?\d{1,2}[\s-]?[A-Z]{1,3}[\s-]?\d{1,4}$/i;
+        if (!vehicleRegex.test(vehicleNumVal)) {
+          vehicleNumInput.classList.add('is-invalid');
+          vehicleNumberError.textContent = 'Enter a valid vehicle number (e.g. KA 01 AB 1234).';
+          vehicleNumberError.classList.add('visible');
+          hasError = true;
+        }
       }
 
-      // Auto-check Terms Checkbox if not checked
+      // ── Terms checkbox ────────────────────────────────────────────
       if (!termsCheckbox.checked) {
-        termsCheckbox.checked = true;
+        termsError.classList.add('visible');
+        hasError = true;
       }
 
       if (hasError) {
         e.preventDefault();
         clientErrorMessage.textContent = 'Please fix the highlighted errors before submitting.';
         clientErrorAlert.style.display = 'flex';
+        // Scroll to first error
+        const firstErr = registerForm.querySelector('.is-invalid');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     });
   </script>

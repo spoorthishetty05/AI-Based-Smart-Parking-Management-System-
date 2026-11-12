@@ -386,9 +386,15 @@
         }
       }
 
-      // Validate password
+      // Validate password - must not be empty, must have min 4 chars
       if (!passwordVal) {
         passwordInput.classList.add('is-invalid');
+        passwordError.textContent = 'Password is required.';
+        passwordError.classList.add('visible');
+        hasError = true;
+      } else if (passwordVal.length < 4) {
+        passwordInput.classList.add('is-invalid');
+        passwordError.textContent = 'Password must be at least 4 characters.';
         passwordError.classList.add('visible');
         hasError = true;
       }
@@ -397,6 +403,53 @@
         e.preventDefault();
         clientErrorMessage.textContent = 'Please fill in all required fields correctly.';
         clientErrorAlert.style.display = 'flex';
+        return;
+      }
+
+      // Show loading state on submit button
+      const submitBtn = document.getElementById('loginSubmitBtn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        const originalText = document.getElementById('submitBtnText').innerHTML;
+        document.getElementById('submitBtnText').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          document.getElementById('submitBtnText').innerHTML = originalText;
+        }, 5000);
+      }
+    });
+
+    // Real-time blur validation for login fields
+    emailInput.addEventListener('blur', () => {
+      if (!emailInput.value.trim()) {
+        emailInput.classList.add('is-invalid');
+        emailError.classList.add('visible');
+      } else {
+        emailInput.classList.remove('is-invalid');
+        emailError.classList.remove('visible');
+      }
+    });
+    passwordInput.addEventListener('blur', () => {
+      if (!passwordInput.value) {
+        passwordInput.classList.add('is-invalid');
+        passwordError.classList.add('visible');
+      } else {
+        passwordInput.classList.remove('is-invalid');
+        passwordError.classList.remove('visible');
+      }
+    });
+    emailInput.addEventListener('input', () => {
+      if (emailInput.value.trim()) {
+        emailInput.classList.remove('is-invalid');
+        emailError.classList.remove('visible');
+        if (clientErrorAlert) clientErrorAlert.style.display = 'none';
+      }
+    });
+    passwordInput.addEventListener('input', () => {
+      if (passwordInput.value) {
+        passwordInput.classList.remove('is-invalid');
+        passwordError.classList.remove('visible');
+        if (clientErrorAlert) clientErrorAlert.style.display = 'none';
       }
     });
 

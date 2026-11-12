@@ -41,7 +41,7 @@ VALID_SLOT_TYPES = {'standard', 'regular', 'ev', 'compact', 'disabled', 'accessi
 @lot_bp.route('/api/lots/search', methods=['GET'])
 def search_parking_lots():
     """Search parking lots by location, landmark, or lot name."""
-    query = request.args.get('q', '').strip().lower()
+    query = (request.args.get('q') or request.args.get('query') or '').strip().lower()
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""

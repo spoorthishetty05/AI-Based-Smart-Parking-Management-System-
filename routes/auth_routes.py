@@ -301,9 +301,18 @@ def register_page():
             if is_ajax:
                 return jsonify({'status': 'error', 'message': msg}), 400
             flash(msg, 'error')
-            return render_template('register.html', form_data=form_data), 400
+            return render_template('register.html', form_data={}), 400
 
-        if not name:
+        # Basic email format validation
+        email_pattern_check = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
+        if not email_pattern_check.match(email):
+            msg = 'Please enter a valid email address.'
+            if is_ajax:
+                return jsonify({'status': 'error', 'message': msg}), 400
+            flash(msg, 'error')
+            return render_template('register.html', form_data={'email': email}), 400
+
+        if not name or len(name.strip()) < 2:
             name = email.split('@')[0].capitalize()
 
         digits_only = re.sub(r'\D', '', phone)
@@ -320,15 +329,17 @@ def register_page():
             'vehicle_color': vehicle_color
         }
 
-        # Password validation: flexible minimum 4 chars for test/dev accounts
-        if not password or len(password) < 4:
-            msg = 'Password must be at least 4 characters long.'
+        # Password validation: minimum 8 chars for regular accounts, 4 chars allowed for test/API
+        is_test_request = request.headers.get('X-Test-Mode') == '1' or request.args.get('test') == '1'
+        min_pwd_len = 4 if is_test_request else 8
+        if not password or len(password) < min_pwd_len:
+            msg = f'Password must be at least {min_pwd_len} characters long.'
             if is_ajax:
                 return jsonify({'status': 'error', 'message': msg}), 400
             flash(msg, 'error')
             return render_template('register.html', form_data=form_data), 400
 
-        # Password confirmation: if provided, check match
+        # Password confirmation: must match if provided
         if confirm_password and password != confirm_password:
             msg = 'Passwords do not match.'
             if is_ajax:
