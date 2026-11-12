@@ -207,24 +207,6 @@
 
       </form>
 
-      <!-- Admin Credentials Helper (Shown on Admin Tab) -->
-      <div class="admin-cred-helper" id="adminCredHelper" {% if active_tab != 'admin' %}style="display:none;"{% endif %}>
-        <div>
-          <i class="fas fa-key" style="color: #d97706; margin-right: 4px;"></i>
-          Permanent Admin: <code>admin@smartparking.ai</code> &bull; <code>admin123</code>
-        </div>
-        <button type="button" class="btn-use-admin" onclick="fillAdminCredentials()">Auto-Fill</button>
-      </div>
-
-      <!-- Security Guard Credentials Helper (Shown on Security Tab) -->
-      <div class="admin-cred-helper security-cred-helper" id="securityCredHelper" {% if active_tab != 'security' %}style="display:none;"{% endif %}>
-        <div>
-          <i class="fas fa-shield-halved" style="color: #059669; margin-right: 4px;"></i>
-          Security Guard: <code>security@smartparking.ai</code> &bull; <code>security123</code>
-        </div>
-        <button type="button" class="btn-use-security" onclick="fillSecurityCredentials()">Auto-Fill</button>
-      </div>
-
       <!-- OR Divider (User Tab) -->
       <div class="auth-divider" id="userDivider" {% if active_tab in ('admin', 'security') %}style="display:none;"{% endif %}>
         <span>OR</span>
@@ -257,8 +239,6 @@
       const emailInput = document.getElementById('loginEmail');
       const passInput = document.getElementById('loginPassword');
       const submitText = document.getElementById('submitBtnText');
-      const adminHelper = document.getElementById('adminCredHelper');
-      const securityHelper = document.getElementById('securityCredHelper');
       const userDivider = document.getElementById('userDivider');
       const userFooter = document.getElementById('userRegisterFooter');
 
@@ -275,8 +255,6 @@
         emailInput.placeholder = 'admin@smartparking.ai';
         passInput.placeholder = 'Enter admin password';
         submitText.innerHTML = 'SIGN IN TO ADMIN CONSOLE &rarr;';
-        if (adminHelper) adminHelper.style.display = 'flex';
-        if (securityHelper) securityHelper.style.display = 'none';
         if (userDivider) userDivider.style.display = 'none';
         if (userFooter) userFooter.style.display = 'none';
       } else if (isSec) {
@@ -288,8 +266,6 @@
         emailInput.placeholder = 'security@smartparking.ai';
         passInput.placeholder = 'Enter security password';
         submitText.innerHTML = 'ACCESS SECURITY DASHBOARD &rarr;';
-        if (adminHelper) adminHelper.style.display = 'none';
-        if (securityHelper) securityHelper.style.display = 'flex';
         if (userDivider) userDivider.style.display = 'none';
         if (userFooter) userFooter.style.display = 'none';
       } else {
@@ -301,25 +277,9 @@
         emailInput.placeholder = 'Enter your registered email or username';
         passInput.placeholder = 'Enter your password';
         submitText.innerHTML = 'LOGIN TO ACCOUNT &rarr;';
-        if (adminHelper) adminHelper.style.display = 'none';
-        if (securityHelper) securityHelper.style.display = 'none';
         if (userDivider) userDivider.style.display = 'flex';
         if (userFooter) userFooter.style.display = 'block';
       }
-      clearErrors();
-    }
-
-    // Permanent Admin Auto-fill Helper
-    function fillAdminCredentials() {
-      document.getElementById('loginEmail').value = 'admin@smartparking.ai';
-      document.getElementById('loginPassword').value = 'admin123';
-      clearErrors();
-    }
-
-    // Security Guard Auto-fill Helper
-    function fillSecurityCredentials() {
-      document.getElementById('loginEmail').value = 'security@smartparking.ai';
-      document.getElementById('loginPassword').value = 'security123';
       clearErrors();
     }
 
