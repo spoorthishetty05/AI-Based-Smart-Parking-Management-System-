@@ -14,20 +14,16 @@ from pymongo import MongoClient, ASCENDING, DESCENDING, ReturnDocument
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 DEFAULT_MONGO_URI = os.getenv('MONGO_URI', 'mongodb://127.0.0.1:27017')
-DATABASE_NAME = 'smart_parking'
+DATABASE_NAME = os.getenv('MONGO_DB_NAME', 'smart_parking')
 DB_PATH = None  # SQLite completely removed
 
 _mongo_client_cache = None
 _mongo_uri_cache = None
 
 def get_mongo_client(uri=None):
-    """Returns a shared, verified MongoClient connected to local MongoDB Community Server."""
+    """Returns a shared, verified MongoClient connected to MongoDB (local or configured MONGO_URI)."""
     global _mongo_client_cache, _mongo_uri_cache
-    target_uri = uri or DEFAULT_MONGO_URI
-
-    # Strictly reject remote cloud URLs
-    if 'mongodb+srv' in target_uri or 'mongodb.net' in target_uri:
-        raise ValueError("Remote cloud database connections (MongoDB Atlas) are strictly disabled. Local MongoDB Community Server only.")
+    target_uri = uri or os.getenv('MONGO_URI') or DEFAULT_MONGO_URI
 
     if _mongo_client_cache is not None and _mongo_uri_cache == target_uri:
         try:
@@ -37,7 +33,7 @@ def get_mongo_client(uri=None):
             _mongo_client_cache = None
 
     try:
-        client = MongoClient(target_uri, serverSelectionTimeoutMS=3000, connectTimeoutMS=3000)
+        client = MongoClient(target_uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
         client.admin.command('ping')
         _mongo_client_cache = client
         _mongo_uri_cache = target_uri
@@ -45,15 +41,15 @@ def get_mongo_client(uri=None):
     except Exception as e:
         _mongo_client_cache = None
         raise ConnectionFailure(
-            f"Local MongoDB Community Server is unavailable at '{target_uri}'. "
-            "Please ensure MongoDB service is running locally on port 27017. "
-            "Cloud databases and local file fallbacks are strictly disabled."
+            f"MongoDB server is unavailable at '{target_uri}'. "
+            "Ensure local MongoDB is running or configure a valid MONGO_URI."
         ) from e
 
 def get_mongo_db(uri=None):
-    """Returns the smart_parking MongoDB database instance."""
+    """Returns the configured smart_parking MongoDB database instance."""
     client = get_mongo_client(uri)
-    return client[DATABASE_NAME]
+    db_name = os.getenv('MONGO_DB_NAME') or DATABASE_NAME
+    return client[db_name]
 
 def get_db():
     """Convenience alias returning the primary MongoDB database."""

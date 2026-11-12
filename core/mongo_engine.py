@@ -21,8 +21,8 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 MONGO_CACHE_PATH = None  # Disabled: Decoupled JSON fallback file strictly disallowed. Local MongoDB only.
 os.makedirs(DATA_DIR, exist_ok=True)
 
-DEFAULT_MONGO_URI = 'mongodb://127.0.0.1:27017'
-DATABASE_NAME = 'smart_parking'
+DEFAULT_MONGO_URI = os.getenv('MONGO_URI', 'mongodb://127.0.0.1:27017')
+DATABASE_NAME = os.getenv('MONGO_DB_NAME', 'smart_parking')
 
 # Detect pymongo availability
 PYMONGO_AVAILABLE = False
@@ -38,16 +38,12 @@ _client_cache = None
 _client_uri_cache = None
 
 def get_mongo_client(uri=None):
-    """Returns a shared, verified MongoClient connected to local MongoDB Community Server."""
+    """Returns a shared, verified MongoClient connected to MongoDB (local or configured MONGO_URI)."""
     global _client_cache, _client_uri_cache
     if not PYMONGO_AVAILABLE:
         return None
 
-    target_uri = uri or DEFAULT_MONGO_URI
-    
-    # Strictly reject remote cloud URLs
-    if 'mongodb+srv' in target_uri or 'mongodb.net' in target_uri:
-        raise ValueError("Remote cloud database connections (MongoDB Atlas) are strictly disabled. Local MongoDB Community Server only.")
+    target_uri = uri or os.getenv('MONGO_URI') or DEFAULT_MONGO_URI
 
     if _client_cache is not None and _client_uri_cache == target_uri:
         try:
@@ -57,7 +53,7 @@ def get_mongo_client(uri=None):
             _client_cache = None
 
     try:
-        client = MongoClient(target_uri, serverSelectionTimeoutMS=2000, connectTimeoutMS=2000)
+        client = MongoClient(target_uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
         client.admin.command('ping')
         _client_cache = client
         _client_uri_cache = target_uri
@@ -69,7 +65,8 @@ def get_mongo_db(uri=None):
     """Returns the smart_parking MongoDB database instance, or None if offline."""
     client = get_mongo_client(uri)
     if client is not None:
-        return client[DATABASE_NAME]
+        db_name = os.getenv('MONGO_DB_NAME') or DATABASE_NAME
+        return client[db_name]
     return None
 
 def get_mongo_connection(uri=None):
@@ -78,7 +75,7 @@ def get_mongo_connection(uri=None):
     Returns (client, db, is_connected, error_message).
     """
     if uri is None:
-        uri = DEFAULT_MONGO_URI
+        uri = os.getenv('MONGO_URI') or DEFAULT_MONGO_URI
 
     if not PYMONGO_AVAILABLE:
         return None, None, False, "PyMongo driver not installed in Python environment."
@@ -86,7 +83,8 @@ def get_mongo_connection(uri=None):
     try:
         client = get_mongo_client(uri)
         if client is not None:
-            db = client[DATABASE_NAME]
+            db_name = os.getenv('MONGO_DB_NAME') or DATABASE_NAME
+            db = client[db_name]
             return client, db, True, "Connected to live MongoDB server."
         else:
             return None, None, False, f"Could not connect to MongoDB server at '{uri}'."

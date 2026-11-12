@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: smart-parking-ai
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 4 --bind 0.0.0.0:$PORT --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB_NAME
+        value: smart_parking
+      - key: FLASK_ENV
+        value: production
+      - key: MAIL_SUPPRESS_SEND
+        value: "true"
+
