@@ -988,9 +988,6 @@ def mongo_create_booking(booking_data):
         'updated_at': now_str
     }
 
-    # Insert into bookings collection
-    db.bookings.insert_one(booking_doc)
-
     res_doc = {
         'reservation_id': res_seq,
         'booking_id': booking_id,
@@ -1040,7 +1037,21 @@ def mongo_create_booking(booking_data):
         'created_at': now_str,
         'updated_at': now_str
     }
-    db.reservations.insert_one(res_doc)
+
+    # Insert into bookings and reservations collections with rollback on failure
+    db.bookings.insert_one(booking_doc)
+    try:
+        db.reservations.insert_one(res_doc)
+    except Exception:
+        db.bookings.delete_one({'booking_id': booking_id})
+        db.parking_slots.update_one(
+            {'slot_id': slot_id},
+            {
+                '$pull': {'reserved_intervals': {'booking_id': booking_id}},
+                '$set': {'status': 'available', 'current_plate': None, 'current_reservation_id': None}
+            }
+        )
+        raise
 
     # Activity Log
     mongo_log_activity({

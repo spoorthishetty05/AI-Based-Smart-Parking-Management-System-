@@ -314,8 +314,12 @@ def api_security_spot_booking():
     end_str = end_dt.strftime('%Y-%m-%d %H:%M:%S')
     today_str = now_dt.strftime('%Y-%m-%d')
 
-    # Sequential Booking ID
-    new_bid = get_next_sequence('bookings')
+    # Sequential Booking ID (unique across both bookings and reservations)
+    while True:
+        new_bid = get_next_sequence('bookings')
+        if not db.bookings.find_one({'booking_id': new_bid}) and not db.reservations.find_one({'reservation_id': new_bid}):
+            break
+    db.counters.update_one({'_id': 'reservations'}, {'$max': {'seq': int(new_bid)}}, upsert=True)
     guard_name = session.get('user_name', 'Security Officer')
 
     booking_doc = {
@@ -495,7 +499,14 @@ def api_security_terminate_booking(booking_id):
 
     db.bookings.update_one({'_id': b['_id']}, {'$set': updates})
     try:
-        db.reservations.update_one({'reservation_id': b.get('booking_id')}, {'$set': updates})
+        db.reservations.update_one(
+            {'$or': [
+                {'reservation_id': b.get('reservation_id')},
+                {'reservation_id': b.get('booking_id')},
+                {'booking_id': b.get('booking_id')}
+            ]},
+            {'$set': updates}
+        )
     except Exception:
         pass
 
@@ -678,7 +689,14 @@ def api_security_update_booking(booking_id):
         updates['last_modified_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         db.bookings.update_one({'_id': b['_id']}, {'$set': updates})
         try:
-            db.reservations.update_one({'reservation_id': b.get('booking_id')}, {'$set': updates})
+            db.reservations.update_one(
+            {'$or': [
+                {'reservation_id': b.get('reservation_id')},
+                {'reservation_id': b.get('booking_id')},
+                {'booking_id': b.get('booking_id')}
+            ]},
+            {'$set': updates}
+        )
         except Exception:
             pass
 
