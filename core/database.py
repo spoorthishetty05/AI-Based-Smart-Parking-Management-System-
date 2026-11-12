@@ -59,16 +59,35 @@ def get_db():
     """Convenience alias returning the primary MongoDB database."""
     return get_mongo_db()
 
+_SEQUENCE_ID_FIELD_MAP = {
+    'users': 'user_id',
+    'vehicles': 'vehicle_id',
+    'parking_lots': 'lot_id',
+    'parking_slots': 'slot_id',
+    'reservations': 'reservation_id',
+    'overstay_records': 'overstay_id',
+    'notifications': 'notification_id',
+    'slot_exchange_requests': 'request_id',
+    'slot_exchange_listings': 'listing_id',
+    'slot_exchange_history': 'history_id',
+}
+
 def get_next_sequence(sequence_name):
-    """Atomically increments and returns the next sequential integer ID for an entity."""
+    """Atomically increments and returns the next unused sequential integer ID for an entity."""
     db = get_mongo_db()
-    ret = db.counters.find_one_and_update(
-        {'_id': sequence_name},
-        {'$inc': {'seq': 1}},
-        upsert=True,
-        return_document=ReturnDocument.AFTER
-    )
-    return int(ret['seq'])
+    id_field = _SEQUENCE_ID_FIELD_MAP.get(sequence_name)
+    while True:
+        ret = db.counters.find_one_and_update(
+            {'_id': sequence_name},
+            {'$inc': {'seq': 1}},
+            upsert=True,
+            return_document=ReturnDocument.AFTER
+        )
+        seq = int(ret['seq'])
+        if not id_field:
+            return seq
+        if not db[sequence_name].find_one({id_field: seq}, {'_id': 1}):
+            return seq
 
 def clean_doc(doc):
     """Converts a MongoDB document to a JSON-serializable dictionary without raw ObjectId."""
