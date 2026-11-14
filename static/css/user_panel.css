@@ -507,13 +507,14 @@ body.user-body {
 }
 
 .slot-box-2d.available {
-  border-color: #ec4899;
-  background: rgba(236, 72, 153, 0.1);
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
   cursor: pointer;
 }
 .slot-box-2d.available:hover {
-  background: rgba(236, 72, 153, 0.25);
-  box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+  background: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+  border-color: #34d399;
 }
 
 .slot-box-2d.occupied {
@@ -592,14 +593,14 @@ body.user-body {
 
 /* Eligible Exchange Slot Style */
 .slot-box-2d.eligible-exchange {
-  border: 2px dashed #ec4899;
-  background: rgba(236, 72, 153, 0.12);
+  border: 2px dashed #10b981;
+  background: rgba(16, 185, 129, 0.12);
   cursor: pointer;
 }
 .slot-box-2d.eligible-exchange:hover {
-  background: rgba(236, 72, 153, 0.28);
-  box-shadow: 0 0 18px rgba(236, 72, 153, 0.6);
-  border-color: #f472b6;
+  background: rgba(16, 185, 129, 0.28);
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.6);
+  border-color: #34d399;
   transform: translateY(-3px) scale(1.03);
 }
 
@@ -618,7 +619,7 @@ body.user-body {
 .slot-exchange-tag {
   font-size: 9px;
   font-weight: 800;
-  color: #f472b6;
+  color: #10b981;
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
@@ -641,9 +642,9 @@ body.user-body {
 }
 
 .slot-box-2d.selected-target {
-  border-color: #ec4899 !important;
-  background: rgba(236, 72, 153, 0.35) !important;
-  box-shadow: 0 0 25px rgba(236, 72, 153, 0.95) !important;
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.95) !important;
   transform: scale(1.06) !important;
   z-index: 5;
 }
@@ -714,9 +715,9 @@ body.user-body {
 }
 
 .slot-box-2d.available:hover .slot-box-empty-bay {
-  border-color: #ec4899;
-  color: #ec4899;
-  background: rgba(236, 72, 153, 0.12);
+  border-color: #10b981;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
 }
 
 .slot-box-status-tag {
@@ -747,7 +748,7 @@ body.user-body {
 .slot-available-tag {
   font-size: 9px;
   font-weight: 700;
-  color: #ec4899;
+  color: #10b981;
   letter-spacing: 0.5px;
 }
 

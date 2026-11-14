@@ -463,7 +463,7 @@ function renderDashboardNearbyLots(lots) {
         </div>
       </div>
       <div style="text-align:right;">
-        <span style="color:#ec4899; font-weight:800; font-size:13px;">${l.available_count || 0} Open</span>
+        <span style="color:#10b981; font-weight:800; font-size:13px;">${l.available_count || 0} Open</span>
       </div>
     </div>
   `;
@@ -670,7 +670,7 @@ async function searchParkingLots() {
             <div style="margin-top:14px; background:#f1f5f9; padding:12px 14px; border-radius:8px;">
               <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
                 <span style="font-weight:700; color:#0f172a;">Occupancy: ${occPct}%</span>
-                <span style="color:#ec4899; font-weight:800;"><i class="fas fa-circle-check"></i> ${l.available_count || 0} Slots Available</span>
+                <span style="color:#10b981; font-weight:800;"><i class="fas fa-circle-check"></i> ${l.available_count || 0} Slots Available</span>
               </div>
               <div style="height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden;">
                 <div style="height:100%; width:${occPct}%; background:${occPct > 80 ? '#ef4444' : (occPct > 50 ? '#f59e0b' : '#10b981')};"></div>

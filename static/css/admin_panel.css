@@ -511,7 +511,7 @@ body.admin-body {
   text-transform: capitalize;
 }
 
-.status-badge.available { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(52, 211, 153, 0.3); }
+.status-badge.available { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
 .status-badge.occupied { background: rgba(244, 63, 94, 0.18); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35); }
 .status-badge.reserved { background: rgba(251, 113, 133, 0.18); color: #f472b6; border: 1px solid rgba(251, 113, 133, 0.35); }
 .status-badge.maintenance, .status-badge.disabled { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(203, 213, 225, 0.3); }
@@ -689,7 +689,7 @@ body.admin-body {
   border-radius: 50%;
 }
 
-.dot-available { background: #ec4899; box-shadow: 0 0 8px rgba(236, 72, 153, 0.5); }
+.dot-available { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
 .dot-occupied { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
 .dot-reserved { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
 .dot-maintenance { background: #64748b; }
@@ -726,8 +726,8 @@ body.admin-body {
 }
 
 .slot-card-2d.status-available {
-  border-color: #ec4899;
-  background: rgba(236, 72, 153, 0.08);
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
 }
 .slot-card-2d.status-occupied {
   border-color: #ef4444;

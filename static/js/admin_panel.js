@@ -810,7 +810,7 @@ function renderLotsCards(lots) {
             <span style="color:#94a3b8;">Total Capacity: <strong style="color:#ffffff;">${l.total_slots} Slots</strong></span>
           </div>
           <div style="height:10px; background:#334155; border-radius:6px; overflow:hidden; display:flex;">
-            <div style="width:${Math.round((l.available_count || 0) / l.total_slots * 100)}%; background:#ec4899;" title="Available"></div>
+            <div style="width:${Math.round((l.available_count || 0) / l.total_slots * 100)}%; background:#10b981;" title="Available"></div>
             <div style="width:${Math.round((l.reserved_count || 0) / l.total_slots * 100)}%; background:#f59e0b;" title="Reserved"></div>
             <div style="width:${Math.round((l.occupied_count || 0) / l.total_slots * 100)}%; background:#ef4444;" title="Occupied"></div>
           </div>

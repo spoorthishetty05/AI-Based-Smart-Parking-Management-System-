@@ -12,9 +12,9 @@
   --primary-light: #fdf2f8;
   --primary-glow: rgba(236, 72, 153, 0.28);
   
-  --available: #ec4899;
-  --available-light: #fdf2f8;
-  --available-glow: rgba(236, 72, 153, 0.2);
+  --available: #10b981;
+  --available-light: #ecfdf5;
+  --available-glow: rgba(16, 185, 129, 0.2);
 
   --occupied: #f43f5e;
   --occupied-light: #fff1f2;
