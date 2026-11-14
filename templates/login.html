@@ -323,22 +323,52 @@
       // Validate email or username
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const roleTab = document.getElementById('loginTypeInput').value;
+      const lowerEmail = emailVal.toLowerCase();
+
       if (roleTab === 'admin') {
-        if (!emailVal || !emailRegex.test(emailVal)) {
+        if (lowerEmail === 'security@smartparking.ai' || lowerEmail.startsWith('security@') || lowerEmail.startsWith('guard@')) {
+          emailInput.classList.add('is-invalid');
+          emailError.textContent = 'Security accounts cannot log in here. Please use the Security Guard tab.';
+          emailError.classList.add('visible');
+          clientErrorMessage.textContent = 'Access Denied: Security personnel cannot log into the Admin Portal. Please use the Security Guard tab.';
+          clientErrorAlert.style.display = 'flex';
+          hasError = true;
+        } else if (!emailVal || !emailRegex.test(emailVal)) {
           emailInput.classList.add('is-invalid');
           emailError.textContent = 'Please enter a valid administrator email.';
           emailError.classList.add('visible');
           hasError = true;
         }
       } else if (roleTab === 'security') {
-        if (!emailVal) {
+        if (lowerEmail === 'admin@smartparking.ai' || lowerEmail.startsWith('admin@')) {
+          emailInput.classList.add('is-invalid');
+          emailError.textContent = 'Admin accounts cannot log in here. Please use the Admin Portal tab.';
+          emailError.classList.add('visible');
+          clientErrorMessage.textContent = 'Access Denied: Administrators cannot log into the Security Guard portal. Please use the Admin Portal tab.';
+          clientErrorAlert.style.display = 'flex';
+          hasError = true;
+        } else if (!emailVal) {
           emailInput.classList.add('is-invalid');
           emailError.textContent = 'Please enter your security guard email or username.';
           emailError.classList.add('visible');
           hasError = true;
         }
       } else {
-        if (!emailVal) {
+        if (lowerEmail === 'admin@smartparking.ai' || lowerEmail.startsWith('admin@')) {
+          emailInput.classList.add('is-invalid');
+          emailError.textContent = 'Admin accounts cannot log in here. Please use the Admin Portal tab.';
+          emailError.classList.add('visible');
+          clientErrorMessage.textContent = 'Access Denied: Administrators cannot log into the User Login portal. Please use the Admin Portal tab.';
+          clientErrorAlert.style.display = 'flex';
+          hasError = true;
+        } else if (lowerEmail === 'security@smartparking.ai' || lowerEmail.startsWith('security@') || lowerEmail.startsWith('guard@')) {
+          emailInput.classList.add('is-invalid');
+          emailError.textContent = 'Security accounts cannot log in here. Please use the Security Guard tab.';
+          emailError.classList.add('visible');
+          clientErrorMessage.textContent = 'Access Denied: Security Guards cannot log into the User Login portal. Please use the Security Guard tab.';
+          clientErrorAlert.style.display = 'flex';
+          hasError = true;
+        } else if (!emailVal) {
           emailInput.classList.add('is-invalid');
           emailError.textContent = 'Please enter your registered email or username.';
           emailError.classList.add('visible');

@@ -138,25 +138,48 @@ def login_page():
                     user_agent=request.headers.get('User-Agent'),
                     status='forbidden_admin_access_denied'
                 )
-                msg = 'Access Denied: This account is registered as a Driver/User, not an Administrator. Please use the User Login tab.'
+                if user.get('role') in ('security', 'guard'):
+                    msg = 'Access Denied: Security Guards cannot log into the Admin Portal. Please use the Security Guard tab.'
+                else:
+                    msg = 'Access Denied: Drivers/Users cannot log into the Admin Portal. Please use the User Login tab.'
                 if is_ajax:
                     return jsonify({'status': 'error', 'message': msg}), 403
                 flash(msg, 'error')
                 return render_template('login.html', active_tab='admin', email=email), 403
 
-            # Handle non-security attempting to log into Security Portal
-            if active_tab == 'security' and user.get('role') not in ('security', 'guard', 'admin'):
+            # Handle non-security attempting to log into Security Portal (neither drivers nor admins allowed)
+            if active_tab == 'security' and user.get('role') not in ('security', 'guard'):
                 mongo_record_login(
                     user_info=dict(user),
                     ip_address=request.remote_addr,
                     user_agent=request.headers.get('User-Agent'),
                     status='forbidden_security_access_denied'
                 )
-                msg = 'Access Denied: This account is not authorized as a Security Guard. Please use the User Login tab.'
+                if user.get('role') == 'admin':
+                    msg = 'Access Denied: Administrators cannot log into the Security Guard portal. Please use the Admin Portal tab.'
+                else:
+                    msg = 'Access Denied: Drivers/Users cannot log into the Security Guard portal. Please use the User Login tab.'
                 if is_ajax:
                     return jsonify({'status': 'error', 'message': msg}), 403
                 flash(msg, 'error')
                 return render_template('login.html', active_tab='security', email=email), 403
+
+            # Handle admin or security attempting to log into User Login Portal
+            if active_tab == 'user' and user.get('role') in ('admin', 'security', 'guard'):
+                mongo_record_login(
+                    user_info=dict(user),
+                    ip_address=request.remote_addr,
+                    user_agent=request.headers.get('User-Agent'),
+                    status='forbidden_user_portal_role_mismatch'
+                )
+                if user.get('role') == 'admin':
+                    msg = 'Access Denied: Administrators cannot log into the User Login portal. Please use the Admin Portal tab.'
+                else:
+                    msg = 'Access Denied: Security Guards cannot log into the User Login portal. Please use the Security Guard tab.'
+                if is_ajax:
+                    return jsonify({'status': 'error', 'message': msg}), 403
+                flash(msg, 'error')
+                return render_template('login.html', active_tab='user', email=email), 403
 
             # Check if user account has been deactivated
             if user.get('is_active') == 0:
@@ -597,7 +620,31 @@ def api_auth_login():
                 user_agent=request.headers.get('User-Agent'),
                 status='forbidden_admin_access_denied'
             )
-            return jsonify({'status': 'error', 'message': 'Access Denied: Administrator privileges required. Please use User Login.'}), 403
+            if user.get('role') in ('security', 'guard'):
+                return jsonify({'status': 'error', 'message': 'Access Denied: Security Guards cannot log into the Admin Portal. Please use the Security Guard tab.'}), 403
+            return jsonify({'status': 'error', 'message': 'Access Denied: Drivers/Users cannot log into the Admin Portal. Please use the User Login tab.'}), 403
+
+        if login_type == 'security' and user.get('role') not in ('security', 'guard'):
+            mongo_record_login(
+                user_info=dict(user),
+                ip_address=request.remote_addr,
+                user_agent=request.headers.get('User-Agent'),
+                status='forbidden_security_access_denied'
+            )
+            if user.get('role') == 'admin':
+                return jsonify({'status': 'error', 'message': 'Access Denied: Administrators cannot log into the Security Guard portal. Please use the Admin Portal tab.'}), 403
+            return jsonify({'status': 'error', 'message': 'Access Denied: Drivers/Users cannot log into the Security Guard portal. Please use the User Login tab.'}), 403
+
+        if login_type == 'user' and user.get('role') in ('admin', 'security', 'guard'):
+            mongo_record_login(
+                user_info=dict(user),
+                ip_address=request.remote_addr,
+                user_agent=request.headers.get('User-Agent'),
+                status='forbidden_user_portal_role_mismatch'
+            )
+            if user.get('role') == 'admin':
+                return jsonify({'status': 'error', 'message': 'Access Denied: Administrators cannot log into the User Login portal. Please use the Admin Portal tab.'}), 403
+            return jsonify({'status': 'error', 'message': 'Access Denied: Security Guards cannot log into the User Login portal. Please use the Security Guard tab.'}), 403
 
         if user.get('is_active') == 0:
             return jsonify({'status': 'error', 'message': 'Account is deactivated. Please contact support.'}), 403
