@@ -95,6 +95,9 @@ def api_update_user_profile():
     if not name:
         return jsonify({'status': 'error', 'message': 'Full name cannot be empty.'}), 400
 
+    if not re.match(r'^[a-zA-Z\s]+$', name):
+        return jsonify({'status': 'error', 'message': 'Full name must contain alphabets only. Digits and special characters are not allowed.'}), 400
+
     conn = get_db_connection()
     cursor = conn.cursor()
 

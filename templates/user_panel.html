@@ -274,7 +274,7 @@
               <form onsubmit="submitUpdateProfile(event)">
                 <div class="user-form-group">
                   <label class="user-form-label">Full Name</label>
-                  <input type="text" id="profileName" class="user-form-input" required>
+                  <input type="text" id="profileName" class="user-form-input" pattern="^[A-Za-z\s]+$" title="Full name must contain alphabets and spaces only." required>
                 </div>
                 <div class="user-form-group">
                   <label class="user-form-label">Email Address</label>

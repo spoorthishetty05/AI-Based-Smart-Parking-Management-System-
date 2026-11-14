@@ -335,8 +335,23 @@ def register_page():
             flash(msg, 'error')
             return render_template('register.html', form_data={'email': email}), 400
 
-        if not name or len(name.strip()) < 2:
-            name = email.split('@')[0].capitalize()
+        name_clean = name.strip()
+        name_alpha_pattern = re.compile(r'^[a-zA-Z\s]+$')
+        if not name_clean or len(name_clean) < 2:
+            msg = 'Full Name is required and must be at least 2 characters.'
+            if is_ajax:
+                return jsonify({'status': 'error', 'message': msg}), 400
+            flash(msg, 'error')
+            return render_template('register.html', form_data=dict(req_data)), 400
+
+        if not name_alpha_pattern.match(name_clean):
+            msg = 'Full Name must contain alphabets only. Digits and special characters are not allowed.'
+            if is_ajax:
+                return jsonify({'status': 'error', 'message': msg}), 400
+            flash(msg, 'error')
+            return render_template('register.html', form_data=dict(req_data)), 400
+
+        name = name_clean
 
         digits_only = re.sub(r'\D', '', phone)
         if not phone or len(digits_only) < 10:
@@ -725,6 +740,9 @@ def api_auth_register():
 
     if not name or not email:
         return jsonify({'status': 'error', 'message': 'Name and Email are required fields.'}), 400
+
+    if not re.match(r'^[a-zA-Z\s]+$', name):
+        return jsonify({'status': 'error', 'message': 'Full Name must contain alphabets only. Digits and special characters are not allowed.'}), 400
 
     try:
         db = get_mongo_db()

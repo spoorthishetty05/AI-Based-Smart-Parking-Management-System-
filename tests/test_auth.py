@@ -117,5 +117,19 @@ class TestAuthenticationModule(unittest.TestCase):
         res = client.get('/logout')
         self.assertIn(res.status_code, (200, 302))
 
+    def test_07_fullname_alphabets_only_validation(self):
+        """Full Name must only accept alphabets and spaces, rejecting digits and special characters."""
+        invalid_names = ['..7885252', 'John123', 'Alice@Wonderland', 'User_1']
+        for bad_name in invalid_names:
+            res = self.client.post('/register', json={
+                'name': bad_name,
+                'email': 'driver_alpha_test@smartparking.edu',
+                'password': 'Password@123',
+                'phone': '9876543210'
+            })
+            self.assertEqual(res.status_code, 400)
+            data = res.get_json() or {}
+            self.assertIn('alphabets only', data.get('message', '').lower())
+
 if __name__ == '__main__':
     unittest.main()

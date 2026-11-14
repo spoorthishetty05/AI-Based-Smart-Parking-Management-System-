@@ -1689,7 +1689,7 @@
         <div class="admin-modal-body">
           <div class="admin-form-group">
             <label class="admin-form-label">Guard Officer Full Name *</label>
-            <input type="text" id="addGuardName" class="admin-form-input" placeholder="e.g. Guard Ramesh Kumar" required>
+            <input type="text" id="addGuardName" class="admin-form-input" placeholder="e.g. Guard Ramesh Kumar" pattern="^[A-Za-z\s]+$" title="Full name must contain alphabets and spaces only." required>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="admin-form-group">

@@ -549,6 +549,9 @@ def api_admin_create_guard():
     if not name or not email:
         return jsonify({'status': 'error', 'message': 'Guard Name and Email are required.'}), 400
 
+    if not re.match(r'^[a-zA-Z\s]+$', name):
+        return jsonify({'status': 'error', 'message': 'Guard Name must contain alphabets only. Digits and special characters are not allowed.'}), 400
+
     db = get_mongo_db()
     if db is None:
         return jsonify({'status': 'error', 'message': 'Database offline'}), 503
