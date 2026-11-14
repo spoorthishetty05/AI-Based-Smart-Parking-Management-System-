@@ -604,7 +604,29 @@ def update_system_settings():
 def export_reports_csv():
     """Exports system reservations and parking utilization from MongoDB as a downloadable CSV."""
     db = get_mongo_db()
-    reservations = list(db.reservations.find().sort('reservation_id', -1))
+    
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    days_arg = request.args.get('days')
+
+    if not (start_date and end_date) and days_arg:
+        try:
+            days = int(days_arg)
+            today = datetime.now()
+            if days == 1:
+                start_date = today.strftime('%Y-%m-%d')
+                end_date = start_date
+            elif days > 1:
+                start_date = (today - timedelta(days=days - 1)).strftime('%Y-%m-%d')
+                end_date = today.strftime('%Y-%m-%d')
+        except ValueError:
+            pass
+
+    query = {}
+    if start_date and end_date:
+        query['date'] = {'$gte': start_date, '$lte': end_date}
+
+    reservations = list(db.reservations.find(query).sort('reservation_id', -1))
 
     users_map = {u.get('user_id'): u.get('name', 'User') for u in db.users.find()}
     slots_map = {s.get('slot_id'): s for s in db.parking_slots.find()}

@@ -1764,9 +1764,99 @@ async function moderateExchange(requestId, action) {
    MODULE 7: REPORTS & ANALYTICS
    ========================================================================== */
 
-async function loadAdminReports() {
+let currentReportDays = 7;
+let currentReportCustomStart = null;
+let currentReportCustomEnd = null;
+
+function toggleReportDateDropdown(e) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const menu = document.getElementById('repDateRangeDropdown');
+  const chevron = document.getElementById('repDateChevron');
+  if (!menu) return;
+  const isShown = menu.style.display === 'block';
+  menu.style.display = isShown ? 'none' : 'block';
+  if (chevron) {
+    chevron.style.transform = isShown ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+}
+
+function setReportDateRange(days, label, btnElem) {
+  currentReportDays = days;
+  currentReportCustomStart = null;
+  currentReportCustomEnd = null;
+
+  document.querySelectorAll('.rep-date-option').forEach(btn => btn.classList.remove('active'));
+  if (btnElem) btnElem.classList.add('active');
+
+  const menu = document.getElementById('repDateRangeDropdown');
+  const chevron = document.getElementById('repDateChevron');
+  if (menu) menu.style.display = 'none';
+  if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+  loadAdminReports(days);
+}
+
+function applyCustomReportDateRange() {
+  const startInput = document.getElementById('repCustomStartDate');
+  const endInput = document.getElementById('repCustomEndDate');
+  if (!startInput || !endInput) return;
+
+  const startDate = startInput.value;
+  const endDate = endInput.value;
+
+  if (!startDate || !endDate) {
+    showToast('Please select both start and end dates', 'warning');
+    return;
+  }
+  if (startDate > endDate) {
+    showToast('Start date cannot be after end date', 'warning');
+    return;
+  }
+
+  currentReportCustomStart = startDate;
+  currentReportCustomEnd = endDate;
+  currentReportDays = null;
+
+  document.querySelectorAll('.rep-date-option').forEach(btn => btn.classList.remove('active'));
+
+  const menu = document.getElementById('repDateRangeDropdown');
+  const chevron = document.getElementById('repDateChevron');
+  if (menu) menu.style.display = 'none';
+  if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+  loadAdminReports(null, startDate, endDate);
+}
+
+// Click outside handler for reports date dropdown
+document.addEventListener('click', (e) => {
+  const container = document.querySelector('.rep-date-range-container');
+  const menu = document.getElementById('repDateRangeDropdown');
+  const chevron = document.getElementById('repDateChevron');
+  if (menu && menu.style.display === 'block') {
+    if (!container || !container.contains(e.target)) {
+      menu.style.display = 'none';
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+  }
+});
+
+async function loadAdminReports(days = currentReportDays, startDate = currentReportCustomStart, endDate = currentReportCustomEnd) {
   try {
-    const res = await fetch('/api/reports/summary');
+    let url = '/api/reports/summary';
+    const params = new URLSearchParams();
+    if (startDate && endDate) {
+      params.append('start_date', startDate);
+      params.append('end_date', endDate);
+    } else if (days !== null && days !== undefined) {
+      params.append('days', days);
+    }
+    const query = params.toString();
+    if (query) url += `?${query}`;
+
+    const res = await fetch(url);
     const data = await res.json();
     if (data.status === 'success') {
       // 1. Top 4 KPI Cards
@@ -1795,11 +1885,15 @@ async function loadAdminReports() {
         if (miniDur) miniDur.textContent = data.overstay_summary.avg_duration || '0m';
       }
 
-      // Update date range banner if labels exist
+      // Update date range banner
       const dateRangeDisp = document.getElementById('repDateRangeDisplay');
-      if (dateRangeDisp && data.trend && Array.isArray(data.trend.labels) && data.trend.labels.length > 0) {
-        const lbls = data.trend.labels;
-        dateRangeDisp.innerHTML = `${lbls[0]} &nbsp;–&nbsp; ${lbls[lbls.length - 1]}`;
+      if (dateRangeDisp) {
+        if (data.date_range_label) {
+          dateRangeDisp.innerHTML = data.date_range_label;
+        } else if (data.trend && Array.isArray(data.trend.labels) && data.trend.labels.length > 0) {
+          const lbls = data.trend.labels;
+          dateRangeDisp.innerHTML = `${lbls[0]} &nbsp;–&nbsp; ${lbls[lbls.length - 1]}`;
+        }
       }
 
       // 3. Render 3 Charts
@@ -2130,7 +2224,17 @@ function renderReportsStatusDonut(breakdownData) {
 }
 
 function downloadReportsCSV() {
-  window.location.href = '/api/reports/export-csv';
+  let url = '/api/reports/export-csv';
+  const params = new URLSearchParams();
+  if (currentReportCustomStart && currentReportCustomEnd) {
+    params.append('start_date', currentReportCustomStart);
+    params.append('end_date', currentReportCustomEnd);
+  } else if (currentReportDays !== null && currentReportDays !== undefined) {
+    params.append('days', currentReportDays);
+  }
+  const query = params.toString();
+  if (query) url += `?${query}`;
+  window.location.href = url;
 }
 
 /* ==========================================================================
