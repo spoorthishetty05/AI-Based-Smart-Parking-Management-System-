@@ -1057,10 +1057,54 @@
           <!-- Filter & Action Bar (Date Range + Export Report) -->
           <div class="rep-header-bar">
             <div class="rep-actions-wrap">
-              <div class="rep-date-range-box" title="Select Report Date Range">
-                <i class="far fa-calendar"></i>
-                <span id="repDateRangeDisplay">Live System Analytics</span>
-                <i class="fas fa-chevron-down" style="font-size:10px;"></i>
+              <div class="rep-date-range-container">
+                <div class="rep-date-range-box" id="repDateRangeBox" onclick="toggleReportDateDropdown(event)" title="Click to filter by date range">
+                  <i class="far fa-calendar"></i>
+                  <span id="repDateRangeDisplay">Live System Analytics</span>
+                  <i class="fas fa-chevron-down" id="repDateChevron" style="font-size:10px; transition: transform 0.2s;"></i>
+                </div>
+                <!-- Interactive Date Range Dropdown Menu -->
+                <div class="rep-date-dropdown-menu" id="repDateRangeDropdown" style="display:none;" onclick="event.stopPropagation()">
+                  <div class="rep-date-dropdown-header">
+                    <i class="fas fa-calendar-alt"></i> Select Time Range
+                  </div>
+                  <div class="rep-date-dropdown-list">
+                    <button type="button" class="rep-date-option active" data-days="7" onclick="setReportDateRange(7, 'Last 7 Days', this)">
+                      <span><i class="fas fa-calendar-week"></i> Last 7 Days (Default)</span>
+                      <i class="fas fa-check checkmark"></i>
+                    </button>
+                    <button type="button" class="rep-date-option" data-days="1" onclick="setReportDateRange(1, 'Today', this)">
+                      <span><i class="fas fa-calendar-day"></i> Today</span>
+                      <i class="fas fa-check checkmark"></i>
+                    </button>
+                    <button type="button" class="rep-date-option" data-days="14" onclick="setReportDateRange(14, 'Last 14 Days', this)">
+                      <span><i class="fas fa-calendar"></i> Last 14 Days</span>
+                      <i class="fas fa-check checkmark"></i>
+                    </button>
+                    <button type="button" class="rep-date-option" data-days="30" onclick="setReportDateRange(30, 'Last 30 Days', this)">
+                      <span><i class="fas fa-calendar-alt"></i> Last 30 Days</span>
+                      <i class="fas fa-check checkmark"></i>
+                    </button>
+                    <button type="button" class="rep-date-option" data-days="90" onclick="setReportDateRange(90, 'Last 3 Months', this)">
+                      <span><i class="fas fa-history"></i> Last 3 Months</span>
+                      <i class="fas fa-check checkmark"></i>
+                    </button>
+                    <button type="button" class="rep-date-option" data-days="0" onclick="setReportDateRange(0, 'All Time', this)">
+                      <span><i class="fas fa-globe"></i> All Time (Full History)</span>
+                      <i class="fas fa-check checkmark"></i>
+                    </button>
+                  </div>
+                  <!-- Custom Date Picker in Dropdown -->
+                  <div class="rep-date-custom-section">
+                    <div class="rep-date-custom-title">Or Custom Range</div>
+                    <div class="rep-date-custom-inputs">
+                      <input type="date" id="repCustomStartDate" class="rep-custom-date-input" title="Start Date">
+                      <span style="color:#64748b; font-size:12px;">to</span>
+                      <input type="date" id="repCustomEndDate" class="rep-custom-date-input" title="End Date">
+                      <button type="button" class="btn-rep-apply-date" onclick="applyCustomReportDateRange()">Apply</button>
+                    </div>
+                  </div>
+                </div>
               </div>
               <button class="btn-export-report" onclick="downloadReportsCSV()" title="Download CSV Report">
                 <i class="fas fa-download"></i> Export Report

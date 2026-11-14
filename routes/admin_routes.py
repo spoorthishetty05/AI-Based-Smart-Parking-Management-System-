@@ -749,11 +749,66 @@ def get_reports_summary():
     eda = get_eda_metrics()
     db = get_mongo_db()
 
+    # Support flexible time range filtering
+    days_arg = request.args.get('days')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    today = datetime.now()
+    today_str = today.strftime('%Y-%m-%d')
+
+    target_dates = []
+    date_range_label = None
+
+    if start_date and end_date:
+        try:
+            s_dt = datetime.strptime(start_date, '%Y-%m-%d')
+            e_dt = datetime.strptime(end_date, '%Y-%m-%d')
+            delta = (e_dt - s_dt).days + 1
+            if delta > 0:
+                target_dates = [(s_dt + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(min(delta, 180))]
+                date_range_label = f"{s_dt.strftime('%d %b')} – {e_dt.strftime('%d %b')}"
+        except Exception:
+            target_dates = []
+            date_range_label = None
+
+    if not target_dates and days_arg is not None:
+        try:
+            days = int(days_arg)
+            if days == 0:
+                target_dates = []
+                date_range_label = "All Time (Full History)"
+            elif days == 1:
+                target_dates = [today_str]
+                date_range_label = f"Today ({today.strftime('%d %b')})"
+            elif days > 1:
+                days = min(365, days)
+                target_dates = [(today - timedelta(days=d)).strftime('%Y-%m-%d') for d in range(days - 1, -1, -1)]
+                date_range_label = f"{(today - timedelta(days=days - 1)).strftime('%d %b')} – {today.strftime('%d %b')}"
+        except ValueError:
+            target_dates = []
+
+    if not target_dates and date_range_label is None:
+        # Default 7 days
+        days = 7
+        target_dates = [(today - timedelta(days=d)).strftime('%Y-%m-%d') for d in range(6, -1, -1)]
+        date_range_label = f"{(today - timedelta(days=6)).strftime('%d %b')} – {today.strftime('%d %b')}"
+
     reservations = list(db.reservations.find())
-    total_bookings = len(reservations)
+    
+    # Active window filter
+    if target_dates:
+        t_set = set(target_dates)
+        active_reservations = [r for r in reservations if r.get('date') in t_set]
+    else:
+        active_reservations = reservations
+
+    total_bookings = len(active_reservations) if active_reservations or not reservations else len(reservations)
 
     # Revenue estimation
-    parking_rev = sum(float(r.get('total_amount', 0.0) or 0.0) for r in reservations if r.get('status') != 'cancelled')
+    parking_rev = sum(float(r.get('total_amount', 0.0) or 0.0) for r in active_reservations if r.get('status') != 'cancelled')
+    if parking_rev == 0 and not active_reservations and reservations:
+        parking_rev = sum(float(r.get('total_amount', 0.0) or 0.0) for r in reservations if r.get('status') != 'cancelled')
 
     # Overstay penalty revenue
     overstays = list(db.overstay_records.find())
@@ -772,7 +827,7 @@ def get_reports_summary():
 
     # Top utilized slots
     slot_counts = {}
-    for r in reservations:
+    for r in (active_reservations or reservations):
         s_id = r.get('slot_id')
         if s_id is not None:
             slot_counts[s_id] = slot_counts.get(s_id, 0) + 1
@@ -810,7 +865,7 @@ def get_reports_summary():
     confirmed_cnt = 0
     cancelled_cnt = 0
     overstay_cnt = 0
-    for r in reservations:
+    for r in (active_reservations or reservations):
         st = (r.get('status') or '').lower()
         if st in ['completed']:
             completed_cnt += 1
@@ -824,9 +879,9 @@ def get_reports_summary():
     if overstay_count > overstay_cnt:
         overstay_cnt = overstay_count
 
-    total_for_donut = max(1, total_bookings)
+    total_for_donut = max(1, len(active_reservations or reservations))
     booking_breakdown = {
-        'total': total_bookings,
+        'total': total_for_donut,
         'completed': {'pct': round(completed_cnt / total_for_donut * 100), 'count': completed_cnt, 'color': '#10b981'},
         'confirmed': {'pct': round(confirmed_cnt / total_for_donut * 100), 'count': confirmed_cnt, 'color': '#38bdf8'},
         'cancelled': {'pct': round(cancelled_cnt / total_for_donut * 100), 'count': cancelled_cnt, 'color': '#f97316'},
@@ -834,30 +889,42 @@ def get_reports_summary():
     }
 
     # Trend calculation
-    today = datetime.now()
     labels = []
     b_trend = []
     r_trend = []
-    for d_offset in range(6, -1, -1):
-        dt = today - timedelta(days=d_offset)
-        d_str = dt.strftime('%Y-%m-%d')
-        labels.append(dt.strftime('%d %b'))
-        day_res = [r for r in reservations if r.get('date') == d_str]
-        b_trend.append(len(day_res))
-        day_rev = sum(float(r.get('total_amount', 0.0) or 0.0) for r in day_res if r.get('status') != 'cancelled')
-        r_trend.append(int(day_rev))
+    if target_dates:
+        for d_str in target_dates:
+            dt_obj = datetime.strptime(d_str, '%Y-%m-%d')
+            labels.append(dt_obj.strftime('%d %b'))
+            day_res = [r for r in reservations if r.get('date') == d_str]
+            b_trend.append(len(day_res))
+            day_rev = sum(float(r.get('total_amount', 0.0) or 0.0) for r in day_res if r.get('status') != 'cancelled')
+            r_trend.append(int(day_rev))
 
-    if sum(b_trend) == 0 and total_bookings > 0:
+        if sum(b_trend) == 0 and len(reservations) > 0 and len(target_dates) == 7 and not (start_date and end_date):
+            date_counts = {}
+            date_revs = {}
+            for r in reservations:
+                d_val = r.get('date') or today_str
+                date_counts[d_val] = date_counts.get(d_val, 0) + 1
+                if r.get('status') != 'cancelled':
+                    date_revs[d_val] = date_revs.get(d_val, 0.0) + float(r.get('total_amount', 0.0) or 0.0)
+            sorted_dates = sorted(date_counts.keys())[-7:]
+            labels = [datetime.strptime(sd, '%Y-%m-%d').strftime('%d %b') if '-' in sd else sd for sd in sorted_dates]
+            b_trend = [date_counts[sd] for sd in sorted_dates]
+            r_trend = [int(date_revs.get(sd, 0.0)) for sd in sorted_dates]
+            date_range_label = f"{labels[0]} – {labels[-1]}"
+    else:
         date_counts = {}
         date_revs = {}
         for r in reservations:
-            d_val = r.get('date') or today.strftime('%Y-%m-%d')
+            d_val = r.get('date') or today_str
             date_counts[d_val] = date_counts.get(d_val, 0) + 1
             if r.get('status') != 'cancelled':
                 date_revs[d_val] = date_revs.get(d_val, 0.0) + float(r.get('total_amount', 0.0) or 0.0)
-        sorted_dates = sorted(date_counts.keys())[-7:]
+        sorted_dates = sorted(date_counts.keys())[-14:] if date_counts else [today_str]
         labels = [datetime.strptime(sd, '%Y-%m-%d').strftime('%d %b') if '-' in sd else sd for sd in sorted_dates]
-        b_trend = [date_counts[sd] for sd in sorted_dates]
+        b_trend = [date_counts.get(sd, 0) for sd in sorted_dates]
         r_trend = [int(date_revs.get(sd, 0.0)) for sd in sorted_dates]
 
     # Recent Overstay Records from MongoDB
@@ -889,6 +956,7 @@ def get_reports_summary():
     return jsonify({
         'status': 'success',
         'eda': eda,
+        'date_range_label': date_range_label,
         'total_bookings': total_bookings,
         'current_occupancy': occ_pct,
         'total_revenue': total_rev,
