@@ -123,7 +123,7 @@
     <main class="user-main">
       <header class="user-topbar">
         <div class="user-topbar-title">
-          <i class="fas fa-ticket" style="color:#2563eb;"></i> My Parking Reservations
+          <i class="fas fa-ticket" style="color:#ec4899;"></i> My Parking Reservations
         </div>
         <div>
           <a href="/booking" class="btn-user btn-user-primary">
@@ -180,7 +180,7 @@
                 {% for b in upcoming %}
                 <tr id="booking-row-{{ b.booking_id }}">
                   <td>
-                    <strong style="font-family:var(--font-mono); color:#2563eb;">{{ b.booking_id }}</strong>
+                    <strong style="font-family:var(--font-mono); color:#ec4899;">{{ b.booking_id }}</strong>
                   </td>
                   <td>
                     <div style="font-weight:700; color:#0f172a;">Slot {{ b.slot_number }}</div>
@@ -308,10 +308,10 @@
   <!-- QR PASS MODAL -->
   <div id="passModal" class="pass-modal-backdrop">
     <div class="user-modal-content" style="max-width:440px; text-align:center; padding:0; overflow:hidden;">
-      <div style="background:linear-gradient(135deg, #1d4ed8, #0ea5e9); padding:24px; color:#ffffff;">
+      <div style="background:linear-gradient(135deg, #db2777, #f472b6); padding:24px; color:#ffffff;">
         <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase;">SMART PARKING PASS</div>
         <h2 style="font-size:26px; font-weight:800; margin:4px 0;" id="modalSlotTitle">Slot A01</h2>
-        <div style="font-size:13.5px; color:#e0f2fe;" id="modalLotTitle">City Parking – Mangaluru</div>
+        <div style="font-size:13.5px; color:#fce7f3;" id="modalLotTitle">City Parking – Mangaluru</div>
       </div>
       <div style="padding:24px;">
         <div style="width:160px; height:160px; margin:0 auto 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px;">
@@ -347,13 +347,13 @@
   <!-- VEHICLE EXIT / CHECKOUT MODAL -->
   <div id="exitModal" class="pass-modal-backdrop">
     <div class="user-modal-content" style="max-width:520px; border-radius:14px; overflow:hidden; box-shadow:0 20px 45px rgba(0,0,0,0.35);">
-      <div style="background:linear-gradient(135deg, #0f172a, #1e293b); padding:20px 24px; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #38bdf8;">
+      <div style="background:linear-gradient(135deg, #0f172a, #1e293b); padding:20px 24px; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f472b6;">
         <div style="display:flex; align-items:center; gap:12px;">
-          <div style="width:40px; height:40px; border-radius:10px; background:rgba(56,189,248,0.15); border:1px solid #38bdf8; display:flex; align-items:center; justify-content:center; color:#38bdf8; font-size:18px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:rgba(56,189,248,0.15); border:1px solid #f472b6; display:flex; align-items:center; justify-content:center; color:#f472b6; font-size:18px;">
             <i class="fas fa-arrow-right-from-bracket"></i>
           </div>
           <div>
-            <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:#38bdf8; text-transform:uppercase;">PARKING CHECKOUT</div>
+            <div style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:#f472b6; text-transform:uppercase;">PARKING CHECKOUT</div>
             <h3 style="font-size:18px; font-weight:800; margin:2px 0 0; color:#ffffff;">Confirm Vehicle Exit</h3>
           </div>
         </div>
@@ -377,7 +377,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #e2e8f0;">
             <div>
               <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Slot</span>
-              <div style="font-size:20px; font-weight:800; color:#0284c7; font-family:var(--font-mono);" id="mSlotDisplay">Slot A-12</div>
+              <div style="font-size:20px; font-weight:800; color:#ec4899; font-family:var(--font-mono);" id="mSlotDisplay">Slot A-12</div>
             </div>
             <div style="text-align:right;">
               <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Status</span>
@@ -407,7 +407,7 @@
 
         <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:16px;">
           <h4 style="font-size:12.5px; text-transform:uppercase; letter-spacing:0.06em; color:#475569; margin:0 0 12px; font-weight:800;">
-            <i class="fas fa-clock" style="color:#0284c7;"></i> Timings & Duration
+            <i class="fas fa-clock" style="color:#ec4899;"></i> Timings & Duration
           </h4>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12.5px;">
             <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
@@ -420,9 +420,9 @@
             </div>
             <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
               <span style="color:#64748b; font-size:11px; display:block;">Current / Exit Time</span>
-              <strong style="color:#0284c7;" id="mExitDisplay">Current time</strong>
+              <strong style="color:#ec4899;" id="mExitDisplay">Current time</strong>
             </div>
-            <div style="background:#e0f2fe; padding:10px; border-radius:6px; border:1px solid #bae6fd;">
+            <div style="background:#fce7f3; padding:10px; border-radius:6px; border:1px solid #bae6fd;">
               <span style="color:#0369a1; font-size:11px; display:block; font-weight:700;">Total Duration</span>
               <strong style="color:#0c4a6e; font-size:14px;" id="mDurationDisplay">2h 30m</strong>
             </div>

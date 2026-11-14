@@ -16,19 +16,19 @@
 
   <style>
     :root {
-      --sec-emerald: #10b981;
-      --sec-emerald-hover: #059669;
-      --sec-emerald-glow: rgba(16, 185, 129, 0.25);
-      --sec-dark-card: #0f1c30;
-      --sec-border: #1e2e48;
+      --sec-emerald: #ec4899;
+      --sec-emerald-hover: #db2777;
+      --sec-emerald-glow: rgba(236, 72, 153, 0.28);
+      --sec-dark-card: #200d26;
+      --sec-border: #441951;
     }
 
     body.admin-body {
-      background: #070d18;
+      background: #140718;
     }
 
     .security-topbar {
-      background: #0c1728;
+      background: #190920;
       border-bottom: 1px solid var(--sec-border);
       padding: 16px 28px;
       display: flex;
@@ -40,9 +40,9 @@
     }
 
     .security-badge-gate {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
+      background: rgba(236, 72, 153, 0.15);
+      border: 1px solid rgba(236, 72, 153, 0.35);
+      color: #f472b6;
       padding: 5px 12px;
       border-radius: 999px;
       font-size: 12px;
@@ -53,8 +53,8 @@
     }
 
     .security-guard-banner {
-      background: linear-gradient(135deg, #0d233a 0%, #093325 100%);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: linear-gradient(135deg, #2c0b36 0%, #1d0724 100%);
+      border: 1px solid rgba(236, 72, 153, 0.35);
       border-radius: 16px;
       padding: 24px 28px;
       margin-bottom: 24px;
@@ -96,13 +96,13 @@
     }
 
     .barrier-open-btn {
-      background: #059669;
+      background: #ec4899;
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
     }
 
     .barrier-open-btn:hover {
-      background: #047857;
+      background: #db2777;
       transform: translateY(-1px);
     }
 
@@ -154,8 +154,8 @@
     }
 
     .veh-pill.active {
-      background: #059669;
-      border-color: #10b981;
+      background: #ec4899;
+      border-color: #f472b6;
       color: #ffffff;
     }
 
@@ -178,8 +178,8 @@
     }
 
     .dur-pill.active {
-      background: #2563eb;
-      border-color: #3b82f6;
+      background: #ec4899;
+      border-color: #f472b6;
       color: #ffffff;
     }
 
@@ -189,19 +189,19 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      background: #091222 !important;
-      border: 2px solid #2563eb !important;
-      color: #38bdf8 !important;
+      background: #190920 !important;
+      border: 2px solid #ec4899 !important;
+      color: #f472b6 !important;
     }
 
     .plate-badge-mono {
       font-family: var(--font-mono);
       font-weight: 700;
-      background: #0b1526;
-      border: 1px solid #1e3a63;
+      background: #2b0e35;
+      border: 1px solid #4a1b59;
       padding: 4px 8px;
       border-radius: 6px;
-      color: #38bdf8;
+      color: #f472b6;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -227,7 +227,7 @@
     }
 
     .btn-action-edit {
-      background: #2563eb;
+      background: #ec4899;
       border: none;
       color: #ffffff;
       padding: 5px 10px;
@@ -242,7 +242,7 @@
     }
 
     .btn-action-edit:hover {
-      background: #1d4ed8;
+      background: #db2777;
     }
 
     /* Barrier gate animation modal */
@@ -314,8 +314,8 @@
     .table-search-input {
       width: 100% !important;
       padding: 11px 16px 11px 42px !important;
-      background: #091322 !important;
-      border: 1px solid #1e2e48 !important;
+      background: #190920 !important;
+      border: 1px solid #4a1b59 !important;
       border-radius: 10px !important;
       color: #ffffff !important;
       font-size: 13.5px !important;
@@ -331,9 +331,9 @@
     }
 
     .table-search-input:focus {
-      border-color: #38bdf8 !important;
-      background: #0d1c33 !important;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+      border-color: #ec4899 !important;
+      background: #210d28 !important;
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25) !important;
     }
 
     .filter-dropdowns {
@@ -347,8 +347,8 @@
       width: auto !important;
       min-width: 180px !important;
       padding: 10px 14px !important;
-      background: #091322 !important;
-      border: 1px solid #1e2e48 !important;
+      background: #190920 !important;
+      border: 1px solid #4a1b59 !important;
       border-radius: 10px !important;
       color: #ffffff !important;
       font-size: 13px !important;
@@ -359,15 +359,15 @@
     }
 
     .table-filter-select:focus {
-      border-color: #38bdf8 !important;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+      border-color: #ec4899 !important;
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25) !important;
     }
 
     /* Dropdown Options High-Contrast Dark Styling */
     select option,
     .admin-form-select option,
     .table-filter-select option {
-      background-color: #0f172a !important;
+      background-color: #190920 !important;
       color: #ffffff !important;
       font-size: 13.5px !important;
       padding: 8px 12px !important;
@@ -381,7 +381,7 @@
     <!-- TOPBAR -->
     <header class="security-topbar">
       <div style="display: flex; align-items: center; gap: 16px;">
-        <div style="width: 40px; height: 40px; background: #059669; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+        <div style="width: 40px; height: 40px; background: #ec4899; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
           <i class="fas fa-shield-halved"></i>
         </div>
         <div>
@@ -418,7 +418,7 @@
       <!-- 4 TELEMETRY KPI CARDS -->
       <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 28px;">
         <!-- Currently Parked -->
-        <div class="kpi-card" style="--kpi-color: #3b82f6;">
+        <div class="kpi-card" style="--kpi-color: #ec4899;">
           <div class="kpi-data">
             <span class="kpi-label">CURRENTLY PARKED VEHICLES</span>
             <span class="kpi-value" id="kpiCurrentlyParked">0</span>

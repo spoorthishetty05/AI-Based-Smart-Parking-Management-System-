@@ -4,21 +4,21 @@
    ========================================================================== */
 
 :root {
-  --user-bg: #f8fafc;
+  --user-bg: #fff0f5;
   --user-card-bg: #ffffff;
-  --user-card-border: #e2e8f0;
-  --user-sidebar-bg: #0f172a;
-  --user-primary: #2563eb;
-  --user-primary-hover: #1d4ed8;
-  --user-accent: #0ea5e9;
+  --user-card-border: #fbcfe8;
+  --user-sidebar-bg: #1a0820;
+  --user-primary: #ec4899;
+  --user-primary-hover: #db2777;
+  --user-accent: #f472b6;
   --user-success: #10b981;
-  --user-warning: #f59e0b;
-  --user-danger: #ef4444;
-  --user-text-main: #0f172a;
-  --user-text-muted: #64748b;
-  --user-text-subtle: #94a3b8;
-  --user-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --user-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --user-warning: #fb7185;
+  --user-danger: #f43f5e;
+  --user-text-main: #200824;
+  --user-text-muted: #703378;
+  --user-text-subtle: #9c67a3;
+  --user-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.06), 0 2px 4px -2px rgba(236, 72, 153, 0.04);
+  --user-shadow-lg: 0 10px 25px -5px rgba(236, 72, 153, 0.12), 0 8px 10px -6px rgba(236, 72, 153, 0.08);
   --user-radius-sm: 8px;
   --user-radius-md: 12px;
   --user-radius-lg: 16px;
@@ -81,14 +81,14 @@ body.user-body {
 .user-brand-icon {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  background: linear-gradient(135deg, #f472b6, #ec4899);
   border-radius: var(--user-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
 }
 
 .user-brand-title {
@@ -101,8 +101,8 @@ body.user-body {
 .user-brand-badge {
   font-size: 10px;
   font-weight: 700;
-  background: rgba(14, 165, 233, 0.2);
-  color: #38bdf8;
+  background: rgba(236, 72, 153, 0.2);
+  color: #f472b6;
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.04em;
@@ -143,7 +143,7 @@ body.user-body {
   gap: 12px;
   padding: 11px 16px;
   border-radius: var(--user-radius-sm);
-  color: #94a3b8;
+  color: #d5a3dc;
   text-decoration: none;
   font-weight: 600;
   font-size: 13.5px;
@@ -159,19 +159,19 @@ body.user-body {
 
 .user-nav-item.active {
   color: #ffffff;
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.3) 0%, rgba(37, 99, 235, 0.05) 100%);
-  border-color: rgba(37, 99, 235, 0.5);
+  background: linear-gradient(90deg, rgba(236, 72, 153, 0.28) 0%, rgba(236, 72, 153, 0.06) 100%);
+  border-color: rgba(236, 72, 153, 0.45);
 }
 
 .user-nav-item.active i {
-  color: #38bdf8;
+  color: #f472b6;
 }
 
 .user-nav-item i {
   width: 20px;
   font-size: 15px;
   text-align: center;
-  color: #64748b;
+  color: #9865a1;
   transition: color 0.2s ease;
 }
 
@@ -194,7 +194,7 @@ body.user-body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  background: linear-gradient(135deg, #f472b6, #ec4899);
   color: #ffffff;
   font-weight: 700;
   display: flex;
@@ -327,12 +327,12 @@ body.user-body {
 
 /* Welcome Header Banner */
 .user-welcome-banner {
-  background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%);
+  background: linear-gradient(135deg, #be185d 0%, #ec4899 50%, #db2777 100%);
   border-radius: var(--user-radius-lg);
   padding: 26px 32px;
   color: #ffffff;
   margin-bottom: 26px;
-  box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.35);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -443,7 +443,7 @@ body.user-body {
   font-size: 18px;
   font-weight: 800;
   letter-spacing: 0.1em;
-  color: #38bdf8;
+  color: #ec4899;
   margin-bottom: 18px;
   text-transform: uppercase;
 }
@@ -452,18 +452,18 @@ body.user-body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #1e293b;
-  border: 1px solid #38bdf8;
+  background: #fff5f8;
+  border: 1px solid #fbcfe8;
   border-radius: 10px;
   padding: 12px 18px;
   margin-bottom: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.08);
 }
 
 .user-slot-pill-badge {
-  background: rgba(14, 165, 233, 0.2);
-  border: 1px solid #0ea5e9;
-  color: #38bdf8;
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid #f472b6;
+  color: #db2777;
   border-radius: 20px;
   padding: 5px 14px;
   font-weight: 800;
@@ -544,17 +544,17 @@ body.user-body {
 }
 
 .slot-box-2d.selected {
-  border-color: #38bdf8 !important;
-  background: rgba(56, 189, 248, 0.3) !important;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.6) !important;
+  border-color: #ec4899 !important;
+  background: rgba(236, 72, 153, 0.3) !important;
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.6) !important;
   transform: scale(1.05);
 }
 
 /* User Assigned Slot Style */
 .slot-box-2d.is-user-slot {
-  border-color: #38bdf8 !important;
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.3) 0%, rgba(14, 165, 233, 0.15) 100%) !important;
-  box-shadow: 0 0 18px rgba(14, 165, 233, 0.6) !important;
+  border-color: #ec4899 !important;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(244, 114, 182, 0.15) 100%) !important;
+  box-shadow: 0 0 18px rgba(236, 72, 153, 0.6) !important;
   cursor: grab;
   animation: pulse-you-slot 2.4s infinite;
   z-index: 4;
@@ -566,17 +566,17 @@ body.user-body {
 
 @keyframes pulse-you-slot {
   0%, 100% {
-    box-shadow: 0 0 14px rgba(14, 165, 233, 0.5);
-    border-color: #38bdf8;
+    box-shadow: 0 0 14px rgba(236, 72, 153, 0.5);
+    border-color: #ec4899;
   }
   50% {
-    box-shadow: 0 0 24px rgba(14, 165, 233, 0.95);
-    border-color: #7dd3fc;
+    box-shadow: 0 0 24px rgba(236, 72, 153, 0.95);
+    border-color: #f472b6;
   }
 }
 
 .slot-you-badge {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   color: #ffffff;
   font-size: 9.5px;
   font-weight: 900;
@@ -586,7 +586,7 @@ body.user-body {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.6);
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.6);
   margin-top: 2px;
 }
 
@@ -633,9 +633,9 @@ body.user-body {
 
 /* Active Swap Selection States */
 .slot-box-2d.selected-source {
-  border-color: #38bdf8 !important;
-  background: rgba(14, 165, 233, 0.35) !important;
-  box-shadow: 0 0 25px rgba(56, 189, 248, 0.95) !important;
+  border-color: #ec4899 !important;
+  background: rgba(236, 72, 153, 0.35) !important;
+  box-shadow: 0 0 25px rgba(236, 72, 153, 0.95) !important;
   transform: scale(1.06) !important;
   z-index: 5;
 }
@@ -765,14 +765,14 @@ body.user-body {
 }
 
 .legend-dot-you {
-  background: #0284c7;
+  background: #ec4899;
   color: #ffffff;
   font-size: 9px;
   font-weight: 900;
   padding: 1px 5px;
   border-radius: 3px;
   margin-right: 4px;
-  box-shadow: 0 1px 4px rgba(2, 132, 199, 0.5);
+  box-shadow: 0 1px 4px rgba(236, 72, 153, 0.5);
 }
 
 /* 2D Layout Flex Wrapper: Slots on Left/Center, Legend on Right Side */
@@ -805,7 +805,7 @@ body.user-body {
   min-width: 195px;
   flex-shrink: 0;
   background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  border: 1px solid rgba(236, 72, 153, 0.25);
   border-radius: 14px;
   padding: 16px 18px;
   backdrop-filter: blur(8px);
@@ -826,7 +826,7 @@ body.user-body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #38bdf8;
+  color: #f472b6;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -889,11 +889,11 @@ body.user-body {
 }
 
 .legend-sidebar-item .eligible-icon {
-  color: #38bdf8;
+  color: #f472b6;
 }
 
 .legend-sidebar-item .eligible-label {
-  color: #38bdf8;
+  color: #f472b6;
   font-weight: 700;
 }
 
@@ -946,10 +946,10 @@ body.user-body {
 
 .swap-preview-card {
   background: rgba(15, 23, 42, 0.95);
-  border: 1.5px solid #38bdf8;
+  border: 1.5px solid #ec4899;
   border-radius: 14px;
   padding: 18px 24px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(56, 189, 248, 0.25);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(236, 72, 153, 0.25);
   backdrop-filter: blur(14px);
   max-width: 640px;
   margin: 0 auto;
@@ -961,13 +961,13 @@ body.user-body {
   align-items: center;
   margin-bottom: 14px;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+  border-bottom: 1px solid rgba(236, 72, 153, 0.2);
 }
 
 .swap-preview-header h4 {
   font-size: 15px;
   font-weight: 800;
-  color: #38bdf8;
+  color: #ec4899;
   margin: 0;
   display: flex;
   align-items: center;
@@ -996,8 +996,8 @@ body.user-body {
 }
 
 .swap-slot-pill.current {
-  border-color: #38bdf8;
-  background: rgba(14, 165, 233, 0.15);
+  border-color: #ec4899;
+  background: rgba(236, 72, 153, 0.15);
 }
 
 .swap-slot-pill.target {
@@ -1028,7 +1028,7 @@ body.user-body {
 }
 
 .pill-badge.you {
-  background: #0284c7;
+  background: #ec4899;
   color: #ffffff;
 }
 
@@ -1049,13 +1049,13 @@ body.user-body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0284c7 0%, #10b981 100%);
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
   animation: swapArrowsSpin 3s linear infinite;
 }
 
@@ -1336,8 +1336,8 @@ body.user-body {
 }
 
 .user-topbar-bell:hover {
-  background: #e2e8f0;
-  color: #0284c7;
+  background: #fdf2f8;
+  color: #ec4899;
   transform: translateY(-1px);
 }
 
@@ -1377,24 +1377,24 @@ body.user-body {
 
 /* Parking History Scope Toggle Buttons */
 .history-scope-btn.active {
-  background: #0284c7 !important;
+  background: #ec4899 !important;
   color: #ffffff !important;
-  border-color: #0284c7 !important;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+  border-color: #ec4899 !important;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
 }
 
 /* Notification Filter Buttons */
 .notif-filter-btn.active {
-  background: #0284c7 !important;
+  background: #ec4899 !important;
   color: #ffffff !important;
-  border-color: #0284c7 !important;
+  border-color: #ec4899 !important;
   font-weight: 700;
 }
 
 /* Notification Items */
 .notif-item {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #fbcfe8;
   border-radius: var(--user-radius-md);
   padding: 16px 20px;
   display: flex;
@@ -1405,13 +1405,13 @@ body.user-body {
 }
 
 .notif-item:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-color: #f472b6;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.08);
 }
 
 .notif-item.unread {
-  background: #f8fafc;
-  border-left: 4px solid #0284c7;
+  background: #fff5f8;
+  border-left: 4px solid #ec4899;
 }
 
 .notif-icon-circle {
@@ -1426,8 +1426,8 @@ body.user-body {
 }
 
 .notif-icon-circle.booking {
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fdf2f8;
+  color: #ec4899;
 }
 
 .notif-icon-circle.exchange {
@@ -1504,13 +1504,13 @@ body.user-body {
 }
 
 .btn-notif-action.primary {
-  background: #0284c7;
+  background: #ec4899;
   color: #ffffff;
-  border-color: #0284c7;
+  border-color: #ec4899;
 }
 
 .btn-notif-action.primary:hover {
-  background: #0369a1;
+  background: #db2777;
 }
 
 /* Sent Exchange Cards */
@@ -1615,10 +1615,10 @@ body.user-body {
 }
 
 .guided-step.active .guided-step-circle {
-  border-color: #2563eb;
-  background: #2563eb;
+  border-color: #ec4899;
+  background: #ec4899;
   color: #ffffff;
-  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 5px rgba(236, 72, 153, 0.2);
 }
 
 .guided-step.completed .guided-step-circle {
@@ -1681,15 +1681,15 @@ body.user-body {
 }
 
 .facility-card-pick:hover {
-  border-color: #93c5fd;
+  border-color: #fbcfe8;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.1);
 }
 
 .facility-card-pick.selected {
-  border-color: #2563eb !important;
-  background: #f0f7ff !important;
-  box-shadow: 0 0 0 1px #2563eb, 0 8px 20px rgba(37, 99, 235, 0.15) !important;
+  border-color: #ec4899 !important;
+  background: #fdf2f8 !important;
+  box-shadow: 0 0 0 1px #ec4899, 0 8px 20px rgba(236, 72, 153, 0.15) !important;
 }
 
 .facility-pick-header {
@@ -1703,8 +1703,8 @@ body.user-body {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background: #eff6ff;
-  color: #2563eb;
+  background: #fdf2f8;
+  color: #ec4899;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1712,7 +1712,7 @@ body.user-body {
 }
 
 .facility-card-pick.selected .facility-pick-icon {
-  background: #2563eb;
+  background: #ec4899;
   color: #ffffff;
 }
 
@@ -1730,8 +1730,8 @@ body.user-body {
 }
 
 .facility-card-pick.selected .facility-radio-mark {
-  border-color: #2563eb;
-  background: #2563eb;
+  border-color: #ec4899;
+  background: #ec4899;
   color: #ffffff;
 }
 
@@ -1800,15 +1800,15 @@ body.user-body {
 }
 
 .vehicle-card-pick:hover {
-  border-color: #93c5fd;
+  border-color: #fbcfe8;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.08);
 }
 
 .vehicle-card-pick.selected {
-  border-color: #2563eb !important;
-  background: #f0f7ff !important;
-  box-shadow: 0 0 0 1px #2563eb, 0 6px 18px rgba(37, 99, 235, 0.15) !important;
+  border-color: #ec4899 !important;
+  background: #fdf2f8 !important;
+  box-shadow: 0 0 0 1px #ec4899, 0 6px 18px rgba(236, 72, 153, 0.15) !important;
 }
 
 .vehicle-card-plate {
@@ -1842,9 +1842,9 @@ body.user-body {
 }
 
 .vehicle-add-box:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: #ec4899;
+  background: #fff5f8;
+  color: #ec4899;
 }
 
 /* Navigation footer */
@@ -1882,7 +1882,7 @@ body.user-body {
 }
 
 .ov-header-icon {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 26px;
 }
 
@@ -2060,12 +2060,12 @@ body.user-body {
 
 /* Card 1: Total Overstays (Past 10 minutes) */
 .ov-card-blue {
-  background: #eff6ff;
-  border: 1px solid #dbeafe;
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
 }
 .ov-icon-blue {
-  background: #dbeafe;
-  color: #2563eb;
+  background: #fce7f3;
+  color: #ec4899;
 }
 
 /* Card 2: Expiring Soon (Within 30 minutes) */
@@ -2126,7 +2126,7 @@ body.user-body {
 }
 
 .ov-table-icon {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 18px;
 }
 
@@ -2363,12 +2363,12 @@ body.user-body {
 }
 
 .ov-status-active {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  background: #fdf2f8;
+  color: #db2777;
+  border: 1px solid #fbcfe8;
 }
 .dot-blue {
-  background: #3b82f6;
+  background: #ec4899;
 }
 
 /* Penalty amount pill */
@@ -2394,8 +2394,8 @@ body.user-body {
 /* Action Buttons */
 .btn-ov-notify {
   background: #ffffff;
-  border: 1px solid #3b82f6;
-  color: #2563eb;
+  border: 1px solid #ec4899;
+  color: #ec4899;
   border-radius: 20px;
   padding: 5px 12px;
   font-size: 11.5px;
@@ -2409,8 +2409,8 @@ body.user-body {
 }
 
 .btn-ov-notify:hover {
-  background: #eff6ff;
-  border-color: #2563eb;
+  background: #fff5f8;
+  border-color: #db2777;
 }
 
 .btn-ov-pay-penalty {
@@ -2478,14 +2478,14 @@ body.user-body {
   user-select: none;
 }
 .duration-pill:hover {
-  border-color: #93c5fd;
+  border-color: #fbcfe8;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.08);
 }
 .duration-pill.active {
-  background: #eff6ff !important;
-  border: 2px solid #2563eb !important;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.12) !important;
+  background: #fdf2f8 !important;
+  border: 2px solid #ec4899 !important;
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.15) !important;
 }
 
 .duration-pill-check {
@@ -2495,13 +2495,13 @@ body.user-body {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #ec4899;
   color: #ffffff;
   display: none;
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.35);
 }
 .duration-pill.active .duration-pill-check {
   display: flex;
@@ -2552,9 +2552,9 @@ body.user-body {
   height: 48px;
 }
 .modern-picker-input:focus {
-  border-color: #2563eb;
+  border-color: #ec4899;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
 }
 
 /* ==========================================================================
@@ -2589,7 +2589,7 @@ body.user-body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #1d4ed8;
+  background: #ec4899;
   color: #ffffff;
   font-size: 19px;
   font-weight: 800;
@@ -2597,7 +2597,7 @@ body.user-body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
 }
 
 .step5-title {
@@ -2656,7 +2656,7 @@ body.user-body {
 }
 
 .head-icon-blue {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 16px;
 }
 
@@ -2789,7 +2789,7 @@ body.user-body {
 
 /* Guarantee Info Banner */
 .step5-info-banner {
-  background: #eff6ff;
+  background: #fdf2f8;
   border-radius: 10px;
   padding: 13px 18px;
   display: flex;
@@ -2799,7 +2799,7 @@ body.user-body {
 }
 
 .step5-info-banner i {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 16px;
   flex-shrink: 0;
 }
@@ -2807,7 +2807,7 @@ body.user-body {
 .step5-info-banner span {
   font-size: 13px;
   font-weight: 600;
-  color: #2563eb;
+  color: #ec4899;
   line-height: 1.35;
 }
 
@@ -2985,7 +2985,7 @@ body.user-body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #2563eb;
+  color: #ec4899;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -2994,12 +2994,13 @@ body.user-body {
 }
 
 .pass-p-pin-icon {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 13px;
 }
 
 .pass-slot-box {
-  background: #f0f7ff;
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
   border-radius: 14px;
   padding: 12px 20px;
   display: flex;
@@ -3010,7 +3011,7 @@ body.user-body {
 }
 
 .pass-slot-car-icon {
-  color: #2563eb;
+  color: #ec4899;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3032,7 +3033,7 @@ body.user-body {
 }
 
 .pass-facility-pin {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 17px;
   margin-top: 2px;
   flex-shrink: 0;
@@ -3095,8 +3096,9 @@ body.user-body {
 }
 
 .pass-code-badge {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #fdf2f8;
+  color: #db2777;
+  border: 1px solid #fbcfe8;
   border-radius: 9999px;
   padding: 3px 10px;
   font-family: var(--font-mono, monospace);
@@ -3118,7 +3120,7 @@ body.user-body {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #1e40af;
+  color: #db2777;
   margin-bottom: 10px;
 }
 
@@ -3126,7 +3128,7 @@ body.user-body {
   width: 22px;
   height: 22px;
   border-radius: 6px;
-  background: #2563eb;
+  background: #ec4899;
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -3136,7 +3138,7 @@ body.user-body {
 
 .pass-details-container {
   background: #ffffff;
-  border: 1px solid #eef2f6;
+  border: 1px solid #fbcfe8;
   border-radius: 16px;
   padding: 16px 20px;
   margin-bottom: 16px;
@@ -3162,7 +3164,7 @@ body.user-body {
 }
 
 .pass-cell-icon {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 16px;
   margin-top: 2px;
   flex-shrink: 0;
@@ -3172,7 +3174,7 @@ body.user-body {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #ec4899;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
@@ -3206,8 +3208,8 @@ body.user-body {
 
 /* Instruction Banner */
 .pass-instructions-box {
-  background: #f0f7ff;
-  border: 1px solid #e0f2fe;
+  background: #fff5f8;
+  border: 1px solid #fbcfe8;
   border-radius: 12px;
   padding: 12px 16px;
   display: flex;
@@ -3217,14 +3219,14 @@ body.user-body {
 }
 
 .pass-instruction-icon {
-  color: #2563eb;
+  color: #ec4899;
   font-size: 18px;
   flex-shrink: 0;
 }
 
 .pass-instruction-msg {
   font-size: 12.5px;
-  color: #1e3a8a;
+  color: #831843;
   line-height: 1.45;
   font-weight: 500;
 }
@@ -3237,7 +3239,7 @@ body.user-body {
 }
 
 .pass-btn-primary {
-  background: #2563eb;
+  background: #ec4899;
   color: #ffffff !important;
   border: none;
   border-radius: 10px;
@@ -3251,14 +3253,14 @@ body.user-body {
   width: 100%;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25);
   transition: all 0.2s ease;
 }
 
 .pass-btn-primary:hover {
-  background: #1d4ed8;
+  background: #db2777;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 16px rgba(236, 72, 153, 0.35);
 }
 
 .pass-btn-secondary {

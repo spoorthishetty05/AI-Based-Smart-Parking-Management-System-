@@ -4,22 +4,22 @@
    ========================================================================== */
 
 :root {
-  --navy-dark-bg: #061325;
-  --navy-card-hero: #0a2544;
-  --navy-hero-reg: #093c72;
-  --cyan-accent: #38bdf8;
-  --blue-primary: #1d68ed;
-  --blue-primary-gradient: linear-gradient(90deg, #0284c7 0%, #1d68ed 100%);
-  --blue-primary-hover: linear-gradient(90deg, #0369a1 0%, #1e40af 100%);
-  --text-dark: #0f172a;
-  --text-body: #334155;
-  --text-muted: #64748b;
-  --text-light-sub: #94a3b8;
-  --input-bg: #f8fafc;
-  --input-border: #e2e8f0;
-  --input-border-focus: #2563eb;
-  --input-shadow-focus: rgba(37, 99, 235, 0.14);
-  --badge-bg: #16263d;
+  --navy-dark-bg: #140718;
+  --navy-card-hero: #250b2d;
+  --navy-hero-reg: #380d44;
+  --cyan-accent: #f472b6;
+  --blue-primary: #ec4899;
+  --blue-primary-gradient: linear-gradient(90deg, #f43f5e 0%, #ec4899 50%, #d946ef 100%);
+  --blue-primary-hover: linear-gradient(90deg, #e11d48 0%, #db2777 50%, #c026d3 100%);
+  --text-dark: #200824;
+  --text-body: #4c1d54;
+  --text-muted: #83478d;
+  --text-light-sub: #b27eb8;
+  --input-bg: #fff5f8;
+  --input-border: #fbcfe8;
+  --input-border-focus: #ec4899;
+  --input-shadow-focus: rgba(236, 72, 153, 0.22);
+  --badge-bg: #2d1036;
 }
 
 * {
@@ -35,7 +35,7 @@ body.auth-page {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--navy-dark-bg);
   background-image: 
-    radial-gradient(circle at 50% 30%, #0d284a 0%, #061325 75%);
+    radial-gradient(circle at 50% 30%, #380c40 0%, #140718 75%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,12 +53,13 @@ body.auth-page {
   background: #ffffff;
   border-radius: 24px;
   box-shadow: 
-    0 25px 60px -15px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(14, 165, 233, 0.08);
+    0 25px 60px -15px rgba(20, 7, 24, 0.5),
+    0 0 40px rgba(236, 72, 153, 0.12);
   display: flex;
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
+  border: 1px solid #fbcfe8;
 }
 
 .auth-split-card.register-card {
@@ -66,11 +67,11 @@ body.auth-page {
 }
 
 /* ==========================================================================
-   Left Hero Panel (Navy Blue Gradient)
+   Left Hero Panel (Velvet Magenta / Pink Dark Gradient)
    ========================================================================== */
 .auth-hero-panel {
   flex: 0 0 42%;
-  background: linear-gradient(165deg, #0d2847 0%, #081e37 55%, #06172d 100%);
+  background: linear-gradient(165deg, #2c0b36 0%, #1d0724 55%, #140718 100%);
   padding: 44px 38px;
   color: #ffffff;
   display: flex;
@@ -81,7 +82,7 @@ body.auth-page {
 
 .auth-split-card.register-card .auth-hero-panel {
   flex: 0 0 39%;
-  background: linear-gradient(175deg, #093c72 0%, #083363 50%, #06284d 100%);
+  background: linear-gradient(175deg, #380d44 0%, #280832 50%, #17051e 100%);
   padding: 42px 34px;
 }
 
@@ -97,7 +98,13 @@ body.auth-page {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #38bdf8 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #db2777 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
+  flex-shrink: 0;
+}
   display: flex;
   align-items: center;
   justify-content: center;
@@ -185,30 +192,30 @@ body.auth-page {
 }
 
 .auth-feature-badge.badge-blue {
-  background: #1d4ed8;
+  background: #db2777;
   color: #ffffff;
   font-weight: 800;
   font-size: 13px;
 }
 
 .auth-feature-badge.badge-robot {
-  background: #152438;
-  color: #c084fc;
+  background: #2b0c36;
+  color: #f472b6;
 }
 
 .auth-feature-badge.badge-chart {
-  background: #152438;
-  color: #38bdf8;
+  background: #2b0c36;
+  color: #f43f5e;
 }
 
 .auth-feature-badge.badge-bell {
-  background: #152438;
-  color: #fbbf24;
+  background: #2b0c36;
+  color: #fb7185;
 }
 
 .auth-feature-badge.badge-sync {
-  background: #152438;
-  color: #38bdf8;
+  background: #2b0c36;
+  color: #f472b6;
 }
 
 .auth-feature-text {
@@ -282,16 +289,16 @@ body.auth-page {
 }
 
 .auth-alert.info {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  background: #fdf2f8;
+  color: #db2777;
+  border: 1px solid #fbcfe8;
 }
 
 /* Section Headings in Register */
 .form-section-title {
   font-size: 11px;
   font-weight: 700;
-  color: #0284c7;
+  color: #db2777;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-top: 14px;
@@ -472,18 +479,18 @@ body.auth-page {
   border-radius: 4px;
   border: 1.5px solid #cbd5e1;
   cursor: pointer;
-  accent-color: #2563eb;
+  accent-color: #ec4899;
 }
 
 .auth-link-simple {
-  color: #0284c7;
+  color: #db2777;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .auth-link-simple:hover {
-  color: #0369a1;
+  color: #be185d;
   text-decoration: underline;
 }
 
@@ -503,14 +510,14 @@ body.auth-page {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  box-shadow: 0 4px 14px rgba(29, 78, 216, 0.35);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 4px;
 }
 
 .btn-auth-submit:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(29, 78, 216, 0.45);
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.45);
   background: var(--blue-primary-hover);
 }
 
@@ -550,7 +557,7 @@ body.auth-page {
 }
 
 .auth-footer .auth-link-bold {
-  color: #0284c7;
+  color: #db2777;
   font-weight: 700;
   text-decoration: none;
   margin-left: 4px;
@@ -558,7 +565,7 @@ body.auth-page {
 }
 
 .auth-footer .auth-link-bold:hover {
-  color: #0369a1;
+  color: #be185d;
   text-decoration: underline;
 }
 
@@ -641,22 +648,22 @@ body.auth-page {
 
 .auth-role-tab.active {
   background: #ffffff;
-  color: #1d4ed8;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  color: #ec4899;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.18);
 }
 
 .auth-role-tab.security-tab.active {
-  color: #059669;
+  color: #db2777;
 }
 
 .auth-role-tab.admin-tab.active {
-  color: #b45309;
+  color: #e11d48;
 }
 
 .auth-register-banner {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1e40af;
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
+  color: #be185d;
   padding: 10px 14px;
   border-radius: 10px;
   font-size: 12.5px;
@@ -668,15 +675,15 @@ body.auth-page {
 }
 
 .auth-register-banner a {
-  color: #1d4ed8;
+  color: #ec4899;
   font-weight: 700;
   text-decoration: underline;
 }
 
 .auth-admin-badge-banner {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  color: #92400e;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
   padding: 10px 14px;
   border-radius: 10px;
   font-size: 12.5px;
@@ -688,12 +695,12 @@ body.auth-page {
 }
 
 .admin-cred-helper {
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
+  background: #fdf2f8;
+  border: 1px dashed #fbcfe8;
   padding: 10px 14px;
   border-radius: 10px;
   font-size: 12px;
-  color: #475569;
+  color: #83478d;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -701,13 +708,13 @@ body.auth-page {
 }
 
 .security-cred-helper {
-  background: #f0fdf4;
-  border-color: #86efac;
+  background: #fff1f5;
+  border-color: #fbcfe8;
 }
 
 .admin-cred-helper code {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #fce7f3;
+  color: #831843;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: 600;
@@ -715,7 +722,7 @@ body.auth-page {
 }
 
 .btn-use-admin {
-  background: #0284c7;
+  background: #ec4899;
   color: #ffffff;
   border: none;
   padding: 4px 10px;
@@ -727,11 +734,11 @@ body.auth-page {
 }
 
 .btn-use-admin:hover {
-  background: #0369a1;
+  background: #db2777;
 }
 
 .btn-use-security {
-  background: #059669;
+  background: #f43f5e;
   color: #ffffff;
   border: none;
   padding: 4px 10px;
@@ -743,11 +750,11 @@ body.auth-page {
 }
 
 .btn-use-security:hover {
-  background: #047857;
+  background: #e11d48;
 }
 
 .btn-register-action {
-  background: #059669;
+  background: #ec4899;
   color: #ffffff;
   padding: 8px 14px;
   border-radius: 8px;
@@ -762,7 +769,7 @@ body.auth-page {
 }
 
 .btn-register-action:hover {
-  background: #047857;
+  background: #db2777;
   color: #ffffff;
 }
 

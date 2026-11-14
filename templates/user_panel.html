@@ -166,7 +166,7 @@
             </div>
             <div>
               <button class="btn-user btn-user-primary" onclick="switchUserTab('find')"
-                style="background:#ffffff; color:#0284c7; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+                style="background:#ffffff; color:#ec4899; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
                 <i class="fas fa-search-location"></i> Find Parking Now &rarr;
               </button>
             </div>
@@ -213,7 +213,7 @@
               <div class="user-card-header">
                 <h3><i class="fas fa-car" style="color:#6366f1;"></i> Primary Vehicle</h3>
                 <a href="#profile" onclick="switchUserTab('profile')"
-                  style="font-size:12px; color:#2563eb; font-weight:700; text-decoration:none;">Manage</a>
+                  style="font-size:12px; color:#ec4899; font-weight:700; text-decoration:none;">Manage</a>
               </div>
               <div style="font-family:var(--font-mono); font-size:22px; font-weight:800; color:#0f172a;"
                 id="dashVehiclePlate">Loading...</div>
@@ -251,7 +251,7 @@
             <div class="user-card-header">
               <h3><i class="fas fa-receipt"></i> Current Parking Reservation</h3>
               <a href="#bookings" onclick="switchUserTab('bookings')"
-                style="font-size:12.5px; color:#2563eb; font-weight:700; text-decoration:none;">All Bookings &rarr;</a>
+                style="font-size:12.5px; color:#ec4899; font-weight:700; text-decoration:none;">All Bookings &rarr;</a>
             </div>
             <div id="dashActiveBookingContainer">
               <!-- Rendered dynamically -->
@@ -411,7 +411,7 @@
 
           <!-- Booking Mode Selector Bar -->
           <div class="booking-mode-bar" style="display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:24px;">
-            <button type="button" class="btn-user btn-user-primary booking-mode-pill" id="modeBtnWizard" onclick="switchBookingMode('wizard')" style="border-radius:24px; padding:10px 22px; font-weight:700; font-size:13.5px; box-shadow:0 3px 10px rgba(37,99,235,0.25);">
+            <button type="button" class="btn-user btn-user-primary booking-mode-pill" id="modeBtnWizard" onclick="switchBookingMode('wizard')" style="border-radius:24px; padding:10px 22px; font-weight:700; font-size:13.5px; box-shadow:0 3px 10px rgba(236,72,153,0.25);">
               <i class="fas fa-wand-magic-sparkles"></i> 5-Step Guided Wizard
             </button>
             <button type="button" class="btn-user btn-user-secondary booking-mode-pill" id="modeBtnQuick" onclick="switchBookingMode('quick')" style="border-radius:24px; padding:10px 22px; font-weight:700; font-size:13.5px;">
@@ -458,14 +458,14 @@
                 <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
                   <div>
                     <h3 style="font-size:20px; font-weight:800; color:#0f172a; margin:0;">
-                      <i class="fas fa-warehouse" style="color:#2563eb;"></i> Step 1: Where do you want to park?
+                      <i class="fas fa-warehouse" style="color:#ec4899;"></i> Step 1: Where do you want to park?
                     </h3>
                     <p style="font-size:13.5px; color:#64748b; margin:4px 0 0;">
                       Select your preferred parking facility and view live vacancy.
                     </p>
                   </div>
                   <span class="badge"
-                    style="background:#e0f2fe; color:#0369a1; padding:6px 14px; border-radius:20px; font-weight:700; font-size:12px;">
+                    style="background:#fce7f3; color:#0369a1; padding:6px 14px; border-radius:20px; font-weight:700; font-size:12px;">
                     Select Facility &amp; Schedule
                   </span>
                 </div>
@@ -488,7 +488,7 @@
                       <div class="facility-pick-name" style="margin-bottom:8px;">{{ lot.lot_name }}</div>
                       <div
                         style="font-size:12px; color:#64748b; margin-bottom:14px; display:flex; align-items:center; gap:6px;">
-                        <i class="fas fa-clock" style="color:#0ea5e9;"></i>
+                        <i class="fas fa-clock" style="color:#f472b6;"></i>
                         <span>{{ lot.operating_hours or '24/7 (Open Daily)' }}</span>
                       </div>
                     </div>
@@ -504,7 +504,7 @@
 
                 <div class="wizard-footer-nav">
                   <div style="font-size:13.5px; color:#64748b;">
-                    Selected Facility: <strong id="wizardStep1SelectedName" style="color:#2563eb;">{{ lots[0].lot_name
+                    Selected Facility: <strong id="wizardStep1SelectedName" style="color:#ec4899;">{{ lots[0].lot_name
                       if lots else 'City Parking' }}</strong>
                   </div>
                   <button type="button" class="btn-user btn-user-primary" id="btnWizardStep1Next"
@@ -524,7 +524,7 @@
                 <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
                   <div>
                     <h3 style="font-size:20px; font-weight:800; color:#0f172a; margin:0;">
-                      <i class="fas fa-car-side" style="color:#2563eb;"></i> Step 2: Which vehicle are you using?
+                      <i class="fas fa-car-side" style="color:#ec4899;"></i> Step 2: Which vehicle are you using?
                     </h3>
                     <p style="font-size:13.5px; color:#64748b; margin:4px 0 0;">
                       Choose from your registered vehicles or enter a vehicle license plate for this parking pass.
@@ -548,7 +548,7 @@
                         <div style="font-size:24px;">
                           {% if (v.vehicle_type or '')|lower == 'bike' %}🏍️{% elif (v.vehicle_type or '')|lower == 'ev' %}⚡{% elif (v.vehicle_type or '')|lower == 'suv' %}🚙{% else %}🚗{% endif %}
                         </div>
-                        <span class="badge" style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">
+                        <span class="badge" style="background:#fce7f3; color:#0369a1; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">
                           {{ v.vehicle_type or 'Car' }}
                         </span>
                       </div>
@@ -586,7 +586,7 @@
                 <div id="wizardManualPlateBox"
                   style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:18px; margin-top:16px;">
                   <h4 style="font-size:14px; font-weight:700; color:#1e293b; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-                    <i class="fas fa-pen" style="color:#2563eb;"></i> Enter Vehicle Details for this Booking
+                    <i class="fas fa-pen" style="color:#ec4899;"></i> Enter Vehicle Details for this Booking
                   </h4>
                   <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
                     <div>
@@ -623,7 +623,7 @@
                     <i class="fas fa-arrow-left"></i> &larr; Back
                   </button>
                   <div style="font-size:13.5px; color:#64748b;">
-                    Selected Vehicle: <strong id="wizardStep2SelectedPlate" style="color:#2563eb;">{{ vehicles[0].license_plate if vehicles else 'None Selected' }}</strong>
+                    Selected Vehicle: <strong id="wizardStep2SelectedPlate" style="color:#ec4899;">{{ vehicles[0].license_plate if vehicles else 'None Selected' }}</strong>
                   </div>
                   <button type="button" class="btn-user btn-user-primary" id="btnWizardStep2Next"
                     onclick="userWizardGoToStep(3)" style="padding:11px 26px; font-weight:700;">
@@ -657,11 +657,11 @@
                   .institution-card-pick:hover {
                     border-color: #93c5fd;
                     transform: translateY(-2px);
-                    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.08);
+                    box-shadow: 0 6px 18px rgba(236, 72, 153, 0.08);
                   }
                   .institution-card-pick.selected {
-                    border: 2px solid #2563eb !important;
-                    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.12) !important;
+                    border: 2px solid #ec4899 !important;
+                    box-shadow: 0 4px 18px rgba(236, 72, 153, 0.12) !important;
                   }
                   .institution-card-pick .inst-radio-indicator {
                     width: 22px;
@@ -677,8 +677,8 @@
                     font-size: 11px;
                   }
                   .institution-card-pick.selected .inst-radio-indicator {
-                    background: #2563eb;
-                    border-color: #2563eb;
+                    background: #ec4899;
+                    border-color: #ec4899;
                     color: #ffffff;
                   }
                 </style>
@@ -686,7 +686,7 @@
                 <!-- Card Header matching Screenshot -->
                 <div style="margin-bottom:26px;">
                   <h3 style="font-size:24px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:12px;">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#0284c7" style="flex-shrink:0;">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#ec4899" style="flex-shrink:0;">
                       <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/>
                       <circle cx="7.5" cy="14.5" r="1.5"/>
                       <circle cx="16.5" cy="14.5" r="1.5"/>
@@ -702,7 +702,7 @@
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:26px;">
                   <div class="user-form-group" style="margin:0;">
                     <label class="user-form-label" style="font-size:13.5px; font-weight:700; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-                      <i class="fa-solid fa-calendar-days" style="color:#0284c7; font-size:15px;"></i> Booking Date <span style="color:#ef4444; font-weight:700;">*</span>
+                      <i class="fa-solid fa-calendar-days" style="color:#ec4899; font-size:15px;"></i> Booking Date <span style="color:#ef4444; font-weight:700;">*</span>
                     </label>
                     <input type="date" id="wizardBookingDate" class="modern-picker-input" min="{{ today }}" value="{{ today }}" onchange="userWizardOnScheduleChange()" required>
                   </div>
@@ -714,7 +714,7 @@
                   </div>
                   <div class="user-form-group" style="margin:0;">
                     <label class="user-form-label" style="font-size:13.5px; font-weight:700; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-                      <i class="fa-solid fa-hourglass-half" style="color:#0284c7; font-size:15px;"></i> Parking Duration <span style="color:#ef4444; font-weight:700;">*</span>
+                      <i class="fa-solid fa-hourglass-half" style="color:#ec4899; font-size:15px;"></i> Parking Duration <span style="color:#ef4444; font-weight:700;">*</span>
                     </label>
                     <select id="wizardDurationSelect" class="modern-picker-input" onchange="userWizardOnDurationSelectChange(this)" style="cursor:pointer;">
                       <option value="1" selected>1 Hour</option>
@@ -740,7 +740,7 @@
                 <!-- Section Title: Select Your Institution (Dynamic per Category) -->
                 <div style="margin-bottom:18px;">
                   <h4 id="wizardStep3PlaceSectionTitle" style="font-size:18px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:10px;">
-                    <i id="wizardStep3PlaceSectionIcon" class="fa-solid fa-building-columns" style="color:#0284c7; font-size:18px;"></i>
+                    <i id="wizardStep3PlaceSectionIcon" class="fa-solid fa-building-columns" style="color:#ec4899; font-size:18px;"></i>
                     <span id="wizardStep3PlaceSectionHeading">Select Your Institution</span>
                   </h4>
                   <p id="wizardStep3PlaceSectionSubheading" style="font-size:13.5px; color:#64748b; margin:4px 0 0; font-weight:500;">
@@ -795,14 +795,14 @@
 
                     <!-- Supported Vehicle Types -->
                     <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px; font-size:12px; color:#475569; font-weight:600;">
-                      <span style="display:flex; align-items:center; gap:5px;"><i class="fas fa-car" style="color:#0284c7;"></i> Car</span>
-                      <span style="display:flex; align-items:center; gap:5px;"><i class="fas fa-motorcycle" style="color:#0284c7;"></i> Bike</span>
+                      <span style="display:flex; align-items:center; gap:5px;"><i class="fas fa-car" style="color:#ec4899;"></i> Car</span>
+                      <span style="display:flex; align-items:center; gap:5px;"><i class="fas fa-motorcycle" style="color:#ec4899;"></i> Bike</span>
                     </div>
 
                     <!-- Available Slots & Parking Fee Row -->
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; border-top:1px solid #f1f5f9; padding-top:12px;">
                       <div style="display:flex; align-items:center; gap:8px;">
-                        <div style="width:26px; height:26px; border-radius:6px; background:#0284c7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; font-family:var(--font-mono); flex-shrink:0;">
+                        <div style="width:26px; height:26px; border-radius:6px; background:#ec4899; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; font-family:var(--font-mono); flex-shrink:0;">
                           P
                         </div>
                         <div>
@@ -812,7 +812,7 @@
                       </div>
 
                       <div style="display:flex; align-items:center; gap:8px; border-left:1px solid #f1f5f9; padding-left:8px;">
-                        <div style="width:26px; height:26px; border-radius:50%; background:#0284c7; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">
+                        <div style="width:26px; height:26px; border-radius:50%; background:#ec4899; color:#ffffff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; flex-shrink:0;">
                           ₹
                         </div>
                         <div>
@@ -828,7 +828,7 @@
 
                 <!-- Empty state when no places match -->
                 <div id="wizardStep3NoPlacesMessage" style="display:none; text-align:center; padding:36px 20px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:14px; color:#64748b; margin-bottom:26px;">
-                  <i class="fas fa-circle-info" style="font-size:24px; color:#0284c7; margin-bottom:8px;"></i>
+                  <i class="fas fa-circle-info" style="font-size:24px; color:#ec4899; margin-bottom:8px;"></i>
                   <h4 style="font-size:15px; font-weight:700; color:#1e293b; margin:0 0 4px;">No Parking Facilities Available</h4>
                   <p style="font-size:13px; margin:0;">There are currently no parking facilities matching this category and vehicle type near your destination.</p>
                 </div>
@@ -843,16 +843,16 @@
                         <ellipse cx="26" cy="46" rx="20" ry="3.5" fill="#e2e8f0"/>
                         <ellipse cx="54" cy="46" rx="6" ry="2" fill="#cbd5e1"/>
                         <rect x="52.5" y="20" width="3" height="26" rx="1.5" fill="#94a3b8"/>
-                        <circle cx="54" cy="18" r="9" fill="#0284c7"/>
+                        <circle cx="54" cy="18" r="9" fill="#ec4899"/>
                         <text x="54" y="22" font-family="'Plus Jakarta Sans', sans-serif" font-size="11.5" font-weight="800" fill="#ffffff" text-anchor="middle">P</text>
                         <rect x="9" y="38" width="5" height="8" rx="2.5" fill="#1e293b"/>
                         <rect x="34" y="38" width="5" height="8" rx="2.5" fill="#1e293b"/>
-                        <rect x="10" y="28" width="28" height="15" rx="5" fill="#2563eb"/>
+                        <rect x="10" y="28" width="28" height="15" rx="5" fill="#ec4899"/>
                         <path d="M13 28L16 19C16.5 17.8 17.8 17 19 17H29C30.2 17 31.5 17.8 32 19L35 28H13Z" fill="#3b82f6"/>
-                        <path d="M16.5 27L18.5 20H29.5L31.5 27H16.5Z" fill="#e0f2fe"/>
+                        <path d="M16.5 27L18.5 20H29.5L31.5 27H16.5Z" fill="#fce7f3"/>
                         <circle cx="14" cy="33" r="2.5" fill="#ffffff"/>
                         <circle cx="34" cy="33" r="2.5" fill="#ffffff"/>
-                        <rect x="20" y="36" width="8" height="4" rx="2" fill="#1d4ed8"/>
+                        <rect x="20" y="36" width="8" height="4" rx="2" fill="#db2777"/>
                       </svg>
                     </div>
 
@@ -878,7 +878,7 @@
                   <button type="button" class="btn-user btn-user-secondary" onclick="userWizardGoToStep(2)" style="background:#f1f5f9; color:#0f172a; border:1.5px solid #e2e8f0; border-radius:12px; padding:12px 24px; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease;">
                     <i class="fas fa-arrow-left"></i> Back
                   </button>
-                  <button type="button" class="btn-user btn-user-primary" id="btnWizardStep3Next" onclick="userWizardGoToStep(4)" style="background:#2563eb; color:#ffffff; border:none; border-radius:12px; padding:12px 28px; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(37,99,235,0.28); cursor:pointer; transition:all 0.2s ease;">
+                  <button type="button" class="btn-user btn-user-primary" id="btnWizardStep3Next" onclick="userWizardGoToStep(4)" style="background:#ec4899; color:#ffffff; border:none; border-radius:12px; padding:12px 28px; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(236,72,153,0.28); cursor:pointer; transition:all 0.2s ease;">
                     <span>Continue to Slot Selection &rarr;</span>
                   </button>
                 </div>
@@ -895,11 +895,11 @@
                 <!-- Header with Title, Section Filter & Refresh matching Image 1 -->
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px; border-bottom:1px solid #1e293b; padding-bottom:16px;">
                   <div>
-                    <div style="font-size:11px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.08em;">
+                    <div style="font-size:11px; font-weight:800; color:#f472b6; text-transform:uppercase; letter-spacing:0.08em;">
                       LIVE 2D SLOT LAYOUT &bull; LIVE SLOT LAYOUT
                     </div>
                     <h3 style="font-size:20px; font-weight:800; color:#ffffff; margin:2px 0 0;">
-                      <i class="fas fa-table-cells" style="color:#38bdf8;"></i> Interactive 2D Parking Matrix
+                      <i class="fas fa-table-cells" style="color:#f472b6;"></i> Interactive 2D Parking Matrix
                     </h3>
                     <p style="font-size:13px; color:#94a3b8; margin:4px 0 0;" id="wizardSlotMatrixSubtitle">
                       Visual slot reservation and interactive slot swapping engine.
@@ -924,7 +924,7 @@
 
                 <!-- Dark 2D Container matching Image 1 -->
                 <div class="layout-2d-container" style="background:#081226; border:1px solid #1e293b; border-radius:16px; padding:24px 16px; box-shadow:0 8px 30px rgba(0,0,0,0.5);">
-                  <div class="layout-lot-title" id="wizard2DLotTitle" style="color:#38bdf8; text-align:center; font-family:var(--font-mono); font-weight:800; font-size:18px; letter-spacing:0.08em; margin-bottom:24px;">
+                  <div class="layout-lot-title" id="wizard2DLotTitle" style="color:#f472b6; text-align:center; font-family:var(--font-mono); font-weight:800; font-size:18px; letter-spacing:0.08em; margin-bottom:24px;">
                     INSTITUTIONS
                   </div>
 
@@ -939,7 +939,7 @@
                   <!-- Legend Bar Matching Image 1 -->
                   <div class="layout-legend-bar" style="margin-top:24px; border-top:1px solid #1e293b; padding-top:16px; display:flex; justify-content:center; flex-wrap:wrap; gap:16px;">
                     <span style="color:#10b981; font-weight:700;"><i class="fas fa-circle"></i> 🟢 Available / Eligible (Click to Select)</span>
-                    <span style="color:#38bdf8; font-weight:700;"><i class="fas fa-circle-check"></i> 🔵 Selected Slot</span>
+                    <span style="color:#f472b6; font-weight:700;"><i class="fas fa-circle-check"></i> 🔵 Selected Slot</span>
                     <span style="color:#f59e0b; font-weight:700;"><i class="fas fa-circle"></i> 🟡 Reserved</span>
                     <span style="color:#ef4444; font-weight:700;"><i class="fas fa-circle"></i> 🔴 Occupied</span>
                     <span style="color:#f43f5e; font-weight:700;"><i class="fas fa-circle"></i> 🚨 Overstayed</span>
@@ -1118,14 +1118,14 @@
                       <i class="fa-solid fa-credit-card head-icon-blue"></i>
                       <span class="step5-section-title">Payment Method</span>
                     </div>
-                    <span style="font-size:11px; background:#eff6ff; color:#2563eb; padding:3px 10px; border-radius:6px; font-weight:800; display:inline-flex; align-items:center; gap:4px;">
+                    <span style="font-size:11px; background:#fdf2f8; color:#ec4899; padding:3px 10px; border-radius:6px; font-weight:800; display:inline-flex; align-items:center; gap:4px;">
                       <i class="fas fa-shield-alt"></i> Razorpay Sandbox
                     </span>
                   </div>
                   <div class="step5-section-body" style="padding:16px;">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
-                      <label style="display:flex; align-items:flex-start; gap:12px; padding:14px; border:2px solid #2563eb; border-radius:10px; background:#f0f7ff; cursor:pointer;" id="lblPayRazorpay">
-                        <input type="radio" name="bookingPaymentOption" id="optPayRazorpay" value="razorpay" checked style="margin-top:3px; accent-color:#2563eb; width:18px; height:18px;" onchange="if(typeof updatePaymentChoiceUI==='function')updatePaymentChoiceUI()" />
+                      <label style="display:flex; align-items:flex-start; gap:12px; padding:14px; border:2px solid #ec4899; border-radius:10px; background:#f0f7ff; cursor:pointer;" id="lblPayRazorpay">
+                        <input type="radio" name="bookingPaymentOption" id="optPayRazorpay" value="razorpay" checked style="margin-top:3px; accent-color:#ec4899; width:18px; height:18px;" onchange="if(typeof updatePaymentChoiceUI==='function')updatePaymentChoiceUI()" />
                         <div>
                           <div style="font-weight:700; color:#0f172a; font-size:13.5px; display:flex; align-items:center; gap:6px;">
                             <span>Pay with Razorpay</span>
@@ -1136,7 +1136,7 @@
                       </label>
 
                       <label style="display:flex; align-items:flex-start; gap:12px; padding:14px; border:1.5px solid #e2e8f0; border-radius:10px; background:#ffffff; cursor:pointer;" id="lblPayArrival">
-                        <input type="radio" name="bookingPaymentOption" id="optPayArrival" value="arrival" style="margin-top:3px; accent-color:#2563eb; width:18px; height:18px;" onchange="if(typeof updatePaymentChoiceUI==='function')updatePaymentChoiceUI()" />
+                        <input type="radio" name="bookingPaymentOption" id="optPayArrival" value="arrival" style="margin-top:3px; accent-color:#ec4899; width:18px; height:18px;" onchange="if(typeof updatePaymentChoiceUI==='function')updatePaymentChoiceUI()" />
                         <div>
                           <div style="font-weight:700; color:#0f172a; font-size:13.5px;">Pay on Arrival</div>
                           <div style="font-size:12px; color:#64748b; margin-top:3px;">Settle cash or card directly at facility entry gate</div>
@@ -1192,7 +1192,7 @@
                       </div>
                       <div class="pass-slot-box">
                         <div class="pass-slot-car-icon">
-                          <svg width="34" height="34" viewBox="0 0 24 24" fill="#2563eb">
+                          <svg width="34" height="34" viewBox="0 0 24 24" fill="#ec4899">
                             <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"/>
                             <circle cx="7.5" cy="14.5" r="1.5"/>
                             <circle cx="16.5" cy="14.5" r="1.5"/>
@@ -1321,13 +1321,13 @@
                 </p>
               </div>
               <button type="button" class="btn-user btn-user-secondary btn-user-sm" onclick="switchBookingMode('wizard')">
-                <i class="fas fa-wand-magic-sparkles" style="color:#2563eb;"></i> Switch to 5-Step Wizard
+                <i class="fas fa-wand-magic-sparkles" style="color:#ec4899;"></i> Switch to 5-Step Wizard
               </button>
             </div>
 
             <form onsubmit="if(typeof submitSlotBooking === 'function'){ submitSlotBooking(event); } else { userSubmitQuickBooking(event); }">
               <div class="user-form-group">
-                <label class="user-form-label" style="font-weight:700;"><i class="fas fa-warehouse" style="color:#2563eb;"></i> Select Parking Facility</label>
+                <label class="user-form-label" style="font-weight:700;"><i class="fas fa-warehouse" style="color:#ec4899;"></i> Select Parking Facility</label>
                 <select id="bookingLotSelect" class="user-form-select" onchange="if(typeof loadAvailableSlotsForBooking === 'function') loadAvailableSlotsForBooking(); else if(typeof loadAvailableSlotsForQuickBooking === 'function') loadAvailableSlotsForQuickBooking(); if(typeof updateEstimatedFare === 'function') updateEstimatedFare(); else if(typeof updateQuickBookingFare === 'function') updateQuickBookingFare();" required>
                   {% for lot in lots %}
                   <option value="{{ lot.lot_id }}" data-rate="{{ lot.hourly_rate or 40.0 }}" {% if loop.first %}selected{% endif %}>{{ lot.lot_name }} (₹{{ lot.hourly_rate or 40 }}/hr)</option>
@@ -1348,11 +1348,11 @@
                   <input type="date" id="bookingDate" class="user-form-input" min="{{ today }}" value="{{ today or '2026-10-07' }}" required>
                 </div>
                 <div class="user-form-group">
-                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-clock" style="color:#0ea5e9;"></i> Start Time</label>
+                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-clock" style="color:#f472b6;"></i> Start Time</label>
                   <input type="time" id="bookingStartTime" class="user-form-input" value="10:00" oninput="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" required>
                 </div>
                 <div class="user-form-group">
-                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-hourglass-end" style="color:#0ea5e9;"></i> End Time</label>
+                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-hourglass-end" style="color:#f472b6;"></i> End Time</label>
                   <input type="time" id="bookingEndTime" class="user-form-input" value="12:00" oninput="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" onchange="if(typeof updateEstimatedFare==='function') updateEstimatedFare(); else if(typeof updateQuickBookingFare==='function') updateQuickBookingFare();" required>
                 </div>
               </div>
@@ -1377,7 +1377,7 @@
               </div>
 
               <div style="display:flex; gap:12px;">
-                <button type="submit" class="btn-user btn-user-primary" style="flex:1; padding:12px; justify-content:center; font-size:15px; font-weight:700; box-shadow:0 4px 14px rgba(37,99,235,0.35);">
+                <button type="submit" class="btn-user btn-user-primary" style="flex:1; padding:12px; justify-content:center; font-size:15px; font-weight:700; box-shadow:0 4px 14px rgba(236,72,153,0.35);">
                   <i class="fas fa-bolt"></i> Instant Confirm Reservation
                 </button>
               </div>
@@ -1804,7 +1804,7 @@
           <div class="user-card">
             <div class="user-card-header" style="flex-wrap:wrap; gap:10px;">
               <div>
-                <h3><i class="fas fa-bell" style="color:#0ea5e9;"></i> Notifications & Activity Alerts</h3>
+                <h3><i class="fas fa-bell" style="color:#f472b6;"></i> Notifications & Activity Alerts</h3>
                 <p style="font-size:12.5px; color:#64748b; margin:2px 0 0;">Live notifications for bookings, slot
                   exchange requests, and system alerts.</p>
               </div>
@@ -1891,11 +1891,11 @@
   <!-- DIGITAL QR PARKING PASS MODAL -->
   <div id="qrPassModal" class="user-modal-backdrop">
     <div class="user-modal-content" style="max-width:440px; text-align:center;">
-      <div style="background:linear-gradient(135deg, #1d4ed8, #0ea5e9); padding:24px; color:#ffffff;">
+      <div style="background:linear-gradient(135deg, #db2777, #f472b6); padding:24px; color:#ffffff;">
         <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.08em;">SMART PARKING
           PASS</div>
         <h2 style="font-size:26px; font-weight:800; margin:6px 0;" id="passSlotDisplay">Slot A01</h2>
-        <div style="font-size:14px; color:#e0f2fe;" id="passLotDisplay">City Parking – Mangaluru</div>
+        <div style="font-size:14px; color:#fce7f3;" id="passLotDisplay">City Parking – Mangaluru</div>
       </div>
       <div class="user-modal-body" style="padding:24px;">
 
@@ -1935,15 +1935,15 @@
     <div class="user-modal-content"
       style="max-width:540px; border-radius:14px; overflow:hidden; box-shadow:0 20px 45px rgba(0,0,0,0.35);">
       <div
-        style="background:linear-gradient(135deg, #0f172a, #1e293b); padding:20px 24px; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #38bdf8;">
+        style="background:linear-gradient(135deg, #0f172a, #1e293b); padding:20px 24px; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f472b6;">
         <div style="display:flex; align-items:center; gap:12px;">
           <div
-            style="width:40px; height:40px; border-radius:10px; background:rgba(56,189,248,0.15); border:1px solid #38bdf8; display:flex; align-items:center; justify-content:center; color:#38bdf8; font-size:18px;">
+            style="width:40px; height:40px; border-radius:10px; background:rgba(56,189,248,0.15); border:1px solid #f472b6; display:flex; align-items:center; justify-content:center; color:#f472b6; font-size:18px;">
             <i class="fas fa-arrow-right-from-bracket"></i>
           </div>
           <div>
             <div
-              style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:#38bdf8; text-transform:uppercase;">
+              style="font-size:11px; font-weight:800; letter-spacing:0.1em; color:#f472b6; text-transform:uppercase;">
               PARKING CHECKOUT</div>
             <h3 style="font-size:18px; font-weight:800; margin:2px 0 0; color:#ffffff;">Confirm Vehicle Exit</h3>
           </div>
@@ -1986,7 +1986,7 @@
             <div>
               <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Assigned
                 Slot</span>
-              <div style="font-size:20px; font-weight:800; color:#0284c7; font-family:var(--font-mono);"
+              <div style="font-size:20px; font-weight:800; color:#ec4899; font-family:var(--font-mono);"
                 id="checkoutSlotDisplay">A-12</div>
             </div>
             <div style="text-align:right;">
@@ -2023,7 +2023,7 @@
           style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:16px;">
           <h4
             style="font-size:12.5px; text-transform:uppercase; letter-spacing:0.06em; color:#475569; margin:0 0 12px; font-weight:800;">
-            <i class="fas fa-clock" style="color:#0284c7;"></i> Session Timings & Duration
+            <i class="fas fa-clock" style="color:#ec4899;"></i> Session Timings & Duration
           </h4>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12.5px;">
@@ -2037,9 +2037,9 @@
             </div>
             <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
               <span style="color:#64748b; font-size:11px; display:block;">Current / Exit Time</span>
-              <strong style="color:#0284c7;" id="checkoutExitTimeDisplay">Current time</strong>
+              <strong style="color:#ec4899;" id="checkoutExitTimeDisplay">Current time</strong>
             </div>
-            <div style="background:#e0f2fe; padding:10px; border-radius:6px; border:1px solid #bae6fd;">
+            <div style="background:#fce7f3; padding:10px; border-radius:6px; border:1px solid #bae6fd;">
               <span style="color:#0369a1; font-size:11px; display:block; font-weight:700;">Total Duration</span>
               <strong style="color:#0c4a6e; font-size:14px;" id="checkoutDurationDisplay">2h 30m</strong>
             </div>
@@ -2049,7 +2049,7 @@
         <!-- Notice -->
         <div
           style="font-size:12px; color:#64748b; background:#f8fafc; border-radius:6px; padding:10px; display:flex; align-items:center; gap:8px;">
-          <i class="fas fa-info-circle" style="color:#0284c7;"></i>
+          <i class="fas fa-info-circle" style="color:#ec4899;"></i>
           <span>Confirming exit will immediately release <strong>Slot <span id="checkoutNoticeSlot">A-12</span></strong>
             back to <span style="color:#10b981; font-weight:700;">Available (🟢)</span>.</span>
         </div>
