@@ -26,7 +26,7 @@ function initCharts(systemData) {
         labels: ['Available', 'Occupied', 'Reserved', 'Overstayed'],
         datasets: [{
           data: [avail, occ, res, over],
-          backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+          backgroundColor: ['#ec4899', '#f472b6', '#fb7185', '#ef4444'],
           borderWidth: 2,
           borderColor: '#ffffff',
           hoverOffset: 4
@@ -96,8 +96,8 @@ function initCharts(systemData) {
         datasets: [{
           label: 'Occupancy Rate (%)',
           data: values,
-          backgroundColor: '#10b981',
-          hoverBackgroundColor: '#059669',
+          backgroundColor: '#ec4899',
+          hoverBackgroundColor: '#db2777',
           borderRadius: 6,
           borderSkipped: false,
           barThickness: 16
@@ -190,14 +190,14 @@ function initEdaCharts(edaData) {
         datasets: [{
           label: 'Avg Occupancy (%)',
           data: values,
-          borderColor: '#0d9488',
-          backgroundColor: 'rgba(13, 148, 136, 0.12)',
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(236, 72, 153, 0.12)',
           fill: true,
           tension: 0.4,
           borderWidth: 2.5,
           pointRadius: 3,
           pointHoverRadius: 6,
-          pointBackgroundColor: '#0d9488'
+          pointBackgroundColor: '#ec4899'
         }]
       },
       options: {
@@ -234,7 +234,7 @@ function initEdaCharts(edaData) {
         datasets: [{
           label: 'Avg Occupancy (%)',
           data: values,
-          backgroundColor: ['#3b82f6', '#3b82f6', '#3b82f6', '#3b82f6', '#0d9488', '#f59e0b', '#f59e0b'],
+          backgroundColor: ['#f472b6', '#f472b6', '#f472b6', '#f472b6', '#ec4899', '#fb7185', '#fb7185'],
           borderRadius: 6
         }]
       },
@@ -264,7 +264,7 @@ function initEdaCharts(edaData) {
         labels: ['Clear / Sunny', 'Cloudy', 'Rainy (Surge)'],
         datasets: [{
           data: values,
-          backgroundColor: ['#10b981', '#64748b', '#3b82f6'],
+          backgroundColor: ['#ec4899', '#f472b6', '#db2777'],
           borderRadius: 6,
           barThickness: 28
         }]
@@ -299,7 +299,7 @@ function initEdaCharts(edaData) {
           {
             label: 'Weekday (Commuter Peak)',
             data: weekdayVals,
-            borderColor: '#3b82f6',
+            borderColor: '#f472b6',
             backgroundColor: 'transparent',
             tension: 0.35,
             borderWidth: 2.2,
@@ -346,13 +346,13 @@ function initReportCharts(summaryData) {
         datasets: [{
           label: 'Daily Utilization (%)',
           data: rates,
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.12)',
+          borderColor: '#ec4899',
+          backgroundColor: 'rgba(236, 72, 153, 0.12)',
           fill: true,
           tension: 0.4,
           borderWidth: 2.5,
           pointRadius: 4,
-          pointBackgroundColor: '#10b981'
+          pointBackgroundColor: '#ec4899'
         }]
       },
       options: {
@@ -404,7 +404,7 @@ function initDurationCharts(durationData) {
         datasets: [{
           label: 'Percentage of Sessions (%)',
           data: values,
-          backgroundColor: ['#10b981', '#0d9488', '#3b82f6', '#f59e0b', '#ef4444'],
+          backgroundColor: ['#ec4899', '#db2777', '#f472b6', '#fb7185', '#ef4444'],
           borderRadius: 6
         }]
       },
@@ -442,7 +442,7 @@ function initDurationCharts(durationData) {
         datasets: [{
           label: 'Average Hours',
           data: vValues,
-          backgroundColor: ['#0d9488', '#3b82f6', '#6366f1', '#10b981', '#f59e0b'],
+          backgroundColor: ['#ec4899', '#f472b6', '#db2777', '#fbcfe8', '#fb7185'],
           borderRadius: 6,
           barThickness: 24
         }]

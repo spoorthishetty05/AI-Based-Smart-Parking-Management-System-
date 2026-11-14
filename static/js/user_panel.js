@@ -459,11 +459,11 @@ function renderDashboardNearbyLots(lots) {
         </div>
         <div>
           <strong style="color:#0f172a; font-size:13.5px; display:block;">${escapeHtml(l.lot_name)}</strong>
-          <span style="font-size:11.5px; color:#64748b;"><i class="fas fa-clock" style="color:#0ea5e9; font-size:10.5px;"></i> ${escapeHtml(l.operating_hours || '24/7 (Open Daily)')}</span>
+          <span style="font-size:11.5px; color:#64748b;"><i class="fas fa-clock" style="color:#ec4899; font-size:10.5px;"></i> ${escapeHtml(l.operating_hours || '24/7 (Open Daily)')}</span>
         </div>
       </div>
       <div style="text-align:right;">
-        <span style="color:#10b981; font-weight:800; font-size:13px;">${l.available_count || 0} Open</span>
+        <span style="color:#ec4899; font-weight:800; font-size:13px;">${l.available_count || 0} Open</span>
       </div>
     </div>
   `;
@@ -653,7 +653,7 @@ async function searchParkingLots() {
                 <div style="font-size:13px; color:#64748b; margin-top:6px; display:flex; align-items:center; gap:8px;">
                   <span><i class="fas fa-layer-group" style="color:#6366f1;"></i> ${l.total_floors || 2} Floors</span>
                   <span style="color:#cbd5e1;">&bull;</span>
-                  <span><i class="fas fa-clock" style="color:#0ea5e9;"></i> ${escapeHtml(l.operating_hours || '24/7 (Open Daily)')}</span>
+                  <span><i class="fas fa-clock" style="color:#ec4899;"></i> ${escapeHtml(l.operating_hours || '24/7 (Open Daily)')}</span>
                 </div>
               </div>
               <div style="display:flex; gap:8px;">
@@ -670,7 +670,7 @@ async function searchParkingLots() {
             <div style="margin-top:14px; background:#f1f5f9; padding:12px 14px; border-radius:8px;">
               <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
                 <span style="font-weight:700; color:#0f172a;">Occupancy: ${occPct}%</span>
-                <span style="color:#10b981; font-weight:800;"><i class="fas fa-circle-check"></i> ${l.available_count || 0} Slots Available</span>
+                <span style="color:#ec4899; font-weight:800;"><i class="fas fa-circle-check"></i> ${l.available_count || 0} Slots Available</span>
               </div>
               <div style="height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden;">
                 <div style="height:100%; width:${occPct}%; background:${occPct > 80 ? '#ef4444' : (occPct > 50 ? '#f59e0b' : '#10b981')};"></div>
@@ -1184,15 +1184,15 @@ function renderOverstayTable(records) {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:36px; color:#94a3b8;"><i class="fas fa-circle-check" style="color:#10b981; margin-right:6px;"></i> No records match the selected filter.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:36px; color:#94a3b8;"><i class="fas fa-circle-check" style="color:#ec4899; margin-right:6px;"></i> No records match the selected filter.</td></tr>';
     return;
   }
 
   tbody.innerHTML = filtered.map((r, idx) => {
     const rawVType = (r.vehicle_type || 'Car').toLowerCase();
-    let vtypeDisplay = `<span class="ov-vtype-badge"><i class="fas fa-car" style="color:#3b82f6;"></i> Car</span>`;
+    let vtypeDisplay = `<span class="ov-vtype-badge"><i class="fas fa-car" style="color:#ec4899;"></i> Car</span>`;
     if (rawVType.includes('bike') || rawVType.includes('motorcycle')) {
-      vtypeDisplay = `<span class="ov-vtype-badge"><i class="fas fa-motorcycle" style="color:#10b981;"></i> Bike</span>`;
+      vtypeDisplay = `<span class="ov-vtype-badge"><i class="fas fa-motorcycle" style="color:#ec4899;"></i> Bike</span>`;
     } else if (rawVType.includes('other') || rawVType.includes('truck') || rawVType.includes('ev') || rawVType.includes('van')) {
       vtypeDisplay = `<span class="ov-vtype-badge"><i class="fas fa-truck-pickup" style="color:#8b5cf6;"></i> Other</span>`;
     }
@@ -1242,7 +1242,7 @@ function renderOverstayTable(records) {
     const penaltyAmt = Number(r.penalty || r.current_penalty || 0);
     let penaltyDisplay = '';
     if (isPaidPenalty && penaltyAmt > 0) {
-      penaltyDisplay = `<span class="ov-penalty-badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:3px 8px; border-radius:6px; font-weight:700;">₹${penaltyAmt.toFixed(0)} <span style="font-size:10px; color:#10b981; font-weight:800;">✓ PAID</span></span>`;
+      penaltyDisplay = `<span class="ov-penalty-badge" style="background:#fdf2f8; color:#be185d; border:1px solid #fbcfe8; padding:3px 8px; border-radius:6px; font-weight:700;">₹${penaltyAmt.toFixed(0)} <span style="font-size:10px; color:#ec4899; font-weight:800;">✓ PAID</span></span>`;
     } else if (penaltyAmt > 0) {
       penaltyDisplay = `<span class="ov-penalty-badge ov-penalty-due">₹${penaltyAmt.toFixed(0)}</span>`;
     } else {
@@ -1256,7 +1256,7 @@ function renderOverstayTable(records) {
     const targetBookingId = r.booking_id || r.reservation_id || '';
     let actionHtml = '';
     if (isCompleted || isPaidPenalty) {
-      actionHtml = `<span style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-check-circle" style="color:#10b981;"></i> Cleared</span>`;
+      actionHtml = `<span style="background:#fdf2f8; color:#be185d; border:1px solid #fbcfe8; padding:5px 10px; border-radius:6px; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-check-circle" style="color:#ec4899;"></i> Cleared</span>`;
     } else if (penaltyAmt > 0) {
       actionHtml = `
         <div style="display:flex; gap:6px; align-items:center; justify-content:center; flex-wrap:wrap;">
@@ -1395,7 +1395,7 @@ window.payOverstayDirectly = function (vehiclePlate, bookingId, amount, overstay
             showUserToast(`Penalty ₹${penalty.toFixed(2)} for ${vehiclePlate} cleared successfully via Razorpay!`, 'success');
             if (btn) {
               btn.disabled = true;
-              btn.style.background = '#059669';
+              btn.style.background = '#ec4899';
               btn.innerHTML = '<i class="fas fa-check-circle"></i> Paid';
             }
             setTimeout(() => {
@@ -1594,7 +1594,7 @@ function updateLayoutSwapHeaderBar(currentLotId) {
     headerBar.style.display = 'flex';
     slotDisplay.textContent = `${displaySlotNumber(userActive2DBooking.slot_number)} (${userActive2DBooking.lot_name || 'Other Lot'})`;
     if (subtext) {
-      subtext.innerHTML = `You have an active booking in <strong>${escapeHtml(userActive2DBooking.lot_name)}</strong>. <a href="javascript:void(0)" onclick="viewLotIn2DLayout(${userActive2DBooking.lot_id})" style="color:#38bdf8; font-weight:700; text-decoration:underline;">Switch Facility to Visual Swap</a>`;
+      subtext.innerHTML = `You have an active booking in <strong>${escapeHtml(userActive2DBooking.lot_name)}</strong>. <a href="javascript:void(0)" onclick="viewLotIn2DLayout(${userActive2DBooking.lot_id})" style="color:#f472b6; font-weight:700; text-decoration:underline;">Switch Facility to Visual Swap</a>`;
     }
   } else {
     headerBar.style.display = 'none';
@@ -1989,10 +1989,10 @@ function renderVisualSwapPreview() {
           <div class="swap-arrow-circle">
             <i class="fas fa-arrow-right-arrow-left"></i>
           </div>
-          <span style="font-size:12px; font-weight:800; color:#38bdf8; letter-spacing:0.5px; margin-top:4px;">
+          <span style="font-size:12px; font-weight:800; color:#f472b6; letter-spacing:0.5px; margin-top:4px;">
             ${escapeHtml(srcDisp)} ⇄ ${escapeHtml(tgtDisp)}
           </span>
-          <span style="font-size:10px; font-weight:700; color:#10b981; letter-spacing:0.5px;">SWAP ${isBike ? 'BIKE' : 'CAR'}</span>
+          <span style="font-size:10px; font-weight:700; color:#ec4899; letter-spacing:0.5px;">SWAP ${isBike ? 'BIKE' : 'CAR'}</span>
         </div>
 
         <!-- New Slot (Target) -->
@@ -2067,8 +2067,8 @@ function drawSwapSvgConnector() {
   svg.innerHTML = `
     <defs>
       <linearGradient id="swapLineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#38bdf8" />
-        <stop offset="100%" stop-color="#10b981" />
+        <stop offset="0%" stop-color="#ec4899" />
+        <stop offset="100%" stop-color="#f472b6" />
       </linearGradient>
       <filter id="swapGlow" x="-20%" y="-20%" width="140%" height="140%">
         <feGaussianBlur stdDeviation="3" result="glow" />
@@ -2079,7 +2079,7 @@ function drawSwapSvgConnector() {
       </filter>
     </defs>
     <!-- Background Glow Line -->
-    <path d="${pathData}" fill="none" stroke="#38bdf8" stroke-width="6" opacity="0.4" filter="url(#swapGlow)" />
+    <path d="${pathData}" fill="none" stroke="#ec4899" stroke-width="6" opacity="0.4" filter="url(#swapGlow)" />
     <!-- Foreground Animated Dashed Line -->
     <path id="swapTrajectory" d="${pathData}" fill="none" stroke="url(#swapLineGrad)" stroke-width="3" stroke-dasharray="8 5">
       <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite" />
@@ -2091,8 +2091,8 @@ function drawSwapSvgConnector() {
       </image>
     </g>
     <!-- Center Swap Icon Badge -->
-    <circle cx="${mx}" cy="${my}" r="16" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
-    <text x="${mx}" y="${my + 4}" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle" font-family="sans-serif">⇄</text>
+    <circle cx="${mx}" cy="${my}" r="16" fill="#140718" stroke="#ec4899" stroke-width="2" />
+    <text x="${mx}" y="${my + 4}" fill="#ec4899" font-size="12" font-weight="bold" text-anchor="middle" font-family="sans-serif">⇄</text>
   `;
 }
 
@@ -2932,7 +2932,7 @@ async function loadParkingHistory(scope = currentHistoryScope) {
                 <div style="font-size:11px; color:#94a3b8;">${escapeHtml(h.floor || 'Ground Floor')}</div>
               </td>
               <td>${escapeHtml(h.date || h.booking_date || '—')}</td>
-              <td><strong style="color:#10b981;">${escapeHtml(entryDisp)}</strong></td>
+              <td><strong style="color:#ec4899;">${escapeHtml(entryDisp)}</strong></td>
               <td><strong style="color:#0284c7;">${escapeHtml(exitDisp)}</strong></td>
               <td>${escapeHtml(durationDisp)}</td>
               <td>${overstayDisp}</td>
@@ -2995,7 +2995,7 @@ async function loadParkingHistory(scope = currentHistoryScope) {
                 <div style="font-size:11px; color:#94a3b8;">${escapeHtml(h.floor || 'Ground Floor')}</div>
               </td>
               <td>${escapeHtml(h.date || h.booking_date || '—')}</td>
-              <td><strong style="color:#10b981;">${escapeHtml(entryDisp)}</strong></td>
+              <td><strong style="color:#ec4899;">${escapeHtml(entryDisp)}</strong></td>
               <td><strong style="color:#0284c7;">${escapeHtml(exitDisp)}</strong></td>
               <td>${escapeHtml(durationDisp)}</td>
               <td>${overstayDisp}</td>
@@ -3337,10 +3337,10 @@ window.payOverstayWithRazorpay = function() {
         if (btnPay) {
           btnPay.disabled = true;
           btnPay.innerHTML = '<i class="fas fa-check-circle"></i> Paid via Razorpay';
-          btnPay.style.background = '#059669';
+          btnPay.style.background = '#ec4899';
         }
         const amtEl = document.getElementById('checkoutOverstayAmount');
-        if (amtEl) amtEl.innerHTML = `₹${penalty.toFixed(2)} <span style="font-size:12px; color:#10b981;">(Settled)</span>`;
+        if (amtEl) amtEl.innerHTML = `₹${penalty.toFixed(2)} <span style="font-size:12px; color:#ec4899;">(Settled)</span>`;
         showUserToast(`Penalty ₹${penalty.toFixed(2)} paid successfully via Razorpay!`, 'success');
       },
       onFailure: function() {
@@ -3385,7 +3385,7 @@ async function openExitParkingModal(bookingId) {
       if (btnPay) {
         btnPay.disabled = false;
         btnPay.innerHTML = '<i class="fas fa-lock"></i> Pay via Razorpay';
-        btnPay.style.background = '#10b981';
+        btnPay.style.background = '#ec4899';
       }
       document.getElementById('checkoutSlotDisplay').textContent = p.slot_number;
       document.getElementById('checkoutPlateDisplay').textContent = p.vehicle_number;

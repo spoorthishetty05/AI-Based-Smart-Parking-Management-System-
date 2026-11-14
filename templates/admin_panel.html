@@ -134,7 +134,7 @@
             <div class="pulse-dot"></div>
             <span>LIVE SYSTEM ACTIVE</span>
           </div>
-          <a href="/security" target="_blank" class="btn-switch-user-view" style="background:#064e3b; border-color:#059669; margin-right:8px;" title="Open Security Guard Dashboard">
+          <a href="/security" target="_blank" class="btn-switch-user-view" style="background:#831843; border-color:#db2777; margin-right:8px;" title="Open Security Guard Dashboard">
             <i class="fas fa-shield-halved"></i> Guard Portal &rarr;
           </a>
           <a href="/user" class="btn-switch-user-view" title="Preview Driver/User Panel">
@@ -155,7 +155,7 @@
           <div class="admin-kpi-grid">
 
             <!-- 1. Total Parking Lots -->
-            <div class="kpi-card" style="--kpi-color: #3b82f6;">
+            <div class="kpi-card" style="--kpi-color: #ec4899;">
               <div class="kpi-data">
                 <h3>Total Parking Lots</h3>
                 <div class="kpi-value" id="kpiTotalLots">—</div>
@@ -165,7 +165,7 @@
             </div>
 
             <!-- 2. Total Parking Slots -->
-            <div class="kpi-card" style="--kpi-color: #6366f1;">
+            <div class="kpi-card" style="--kpi-color: #db2777;">
               <div class="kpi-data">
                 <h3>Total Parking Slots</h3>
                 <div class="kpi-value" id="kpiTotalSlots">—</div>
@@ -175,10 +175,10 @@
             </div>
 
             <!-- 3. Available Slots -->
-            <div class="kpi-card" style="--kpi-color: #10b981;">
+            <div class="kpi-card" style="--kpi-color: #ec4899;">
               <div class="kpi-data">
                 <h3>Available Slots</h3>
-                <div class="kpi-value" id="kpiAvailableSlots" style="color: #34d399;">—</div>
+                <div class="kpi-value" id="kpiAvailableSlots" style="color: #f472b6;">—</div>
                 <div class="kpi-sub">Ready for entry (🟢)</div>
               </div>
               <div class="kpi-icon"><i class="fas fa-circle-check"></i></div>
@@ -215,7 +215,7 @@
             </div>
 
             <!-- 7. Current Bookings -->
-            <div class="kpi-card" style="--kpi-color: #06b6d4;">
+            <div class="kpi-card" style="--kpi-color: #ec4899;">
               <div class="kpi-data">
                 <h3>Current Bookings</h3>
                 <div class="kpi-value" id="kpiCurrentBookings">—</div>
@@ -235,7 +235,7 @@
             </div>
 
             <!-- 9. AI Parking Predictions -->
-            <div class="kpi-card" style="--kpi-color: #14b8a6;">
+            <div class="kpi-card" style="--kpi-color: #ec4899;">
               <div class="kpi-data">
                 <h3>AI Parking Predictions</h3>
                 <div class="kpi-value" id="kpiAIPredictions">—</div>
@@ -342,14 +342,14 @@
           <div class="admin-card">
             <div class="admin-card-header">
               <div>
-                <h2><i class="fas fa-user-shield" style="color: #10b981;"></i> Security Personnel & Gate Management</h2>
+                <h2><i class="fas fa-user-shield" style="color: #ec4899;"></i> Security Personnel & Gate Management</h2>
                 <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Assign guards to parking lots & gates, manage shift duty, and grant walk-in spot booking permissions</p>
               </div>
               <div style="display:flex; gap:10px;">
-                <a href="/security" target="_blank" class="btn-admin btn-admin-secondary" style="border-color:#10b981; color:#10b981;">
+                <a href="/security" target="_blank" class="btn-admin btn-admin-secondary" style="border-color:#ec4899; color:#ec4899;">
                   <i class="fas fa-external-link-alt"></i> Open Guard Portal
                 </a>
-                <button class="btn-admin btn-admin-primary" onclick="openAddGuardModal()" style="background:#059669; border-color:#059669;">
+                <button class="btn-admin btn-admin-primary" onclick="openAddGuardModal()" style="background:#db2777; border-color:#db2777;">
                   <i class="fas fa-user-plus"></i> + Add Security Guard
                 </button>
               </div>
@@ -357,7 +357,7 @@
 
             <!-- KPI Cards for Guards -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
-              <div class="kpi-card" style="--kpi-color: #10b981;">
+              <div class="kpi-card" style="--kpi-color: #ec4899;">
                 <div class="kpi-data">
                   <span class="kpi-label">TOTAL SECURITY GUARDS</span>
                   <span class="kpi-value" id="kpiTotalGuards">0</span>
@@ -365,7 +365,7 @@
                 </div>
                 <div class="kpi-icon"><i class="fas fa-shield-halved"></i></div>
               </div>
-              <div class="kpi-card" style="--kpi-color: #3b82f6;">
+              <div class="kpi-card" style="--kpi-color: #ec4899;">
                 <div class="kpi-data">
                   <span class="kpi-label">ACTIVE ON SHIFT</span>
                   <span class="kpi-value" id="kpiActiveGuards">0</span>
@@ -660,13 +660,13 @@
                 <div id="aiRecommendedLotsList" class="ai-rec-list">
                   <div class="ai-rec-item">
                     <div class="ai-rec-left">
-                      <div class="ai-rec-pin" style="background:rgba(20,184,166,0.18); color:#14b8a6;">
+                      <div class="ai-rec-pin" style="background:rgba(20,184,166,0.18); color:#ec4899;">
                         <i class="fas fa-location-dot"></i>
                       </div>
                       <span class="ai-rec-name">Ground Floor</span>
                     </div>
                     <div class="ai-rec-right">
-                      <span class="ai-rec-avail" style="color:#14b8a6;">12 / 40 available</span>
+                      <span class="ai-rec-avail" style="color:#ec4899;">12 / 40 available</span>
                       <i class="fas fa-chevron-right"></i>
                     </div>
                   </div>
@@ -696,13 +696,13 @@
                   </div>
                   <div class="ai-rec-item">
                     <div class="ai-rec-left">
-                      <div class="ai-rec-pin" style="background:rgba(6,182,212,0.18); color:#06b6d4;">
+                      <div class="ai-rec-pin" style="background:rgba(6,182,212,0.18); color:#ec4899;">
                         <i class="fas fa-location-dot"></i>
                       </div>
                       <span class="ai-rec-name">Third Floor</span>
                     </div>
                     <div class="ai-rec-right">
-                      <span class="ai-rec-avail" style="color:#06b6d4;">5 / 30 available</span>
+                      <span class="ai-rec-avail" style="color:#ec4899;">5 / 30 available</span>
                       <i class="fas fa-chevron-right"></i>
                     </div>
                   </div>
@@ -761,13 +761,13 @@
               <div class="ai-simulator-result-col">
                 <div class="ai-result-box">
                   <div class="ai-result-header">
-                    <i class="fas fa-sparkles" style="color:#2dd4bf;"></i>
+                    <i class="fas fa-sparkles" style="color:#f472b6;"></i>
                     <span>Prediction Result</span>
                   </div>
                   <div class="ai-result-content">
                     <!-- Radial Conic Gauge -->
                     <div class="ai-gauge-wrapper">
-                      <div class="ai-conic-gauge" id="aiSimGaugeRing" style="background: conic-gradient(#14b8a6 0% 68%, rgba(255,255,255,0.08) 68% 100%);">
+                      <div class="ai-conic-gauge" id="aiSimGaugeRing" style="background: conic-gradient(#ec4899 0% 68%, rgba(255,255,255,0.08) 68% 100%);">
                         <div class="ai-gauge-hole">
                           <span class="ai-gauge-value" id="aiSimResultPct">68%</span>
                           <span class="ai-gauge-label">Estimated Occupancy</span>
@@ -1216,7 +1216,7 @@
                 </div>
                 <div class="rep-donut-legend" id="repDonutLegend">
                   <div class="rep-donut-leg-row">
-                    <span class="rep-leg-dot" style="background:#10b981;"></span>
+                    <span class="rep-leg-dot" style="background:#ec4899;"></span>
                     <span class="rep-leg-name">Completed</span>
                     <span class="rep-leg-stat">72% (898)</span>
                   </div>
@@ -1682,7 +1682,7 @@
   <div id="addGuardModal" class="admin-modal-backdrop">
     <div class="admin-modal-content">
       <div class="admin-modal-header">
-        <h3><i class="fas fa-user-shield" style="color:#10b981;"></i> Register Security Guard</h3>
+        <h3><i class="fas fa-user-shield" style="color:#ec4899;"></i> Register Security Guard</h3>
         <button class="admin-modal-close" onclick="closeAddGuardModal()">&times;</button>
       </div>
       <form id="addGuardForm" onsubmit="submitAddGuard(event)">
@@ -1728,7 +1728,7 @@
         </div>
         <div class="admin-modal-footer">
           <button type="button" class="btn-admin btn-admin-secondary" onclick="closeAddGuardModal()">Cancel</button>
-          <button type="submit" class="btn-admin btn-admin-primary" style="background:#059669; border-color:#059669;">Create Guard Account</button>
+          <button type="submit" class="btn-admin btn-admin-primary" style="background:#db2777; border-color:#db2777;">Create Guard Account</button>
         </div>
       </form>
     </div>
@@ -1738,7 +1738,7 @@
   <div id="editGuardModal" class="admin-modal-backdrop">
     <div class="admin-modal-content">
       <div class="admin-modal-header">
-        <h3><i class="fas fa-edit" style="color:#10b981;"></i> Edit Guard Assignment</h3>
+        <h3><i class="fas fa-edit" style="color:#ec4899;"></i> Edit Guard Assignment</h3>
         <button class="admin-modal-close" onclick="closeEditGuardModal()">&times;</button>
       </div>
       <form id="editGuardForm" onsubmit="submitEditGuard(event)">
@@ -1794,7 +1794,7 @@
         </div>
         <div class="admin-modal-footer">
           <button type="button" class="btn-admin btn-admin-secondary" onclick="closeEditGuardModal()">Cancel</button>
-          <button type="submit" class="btn-admin btn-admin-primary" style="background:#059669; border-color:#059669;">Save Changes</button>
+          <button type="submit" class="btn-admin btn-admin-primary" style="background:#db2777; border-color:#db2777;">Save Changes</button>
         </div>
       </form>
     </div>

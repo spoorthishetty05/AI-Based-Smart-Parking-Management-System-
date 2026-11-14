@@ -185,8 +185,8 @@
 }
 
 .rzp-tab.active {
-  color: #2563eb;
-  border-bottom-color: #2563eb;
+  color: #db2777;
+  border-bottom-color: #db2777;
   background: #ffffff;
   font-weight: 700;
 }
@@ -233,7 +233,7 @@
 }
 
 .rzp-input:focus {
-  border-color: #2563eb;
+  border-color: #db2777;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
@@ -244,8 +244,8 @@
 
 .rzp-test-card-btn {
   background: #eff6ff;
-  border: 1px dashed #3b82f6;
-  color: #1d4ed8;
+  border: 1px dashed #ec4899;
+  color: #be185d;
   font-size: 11.5px;
   font-weight: 600;
   padding: 7px 12px;
@@ -259,7 +259,7 @@
 }
 
 .rzp-test-card-btn:hover {
-  background: #dbeafe;
+  background: #fdf2f8;
 }
 
 /* UPI Panel */
@@ -437,7 +437,7 @@
 .rzp-success-icon {
   width: 52px;
   height: 52px;
-  background: #dcfce7;
+  background: #fdf2f8;
   color: #16a34a;
   border-radius: 50%;
   display: flex;

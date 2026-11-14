@@ -283,8 +283,8 @@ body.auth-page {
 }
 
 .auth-alert.success {
-  background: #ecfdf5;
-  color: #047857;
+  background: #fdf2f8;
+  color: #9d174d;
   border: 1px solid #a7f3d0;
 }
 

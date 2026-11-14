@@ -11,7 +11,7 @@
   --admin-primary: #ec4899;
   --admin-primary-hover: #db2777;
   --admin-accent: #f472b6;
-  --admin-success: #10b981;
+  --admin-success: #ec4899;
   --admin-warning: #fb7185;
   --admin-danger: #f43f5e;
   --admin-info: #d946ef;
@@ -511,14 +511,14 @@ body.admin-body {
   text-transform: capitalize;
 }
 
-.status-badge.available { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+.status-badge.available { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(52, 211, 153, 0.3); }
 .status-badge.occupied { background: rgba(244, 63, 94, 0.18); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35); }
 .status-badge.reserved { background: rgba(251, 113, 133, 0.18); color: #f472b6; border: 1px solid rgba(251, 113, 133, 0.35); }
 .status-badge.maintenance, .status-badge.disabled { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(203, 213, 225, 0.3); }
-.status-badge.active { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+.status-badge.active { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(52, 211, 153, 0.3); }
 .status-badge.deactivated { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
 .status-badge.confirmed { background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.35); }
-.status-badge.completed { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+.status-badge.completed { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(52, 211, 153, 0.3); }
 .status-badge.cancelled { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
 
 /* Table Filter & Search Bars */
@@ -629,10 +629,10 @@ body.admin-body {
 .btn-admin-primary:hover { background: var(--admin-primary-hover); }
 
 .btn-admin-success {
-  background: #059669;
+  background: #db2777;
   color: #ffffff;
 }
-.btn-admin-success:hover { background: #047857; }
+.btn-admin-success:hover { background: #9d174d; }
 
 .btn-admin-danger {
   background: rgba(239, 68, 68, 0.2);
@@ -689,7 +689,7 @@ body.admin-body {
   border-radius: 50%;
 }
 
-.dot-available { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+.dot-available { background: #ec4899; box-shadow: 0 0 8px rgba(236, 72, 153, 0.5); }
 .dot-occupied { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
 .dot-reserved { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
 .dot-maintenance { background: #64748b; }
@@ -726,8 +726,8 @@ body.admin-body {
 }
 
 .slot-card-2d.status-available {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.08);
+  border-color: #ec4899;
+  background: rgba(236, 72, 153, 0.08);
 }
 .slot-card-2d.status-occupied {
   border-color: #ef4444;
@@ -914,7 +914,7 @@ select option,
   to { transform: translateX(0); }
 }
 
-.admin-toast.success { border-left: 4px solid #10b981; }
+.admin-toast.success { border-left: 4px solid #ec4899; }
 .admin-toast.error { border-left: 4px solid #ef4444; }
 
 /* ==========================================================================
@@ -938,7 +938,7 @@ select option,
 }
 
 .ai-kpi-card {
-  background: #0d1527;
+  background: #190920;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 18px 20px;
@@ -950,7 +950,7 @@ select option,
 }
 .ai-kpi-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.3);
+  border-color: rgba(236, 72, 153, 0.3);
 }
 
 .ai-kpi-main {
@@ -974,9 +974,9 @@ select option,
   border: 1px solid rgba(244, 114, 182, 0.35);
 }
 .ai-icon-green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(236, 72, 153, 0.15);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.3);
 }
 .ai-icon-orange {
   background: rgba(249, 115, 22, 0.15);
@@ -1024,7 +1024,7 @@ select option,
   transition: width 0.5s ease;
 }
 .ai-bar-blue { background: #f472b6; }
-.ai-bar-green { background: #10b981; }
+.ai-bar-green { background: #ec4899; }
 .ai-bar-orange { background: #f97316; }
 .ai-bar-purple { background: #a855f7; }
 
@@ -1117,7 +1117,7 @@ select option,
 }
 .ai-rec-item:hover {
   background: rgba(15, 23, 42, 0.85);
-  border-color: rgba(56, 189, 248, 0.3);
+  border-color: rgba(236, 72, 153, 0.3);
 }
 .ai-rec-left {
   display: flex;
@@ -1214,7 +1214,7 @@ select option,
   width: 100%;
   height: 42px;
   padding: 0 12px 0 34px;
-  background: #090f1e;
+  background: #140718;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: #ffffff;
@@ -1298,7 +1298,7 @@ select option,
   width: 77px;
   height: 77px;
   border-radius: 50%;
-  background: #090f1e;
+  background: #140718;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1365,7 +1365,7 @@ select option,
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #0d1527;
+  background: #190920;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   padding: 9px 16px;
@@ -1565,7 +1565,7 @@ select option,
 }
 
 .rep-kpi-card {
-  background: #0d1527;
+  background: #190920;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 20px;
@@ -1577,7 +1577,7 @@ select option,
 }
 .rep-kpi-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(56, 189, 248, 0.3);
+  border-color: rgba(236, 72, 153, 0.3);
 }
 
 .rep-kpi-icon-wrap {
@@ -1596,9 +1596,9 @@ select option,
   border: 1px solid rgba(244, 114, 182, 0.35);
 }
 .rep-icon-teal {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(236, 72, 153, 0.15);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.3);
 }
 .rep-icon-purple {
   background: rgba(168, 85, 247, 0.15);
@@ -1634,7 +1634,7 @@ select option,
   font-size: 11px;
 }
 .rep-trend-up {
-  color: #10b981;
+  color: #ec4899;
   font-weight: 700;
 }
 .rep-trend-alert {
@@ -1881,9 +1881,9 @@ select option,
   font-weight: 700;
 }
 .rep-status-paid {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(236, 72, 153, 0.15);
+  color: #f472b6;
+  border: 1px solid rgba(236, 72, 153, 0.3);
 }
 .rep-status-pending {
   background: rgba(245, 158, 11, 0.15);
@@ -1902,8 +1902,8 @@ select option,
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #ec4899;
+  border: 1px solid rgba(236, 72, 153, 0.4);
   background: transparent;
 }
 .rep-pill-outline-blue {
@@ -1988,7 +1988,7 @@ select option,
 }
 
 .overstay-kpi-card {
-  background: #0b1329;
+  background: #140718;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 13px 15px;
@@ -2086,18 +2086,18 @@ select option,
 }
 
 .kpi-card-green {
-  border-left: 3px solid #10b981;
+  border-left: 3px solid #ec4899;
 }
 .kpi-card-green:hover {
-  border-color: rgba(16, 185, 129, 0.5);
+  border-color: rgba(236, 72, 153, 0.5);
 }
 .kpi-card-green .overstay-kpi-icon {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+  background: rgba(236, 72, 153, 0.15);
+  color: #ec4899;
+  box-shadow: 0 0 16px rgba(236, 72, 153, 0.2);
 }
 .kpi-card-green .overstay-kpi-val {
-  color: #34d399;
+  color: #f472b6;
 }
 
 .kpi-card-purple {
@@ -2117,7 +2117,7 @@ select option,
 
 /* Filter Bar Container */
 .overstay-filter-bar {
-  background: #0b1329;
+  background: #140718;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 14px 18px;
@@ -2289,7 +2289,7 @@ select option,
 }
 
 .overstay-data-table th {
-  background: #080e22;
+  background: #140718;
   color: #94a3b8;
   font-size: 11px;
   font-weight: 700;
@@ -2357,9 +2357,9 @@ select option,
 }
 
 .ov-badge-green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: rgba(236, 72, 153, 0.15);
+  color: #f472b6;
+  border: 1px solid rgba(236, 72, 153, 0.4);
 }
 
 .ov-badge-gray {

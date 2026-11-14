@@ -476,7 +476,7 @@ async function loadParkingLotsConfig() {
             <div style="position:absolute; bottom:8px; left:8px; background:rgba(15,23,42,0.85); backdrop-filter:blur(4px); color:#ffffff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:6px; display:flex; align-items:center; gap:6px;">
               <i class="fas fa-parking"></i> City Parking Facility • Mangaluru
             </div>
-            <div style="position:absolute; top:8px; right:8px; background:rgba(16,185,129,0.95); color:#ffffff; font-size:11px; font-weight:800; padding:3px 10px; border-radius:6px;">
+            <div style="position:absolute; top:8px; right:8px; background:rgba(236,72,153,0.95); color:#ffffff; font-size:11px; font-weight:800; padding:3px 10px; border-radius:6px;">
               ${lot.available_count ?? 0} Slots Free
             </div>
           </div>
@@ -529,10 +529,10 @@ async function loadParkingLotsConfig() {
 
           <!-- Live Status Pills -->
           <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:11px; font-weight:700;">
-            <span style="background:#ecfdf5; color:#059669; padding:3px 8px; border-radius:6px; border:1px solid #a7f3d0;">
+            <span style="background:#fdf2f8; color:#db2777; padding:3px 8px; border-radius:6px; border:1px solid #fbcfe8;">
               Available: ${lot.available_count ?? 0}
             </span>
-            <span style="background:#eff6ff; color:#2563eb; padding:3px 8px; border-radius:6px; border:1px solid #bfdbfe;">
+            <span style="background:#fdf2f8; color:#2563eb; padding:3px 8px; border-radius:6px; border:1px solid #bfdbfe;">
               Occupied: ${lot.occupied_count ?? 0}
             </span>
             <span style="background:#fffbeb; color:#d97706; padding:3px 8px; border-radius:6px; border:1px solid #fde68a;">
@@ -1416,7 +1416,7 @@ function selectAllocSlot(slotId) {
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
         <div>
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-            <div style="width:24px; height:24px; border-radius:50%; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:12px;">
+            <div style="width:24px; height:24px; border-radius:50%; background:#fdf2f8; color:#db2777; display:flex; align-items:center; justify-content:center; font-size:12px;">
               <i class="fas fa-check"></i>
             </div>
             <h3 style="font-size:16px; font-weight:800; color:#0f172a; margin:0;">Best Slot Allocated!</h3>
@@ -1426,7 +1426,7 @@ function selectAllocSlot(slotId) {
           <div style="display:flex; gap:10px; flex-wrap:wrap; margin-left:32px;">
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 12px; font-size:11px;">
               <span style="color:#64748b; display:block; font-size:10px;">Match Score</span>
-              <strong style="color:#059669; font-size:13px;">${slot.suitability_score}%</strong>
+              <strong style="color:#db2777; font-size:13px;">${slot.suitability_score}%</strong>
             </div>
 
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 12px; font-size:11px;">
@@ -1436,7 +1436,7 @@ function selectAllocSlot(slotId) {
 
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 12px; font-size:11px;">
               <span style="color:#64748b; display:block; font-size:10px;">Congestion Level</span>
-              <strong style="color:#059669; font-size:13px;"><i class="fas fa-users" style="font-size:11px;"></i> ${slot.congestion_level || 'Low'}</strong>
+              <strong style="color:#db2777; font-size:13px;"><i class="fas fa-users" style="font-size:11px;"></i> ${slot.congestion_level || 'Low'}</strong>
             </div>
 
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 12px; font-size:11px;">
@@ -1456,7 +1456,7 @@ function selectAllocSlot(slotId) {
           <div style="font-size:24px; font-weight:900; color:#0f172a; line-height:1.1;">Slot ${slot.slot_number}</div>
           <span style="font-size:12px; color:#64748b;">${slot.floor} • ${slot.lot_name || 'City Parking'}</span>
           <div style="margin-top:6px;">
-            <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:800;">
+            <span style="background:#fdf2f8; color:#db2777; border:1px solid #fbcfe8; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:800;">
               <i class="fas fa-check-circle" style="font-size:9px;"></i> Available (Best Match)
             </span>
           </div>
@@ -1498,7 +1498,7 @@ function selectAllocSlot(slotId) {
     bullets.forEach(b => {
       html += `
         <li style="display:flex; align-items:center; gap:8px;">
-          <i class="fas fa-check" style="color:#059669; font-size:11px;"></i>
+          <i class="fas fa-check" style="color:#db2777; font-size:11px;"></i>
           <span>${b}</span>
         </li>
       `;
@@ -1515,8 +1515,8 @@ function selectAllocSlot(slotId) {
       <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Zone:</span><span>${slot.zone}</span></div>
       <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Type:</span><span class="badge badge-info" style="font-size:10px;">${slot.slot_type}</span></div>
       <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Distance to Elevator:</span><span>${slot.distance_to_elevator_m} meters</span></div>
-      <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Hourly Rate:</span><strong style="color:#059669;">₹${slot.hourly_rate || 40} / hr</strong></div>
-      <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Availability:</span><span style="color:#059669; font-weight:700;">● Available</span></div>
+      <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Hourly Rate:</span><strong style="color:#db2777;">₹${slot.hourly_rate || 40} / hr</strong></div>
+      <div style="display:flex; justify-content:space-between;"><span style="color:#64748b;">Availability:</span><span style="color:#db2777; font-weight:700;">● Available</span></div>
     `;
   }
 
@@ -1593,7 +1593,7 @@ function renderAllocInteractiveMap(selectedSlot) {
           <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; flex:1;">
             ${r.slots.map(s => {
               const isSel = selectedSlot.slot_number === s.num;
-              let bg = '#10b981'; // available
+              let bg = '#ec4899'; // available
               if (isSel) bg = '#f59e0b'; // selected
               else if (s.status === 'occupied') bg = '#ef4444'; // occupied
               else if (s.status === 'reserved') bg = '#eab308'; // reserved
@@ -1634,10 +1634,10 @@ function renderAllocInteractiveMap(selectedSlot) {
         const isSel = selectedSlot.slot_number === snum;
         const isOcc = (idx === 3 || idx === 7) && !isSel;
         const isRes = idx === 5 && !isSel;
-        let bg = '#10b981';
+        let bg = '#ec4899';
         if (isSel) bg = '#f59e0b';
         else if (isOcc) bg = '#ef4444';
-        else if (isRes) bg = '#3b82f6';
+        else if (isRes) bg = '#f472b6';
         return `
           <div style="flex:1; height:36px; background:${bg}; border-radius:4px; font-size:11px; font-weight:800; color:#ffffff; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; box-shadow:0 1px 3px rgba(0,0,0,0.3);" onclick="selectAllocSlotByNumber('${snum}')">
             ${snum}
@@ -1668,7 +1668,7 @@ function renderAllocInteractiveMap(selectedSlot) {
           ${['R4', 'R5', 'R6', 'R7'].map((snum, idx) => {
             const isSel = selectedSlot.slot_number === snum;
             const isOcc = idx === 1 && !isSel;
-            let bg = '#10b981';
+            let bg = '#ec4899';
             if (isSel) bg = '#f59e0b';
             else if (isOcc) bg = '#ef4444';
             return `
@@ -1706,7 +1706,7 @@ function renderAllocInteractiveMap(selectedSlot) {
       ${['R22', 'R23', 'R24', 'R25', 'R26', 'R27', 'R28', 'R29'].map((snum, idx) => {
         const isSel = selectedSlot.slot_number === snum;
         const isOcc = idx === 4 && !isSel;
-        let bg = '#10b981';
+        let bg = '#ec4899';
         if (isSel) bg = '#f59e0b';
         else if (isOcc) bg = '#ef4444';
         return `
@@ -1774,7 +1774,7 @@ function renderAllocAiSummary(summary) {
 
   container.innerHTML = `
     <div class="ai-kpi-summary-card">
-      <div class="ai-kpi-icon-box" style="background:#eff6ff; color:#2563eb;">
+      <div class="ai-kpi-icon-box" style="background:#fdf2f8; color:#2563eb;">
         <i class="fas fa-users"></i>
       </div>
       <div>
@@ -1795,7 +1795,7 @@ function renderAllocAiSummary(summary) {
     </div>
 
     <div class="ai-kpi-summary-card">
-      <div class="ai-kpi-icon-box" style="background:#ecfdf5; color:#059669;">
+      <div class="ai-kpi-icon-box" style="background:#fdf2f8; color:#db2777;">
         <i class="fas fa-chart-line"></i>
       </div>
       <div>
@@ -1806,7 +1806,7 @@ function renderAllocAiSummary(summary) {
     </div>
 
     <div class="ai-kpi-summary-card">
-      <div class="ai-kpi-icon-box" style="background:#eff6ff; color:#3b82f6;">
+      <div class="ai-kpi-icon-box" style="background:#fdf2f8; color:#ec4899;">
         <i class="fas fa-bullseye"></i>
       </div>
       <div>
@@ -1848,7 +1848,7 @@ function renderAllocRankedGrid(recs, selectedSlotId) {
           <div class="mini-map-preview">
             <div style="display:flex; gap:4px;">
               <div style="width:28px; height:45px; background:#e2e8f0; border-radius:3px;"></div>
-              <div style="width:34px; height:45px; background:#10b981; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#ffffff; font-weight:800; font-size:10px; box-shadow:0 2px 5px rgba(16,185,129,0.3);">
+              <div style="width:34px; height:45px; background:#ec4899; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#ffffff; font-weight:800; font-size:10px; box-shadow:0 2px 5px rgba(16,185,129,0.3);">
                 ${r.slot_number}
               </div>
               <div style="width:28px; height:45px; background:#e2e8f0; border-radius:3px;"></div>
@@ -1865,8 +1865,8 @@ function renderAllocRankedGrid(recs, selectedSlotId) {
               <span>${r.walking_time_mins || 1} min${(r.walking_time_mins || 1) > 1 ? 's' : ''}</span>
             </div>
             <div style="display:flex; justify-content:space-between;">
-              <span><i class="fas fa-check-circle" style="color:#059669; font-size:10px; margin-right:4px;"></i> Suitability Score:</span>
-              <strong style="color:#059669;">${r.suitability_score}%</strong>
+              <span><i class="fas fa-check-circle" style="color:#db2777; font-size:10px; margin-right:4px;"></i> Suitability Score:</span>
+              <strong style="color:#db2777;">${r.suitability_score}%</strong>
             </div>
           </div>
         </div>
@@ -1980,18 +1980,18 @@ function openReviewBookingSummaryModal() {
         <div><span style="color:#64748b;">Duration:</span> <strong>${duration} Hours</strong></div>
         <div><span style="color:#64748b;">Slot Type:</span> <strong>${slot.slot_type}</strong></div>
         <div><span style="color:#64748b;">Vehicle Plate:</span> <strong>${plate}</strong></div>
-        <div><span style="color:#64748b;">Status:</span> <strong style="color:#059669;">Confirmed Upon Booking</strong></div>
+        <div><span style="color:#64748b;">Status:</span> <strong style="color:#db2777;">Confirmed Upon Booking</strong></div>
       </div>
 
-      <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <div style="background:#fdf2f8; border:1px solid #fbcfe8; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <div>
           <span style="font-size:11px; color:#065f46; font-weight:700;">Total Parking Amount</span>
-          <div style="font-size:18px; font-weight:900; color:#059669;">₹${slot.total_amount || (duration * (slot.hourly_rate || 40))}</div>
+          <div style="font-size:18px; font-weight:900; color:#db2777;">₹${slot.total_amount || (duration * (slot.hourly_rate || 40))}</div>
         </div>
         <span style="font-size:11px; color:#047857;"><i class="fas fa-lock"></i> Free Cancellation</span>
       </div>
 
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:8px 12px; font-size:11px; color:#1e40af; display:flex; align-items:center; gap:8px;">
+      <div style="background:#fdf2f8; border:1px solid #bfdbfe; border-radius:8px; padding:8px 12px; font-size:11px; color:#1e40af; display:flex; align-items:center; gap:8px;">
         <i class="fas fa-shield-alt" style="color:#2563eb;"></i>
         <span>Live Availability Check: No conflicting booking detected for this slot.</span>
       </div>
@@ -2700,7 +2700,7 @@ async function loadAdminParkingLotsAndSlots() {
             <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:6px 0 2px 0;">${l.lot_name}</h4>
             <p style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${l.location}</p>
             <div style="display:flex; gap:6px; flex-wrap:wrap; font-size:10.5px; font-weight:700;">
-              <span style="color:#059669;">Avail: ${l.available_count ?? 0}</span> •
+              <span style="color:#db2777;">Avail: ${l.available_count ?? 0}</span> •
               <span style="color:#2563eb;">Occ: ${l.occupied_count ?? 0}</span> •
               <span style="color:#d97706;">Res: ${l.reserved_count ?? 0}</span> •
               <span style="color:#dc2626;">Overstay: ${l.overstayed_count ?? 0}</span>
@@ -3248,17 +3248,17 @@ async function loadUserActiveBookingForExchange(targetResId = null) {
           </div>
           <div>
             <span style="font-size:10px; text-transform:uppercase; color:#94a3b8; font-weight:700; display:block;">Amount Paid</span>
-            <span style="font-size:12px; font-weight:700; color:#059669;"><i class="fas fa-rupee-sign" style="margin-right:2px;"></i> ₹${b.total_amount || 80}</span>
+            <span style="font-size:12px; font-weight:700; color:#db2777;"><i class="fas fa-rupee-sign" style="margin-right:2px;"></i> ₹${b.total_amount || 80}</span>
           </div>
         </div>
 
         <div>
           ${isOffered ? `
-            <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:10px; text-align:center; margin-bottom:10px;">
-              <span style="font-size:12px; font-weight:800; color:#059669;"><i class="fas fa-check-circle"></i> Listed for Exchange</span>
+            <div style="background:#fdf2f8; border:1px solid #fbcfe8; border-radius:8px; padding:10px; text-align:center; margin-bottom:10px;">
+              <span style="font-size:12px; font-weight:800; color:#db2777;"><i class="fas fa-check-circle"></i> Listed for Exchange</span>
               <p style="font-size:11px; color:#047857; margin:2px 0 0 0;">Waiting for other drivers to propose a swap</p>
             </div>
-            <button class="btn-primary" style="width:100%; font-weight:700; font-size:12px; padding:8px; margin-bottom:8px; background:#10b981; border-color:#10b981;" onclick="simulateIncomingExchangeRequest()">
+            <button class="btn-primary" style="width:100%; font-weight:700; font-size:12px; padding:8px; margin-bottom:8px; background:#ec4899; border-color:#ec4899;" onclick="simulateIncomingExchangeRequest()">
               <i class="fas fa-magic"></i> Simulate Incoming Swap Request
             </button>
             <button class="btn-secondary" style="width:100%; font-weight:700; font-size:12px; padding:8px;" onclick="cancelCurrentSlotOffer(${listing.listing_id})">
@@ -3271,7 +3271,7 @@ async function loadUserActiveBookingForExchange(targetResId = null) {
           `}
         </div>
 
-        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:8px 12px; font-size:11px; color:#1e40af; margin-top:14px; display:flex; align-items:center; gap:8px;">
+        <div style="background:#fdf2f8; border:1px solid #bfdbfe; border-radius:8px; padding:8px 12px; font-size:11px; color:#1e40af; margin-top:14px; display:flex; align-items:center; gap:8px;">
           <i class="fas fa-info-circle" style="font-size:14px; flex-shrink:0;"></i>
           <span>You can exchange this slot before <strong>${b.date}, ${b.start_time}</strong></span>
         </div>
@@ -3414,7 +3414,7 @@ async function searchExchangeOpportunities() {
             <div>
               <div style="display:flex; align-items:center; gap:6px;">
                 <h5 style="font-size:13px; font-weight:800; color:#0f172a; margin:0;">Slot ${o.slot_number} - ${o.floor}</h5>
-                <span style="font-size:10px; background:#eff6ff; color:#2563eb; padding:2px 6px; border-radius:6px; font-weight:700;" title="Transparent Rule-Based Matching">${o.match_score}% Match</span>
+                <span style="font-size:10px; background:#fdf2f8; color:#2563eb; padding:2px 6px; border-radius:6px; font-weight:700;" title="Transparent Rule-Based Matching">${o.match_score}% Match</span>
                 ${o.status === 'pending' ? '<span style="font-size:9px; background:#fff7ed; color:#c2410c; padding:1px 5px; border-radius:4px; font-weight:700;">Open Proposals</span>' : ''}
               </div>
               <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">
@@ -3481,13 +3481,13 @@ function openRequestExchangeModal(listingId, slotNumber, floor, lotName, matchSc
 
         <div style="text-align:center;">
           <span style="font-size:10px; text-transform:uppercase; color:#94a3b8; font-weight:700; display:block; margin-bottom:4px;">You Receive</span>
-          <div style="font-weight:800; font-size:15px; color:#059669;">Slot ${slotNumber}</div>
+          <div style="font-weight:800; font-size:15px; color:#db2777;">Slot ${slotNumber}</div>
           <span style="font-size:11px; color:#64748b;">${floor}</span>
         </div>
       </div>
 
       <!-- Transparent Rule-Based Match Breakdown -->
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 14px; margin-bottom:14px;">
+      <div style="background:#fdf2f8; border:1px solid #bfdbfe; border-radius:10px; padding:10px 14px; margin-bottom:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
           <span style="font-size:11px; font-weight:800; color:#1e40af;"><i class="fas fa-check-circle"></i> Rule-Based Match Score</span>
           <span style="font-size:12px; font-weight:800; color:#2563eb;">${matchScore}%</span>
@@ -3498,7 +3498,7 @@ function openRequestExchangeModal(listingId, slotNumber, floor, lotName, matchSc
       </div>
 
       <p style="font-size:11px; color:#64748b; margin:0;">
-        <i class="fas fa-shield-alt" style="color:#059669;"></i> Security: Original bookings remain unchanged unless the owner explicitly accepts this request.
+        <i class="fas fa-shield-alt" style="color:#db2777;"></i> Security: Original bookings remain unchanged unless the owner explicitly accepts this request.
       </p>
     `;
   }
@@ -3614,7 +3614,7 @@ async function loadExchangeRequests() {
                 <div>
                   <div style="display:flex; align-items:center; gap:6px;">
                     <h5 style="font-size:13px; font-weight:800; color:#0f172a; margin:0;">${r.requester_name}</h5>
-                    <span style="font-size:10px; background:#ecfdf5; color:#059669; font-weight:700; padding:1px 5px; border-radius:4px;">★ 4.8</span>
+                    <span style="font-size:10px; background:#fdf2f8; color:#db2777; font-weight:700; padding:1px 5px; border-radius:4px;">★ 4.8</span>
                   </div>
                   <span style="font-size:11px; color:#64748b;">Member since Feb 2024</span>
                 </div>
@@ -3633,7 +3633,7 @@ async function loadExchangeRequests() {
                   </div>
                 </div>
 
-                <div style="color:#059669; font-size:18px; padding:0 8px;">
+                <div style="color:#db2777; font-size:18px; padding:0 8px;">
                   <i class="fas fa-exchange-alt"></i>
                 </div>
 
@@ -3685,7 +3685,7 @@ async function loadExchangeRequests() {
 
           if (s.status === 'pending') {
             withdrawBtn = `
-              <button class="btn-primary" style="font-size:11px; padding:4px 8px; background:#10b981; border-color:#10b981; font-weight:700;" onclick="simulateOwnerAccept(${s.request_id})" title="Simulate partner driver accepting this proposal">
+              <button class="btn-primary" style="font-size:11px; padding:4px 8px; background:#ec4899; border-color:#ec4899; font-weight:700;" onclick="simulateOwnerAccept(${s.request_id})" title="Simulate partner driver accepting this proposal">
                 <i class="fas fa-check-double"></i> Simulate Accept
               </button>
               <button class="btn-secondary" style="font-size:11px; padding:4px 10px; color:#ef4444; border-color:#ef4444; font-weight:700;" onclick="cancelExchangeRequest(${s.request_id})">
@@ -4305,7 +4305,7 @@ function renderParkingSearchResults(lots) {
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
               <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">${displayName}</h4>
               <span class="badge badge-success" style="font-size:11px; padding:3px 8px; font-weight:800;">
-                <span class="pulse-dot" style="width:6px; height:6px; background:#10b981; border-radius:50%; display:inline-block; margin-right:4px;"></span>
+                <span class="pulse-dot" style="width:6px; height:6px; background:#ec4899; border-radius:50%; display:inline-block; margin-right:4px;"></span>
                 ${availCount} slots available
               </span>
             </div>

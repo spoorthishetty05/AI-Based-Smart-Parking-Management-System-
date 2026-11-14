@@ -16,9 +16,9 @@
 
   <style>
     .badge-confirmed {
-      background: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
+      background: #fdf2f8;
+      color: #831843;
+      border: 1px solid #fbcfe8;
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 12px;
@@ -135,12 +135,12 @@
       <div class="user-content" style="max-width:1100px; margin:0 auto; padding:24px 20px;">
         
         <!-- Flash or Info Notice -->
-        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="background:#fdf2f8; border:1px solid #fbcfe8; border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center;">
           <div style="display:flex; align-items:center; gap:12px;">
-            <i class="fas fa-circle-check fa-lg" style="color:#16a34a;"></i>
+            <i class="fas fa-circle-check fa-lg" style="color:#ec4899;"></i>
             <div>
-              <strong style="color:#166534; font-size:14px;">MongoDB Real-Time Synchronization Active</strong>
-              <div style="color:#15803d; font-size:12.5px;">All reservations, cancellations, and barrier passes are saved directly to your MongoDB database collections.</div>
+              <strong style="color:#9d174d; font-size:14px;">MongoDB Real-Time Synchronization Active</strong>
+              <div style="color:#db2777; font-size:12.5px;">All reservations, cancellations, and barrier passes are saved directly to your MongoDB database collections.</div>
             </div>
           </div>
           <button class="btn-user btn-user-secondary btn-user-sm" onclick="location.reload()" style="background:#ffffff;">
@@ -152,12 +152,12 @@
         <div class="user-card" style="margin-bottom:28px;">
           <div class="user-card-header">
             <div>
-              <h3><i class="fas fa-calendar-check" style="color:#10b981;"></i> Upcoming & Active Reservations</h3>
+              <h3><i class="fas fa-calendar-check" style="color:#ec4899;"></i> Upcoming & Active Reservations</h3>
               <p style="font-size:13px; color:#64748b; margin-top:2px;">
                 Active parking passes ready for barrier scanning. You can cancel at any time prior to arrival.
               </p>
             </div>
-            <span class="badge" style="background:#dbeafe; color:#1e40af; font-weight:800; padding:6px 12px; border-radius:12px;">
+            <span class="badge" style="background:#fdf2f8; color:#9d174d; font-weight:800; padding:6px 12px; border-radius:12px;">
               {{ upcoming|length }} Active
             </span>
           </div>
@@ -416,15 +416,15 @@
             </div>
             <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
               <span style="color:#64748b; font-size:11px; display:block;">Actual Entry</span>
-              <strong style="color:#10b981;" id="mEntryDisplay">10:05 AM</strong>
+              <strong style="color:#ec4899;" id="mEntryDisplay">10:05 AM</strong>
             </div>
             <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
               <span style="color:#64748b; font-size:11px; display:block;">Current / Exit Time</span>
               <strong style="color:#ec4899;" id="mExitDisplay">Current time</strong>
             </div>
-            <div style="background:#fce7f3; padding:10px; border-radius:6px; border:1px solid #bae6fd;">
-              <span style="color:#0369a1; font-size:11px; display:block; font-weight:700;">Total Duration</span>
-              <strong style="color:#0c4a6e; font-size:14px;" id="mDurationDisplay">2h 30m</strong>
+            <div style="background:#fce7f3; padding:10px; border-radius:6px; border:1px solid #fbcfe8;">
+              <span style="color:#be185d; font-size:11px; display:block; font-weight:700;">Total Duration</span>
+              <strong style="color:#831843; font-size:14px;" id="mDurationDisplay">2h 30m</strong>
             </div>
           </div>
         </div>

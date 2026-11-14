@@ -72,8 +72,8 @@
       box-shadow: 0 0 0 5px rgba(236, 72, 153, 0.18);
     }
     .wizard-step.completed .step-circle {
-      border-color: #10b981;
-      background: #10b981;
+      border-color: #ec4899;
+      background: #ec4899;
       color: #ffffff;
     }
     .step-label {
@@ -88,7 +88,7 @@
       font-weight: 800;
     }
     .wizard-step.completed .step-label {
-      color: #10b981;
+      color: #ec4899;
     }
 
     /* Wizard Step Cards */
@@ -133,7 +133,7 @@
       user-select: none;
     }
     .duration-pill:hover {
-      border-color: #93c5fd;
+      border-color: #f472b6;
       transform: translateY(-2px);
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
     }
@@ -214,7 +214,7 @@
 
     /* 2D Interactive Grid */
     .layout-card {
-      background: #0f172a;
+      background: #210d28; border: 1px solid #42184f;
       border-radius: 16px;
       padding: 24px;
       color: #ffffff;
@@ -226,7 +226,7 @@
       align-items: center;
       margin-bottom: 20px;
       padding-bottom: 14px;
-      border-bottom: 1px solid #1e293b;
+      border-bottom: 1px solid #42184f;
     }
     .layout-grid {
       display: grid;
@@ -239,8 +239,8 @@
       .layout-grid { grid-template-columns: repeat(2, 1fr); }
     }
     .slot-cell {
-      background: #1e293b;
-      border: 2px solid #334155;
+      background: #190920;
+      border: 2px solid #42184f;
       border-radius: 10px;
       padding: 16px 12px;
       text-align: center;
@@ -253,14 +253,14 @@
       user-select: none;
     }
     .slot-cell.available {
-      border-color: #10b981;
-      background: rgba(16, 185, 129, 0.12);
+      border-color: #ec4899;
+      background: rgba(236, 72, 153, 0.12);
       cursor: pointer;
     }
     .slot-cell.available:hover {
-      background: rgba(16, 185, 129, 0.28);
+      background: rgba(236, 72, 153, 0.28);
       transform: translateY(-2px);
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 16px rgba(236, 72, 153, 0.4);
     }
     .slot-cell.occupied {
       border-color: #ef4444;
@@ -288,8 +288,8 @@
     }
     .slot-cell.selected {
       border-color: #f472b6 !important;
-      background: rgba(56, 189, 248, 0.35) !important;
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.7) !important;
+      background: rgba(236, 72, 153, 0.35) !important;
+      box-shadow: 0 0 20px rgba(236, 72, 153, 0.7) !important;
       transform: scale(1.05);
     }
     .slot-cell-id {
@@ -507,7 +507,7 @@
       flex-direction: column;
     }
     .grace-val {
-      color: #10b981 !important;
+      color: #ec4899 !important;
       font-weight: 700;
     }
     .step5-fee-divider {
@@ -583,7 +583,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #10b981;
+      background: #ec4899;
       border: none;
       border-radius: 10px;
       padding: 12px 28px;
@@ -592,11 +592,11 @@
       color: #ffffff;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
     }
     .btn-step5-confirm:hover {
-      background: #059669;
-      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+      background: #db2777;
+      box-shadow: 0 6px 18px rgba(236, 72, 153, 0.45);
       transform: translateY(-1px);
     }
     .btn-step5-confirm:active {
@@ -613,11 +613,11 @@
     /* Floating Alert */
     .booking-notice {
       background: #fdf2f8;
-      border-left: 4px solid #3b82f6;
+      border-left: 4px solid #ec4899;
       padding: 12px 16px;
       border-radius: 6px;
       font-size: 13px;
-      color: #1e40af;
+      color: #be185d;
       margin-bottom: 20px;
       display: flex;
       align-items: center;
@@ -645,7 +645,7 @@
       user-select: none;
     }
     .category-card-pick:hover {
-      border-color: #93c5fd;
+      border-color: #f472b6;
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(236, 72, 153, 0.08);
     }
@@ -697,7 +697,7 @@
       user-select: none;
     }
     .place-card-pick:hover {
-      border-color: #93c5fd;
+      border-color: #f472b6;
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(236, 72, 153, 0.08);
     }
@@ -928,7 +928,7 @@
                   </div>
                   <div style="margin-top:16px; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:11.5px; font-weight:700; color:#ec4899; text-transform:uppercase; letter-spacing:0.04em;">3 Locations</span>
-                    <span style="font-size:11.5px; color:#10b981; font-weight:700;"><i class="fas fa-circle" style="font-size:8px;"></i> Live Vacancy</span>
+                    <span style="font-size:11.5px; color:#ec4899; font-weight:700;"><i class="fas fa-circle" style="font-size:8px;"></i> Live Vacancy</span>
                   </div>
                 </div>
                 {% endfor %}
@@ -1059,7 +1059,7 @@
                   </div>
                 </div>
                 <div style="font-size:12px; color:#64748b; margin-top:10px;">
-                  <i class="fas fa-info-circle" style="color:#3b82f6;"></i> Both vehicle name and vehicle type will be recorded on your booking pass and receipt.
+                  <i class="fas fa-info-circle" style="color:#ec4899;"></i> Both vehicle name and vehicle type will be recorded on your booking pass and receipt.
                 </div>
               </div>
               </div>
@@ -1198,7 +1198,7 @@
                   </div>
                   <div class="duration-pill" data-hours="2" onclick="userWizardSelectDuration(2, '2 Hours')">
                     <div class="duration-pill-check"><i class="fas fa-check"></i></div>
-                    <div class="duration-pill-icon" style="background:#dcfce7; color:#10b981;"><i class="fa-regular fa-clock"></i></div>
+                    <div class="duration-pill-icon" style="background:#fdf2f8; color:#ec4899;"><i class="fa-regular fa-clock"></i></div>
                     <div class="duration-pill-title">2 Hours</div>
                   </div>
                   <div class="duration-pill" data-hours="3" onclick="userWizardSelectDuration(3, '3 Hours')">
@@ -1218,7 +1218,7 @@
                   </div>
                   <div class="duration-pill" data-hours="8" onclick="userWizardSelectDuration(8, '8 Hours')">
                     <div class="duration-pill-check"><i class="fas fa-check"></i></div>
-                    <div class="duration-pill-icon" style="background:#ccfbf1; color:#0d9488;"><i class="fa-regular fa-clock"></i></div>
+                    <div class="duration-pill-icon" style="background:#fdf2f8; color:#0d9488;"><i class="fa-regular fa-clock"></i></div>
                     <div class="duration-pill-title">8 Hours</div>
                   </div>
                 </div>
@@ -1237,7 +1237,7 @@
                       <rect x="9" y="38" width="5" height="8" rx="2.5" fill="#1e293b"/>
                       <rect x="34" y="38" width="5" height="8" rx="2.5" fill="#1e293b"/>
                       <rect x="10" y="28" width="28" height="15" rx="5" fill="#ec4899"/>
-                      <path d="M13 28L16 19C16.5 17.8 17.8 17 19 17H29C30.2 17 31.5 17.8 32 19L35 28H13Z" fill="#3b82f6"/>
+                      <path d="M13 28L16 19C16.5 17.8 17.8 17 19 17H29C30.2 17 31.5 17.8 32 19L35 28H13Z" fill="#ec4899"/>
                       <path d="M16.5 27L18.5 20H29.5L31.5 27H16.5Z" fill="#fce7f3"/>
                       <circle cx="14" cy="33" r="2.5" fill="#ffffff"/>
                       <circle cx="34" cy="33" r="2.5" fill="#ffffff"/>
@@ -1248,8 +1248,8 @@
                   <div>
                     <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">ESTIMATED PARKING FEE</div>
                     <div style="font-size:14.5px; font-weight:700; color:#334155; margin-top:2px;" id="wizardTariffBreakdown">University Campus (₹30/hr) × 1 Hour</div>
-                    <div style="font-size:12.5px; font-weight:600; color:#10b981; margin-top:3px; display:flex; align-items:center; gap:6px;">
-                      <i class="fas fa-check-circle" style="color:#10b981;"></i> Includes 15-minute grace period on exit
+                    <div style="font-size:12.5px; font-weight:600; color:#ec4899; margin-top:3px; display:flex; align-items:center; gap:6px;">
+                      <i class="fas fa-check-circle" style="color:#ec4899;"></i> Includes 15-minute grace period on exit
                     </div>
                   </div>
                 </div>
@@ -1257,7 +1257,7 @@
               </div>
 
               <!-- 2D Live Slot Matrix -->
-              <div style="background:#0a1128; color:#ffffff; border-radius:16px; padding:22px; margin-bottom:20px;">
+              <div style="background:#210d28; color:#ffffff; border-radius:16px; padding:22px; margin-bottom:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:18px; border-bottom:1px solid #1e293b; padding-bottom:14px;">
                   <div>
                     <div style="font-size:11px; font-weight:800; color:#f472b6; text-transform:uppercase; letter-spacing:0.08em;">
@@ -1283,7 +1283,7 @@
                   </div>
                 </div>
 
-                <div class="layout-2d-container" style="background:#081226; border:1px solid #1e293b; border-radius:14px; padding:20px 14px;">
+                <div class="layout-2d-container" style="background:#190920; border:1px solid #42184f; border-radius:14px; padding:20px 14px;">
                   <div class="grid-2d-box" id="wizardSlotGridContainer">
                     <div style="grid-column: 1/-1; text-align:center; padding:36px; color:#94a3b8;">
                       <i class="fas fa-spinner fa-spin fa-2x"></i>
@@ -1291,8 +1291,8 @@
                     </div>
                   </div>
 
-                  <div class="layout-legend-bar" style="margin-top:20px; border-top:1px solid #1e293b; padding-top:14px; display:flex; justify-content:center; flex-wrap:wrap; gap:14px; font-size:12px;">
-                    <span style="color:#10b981; font-weight:700;"><i class="fas fa-circle"></i> 🟢 Available (Click to Select)</span>
+                  <div class="layout-legend-bar" style="margin-top:20px; border-top:1px solid #42184f; padding-top:14px; display:flex; justify-content:center; flex-wrap:wrap; gap:14px; font-size:12px;">
+                    <span style="color:#ec4899; font-weight:700;"><i class="fas fa-circle"></i> 🟢 Available (Click to Select)</span>
                     <span style="color:#f472b6; font-weight:700;"><i class="fas fa-circle-check"></i> 🔵 Selected Slot</span>
                     <span style="color:#f59e0b; font-weight:700;"><i class="fas fa-circle"></i> 🟡 Reserved</span>
                     <span style="color:#ef4444; font-weight:700;"><i class="fas fa-circle"></i> 🔴 Occupied</span>
@@ -1693,7 +1693,7 @@
                 </div>
 
                 <div class="user-form-group">
-                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-table-cells" style="color:#10b981;"></i> Select Available Slot</label>
+                  <label class="user-form-label" style="font-weight:700;"><i class="fas fa-table-cells" style="color:#ec4899;"></i> Select Available Slot</label>
                   <select id="bookingSlotSelect" class="user-form-select" required>
                     <option value="">Loading available slots...</option>
                   </select>
@@ -1730,7 +1730,7 @@
                     <span style="font-size:12px; color:#64748b; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">Estimated Total Fare</span>
                     <div style="font-size:12.5px; color:#64748b; margin-top:2px;" id="bookingRateSubtext">Standard tariff: ₹{{ lots[0].hourly_rate or 40 }}/hr &bull; Duration: 2 Hours &bull; Overstay grace: 15m</div>
                   </div>
-                  <div style="font-family:var(--font-mono); font-size:26px; font-weight:800; color:#10b981;" id="bookingEstimatedFare">₹{{ "%.2f"|format(2 * (lots[0].hourly_rate or 40.0)) }}</div>
+                  <div style="font-family:var(--font-mono); font-size:26px; font-weight:800; color:#ec4899;" id="bookingEstimatedFare">₹{{ "%.2f"|format(2 * (lots[0].hourly_rate or 40.0)) }}</div>
                 </div>
 
                 <div style="display:flex; gap:12px;">
