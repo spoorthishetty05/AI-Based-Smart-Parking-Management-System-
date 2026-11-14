@@ -16,19 +16,19 @@
 
   <style>
     :root {
-      --sec-emerald: #10b981;
-      --sec-emerald-hover: #059669;
-      --sec-emerald-glow: rgba(16, 185, 129, 0.25);
-      --sec-dark-card: #0f1c30;
-      --sec-border: #1e2e48;
+      --sec-emerald: #ec4899;
+      --sec-emerald-hover: #db2777;
+      --sec-emerald-glow: rgba(236, 72, 153, 0.28);
+      --sec-dark-card: #200d26;
+      --sec-border: #441951;
     }
 
     body.admin-body {
-      background: #070d18;
+      background: #140718;
     }
 
     .security-topbar {
-      background: #0c1728;
+      background: #190920;
       border-bottom: 1px solid var(--sec-border);
       padding: 16px 28px;
       display: flex;
@@ -40,9 +40,9 @@
     }
 
     .security-badge-gate {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
+      background: rgba(236, 72, 153, 0.15);
+      border: 1px solid rgba(236, 72, 153, 0.35);
+      color: #f472b6;
       padding: 5px 12px;
       border-radius: 999px;
       font-size: 12px;
@@ -53,8 +53,8 @@
     }
 
     .security-guard-banner {
-      background: linear-gradient(135deg, #0d233a 0%, #093325 100%);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: linear-gradient(135deg, #2c0b36 0%, #1d0724 100%);
+      border: 1px solid rgba(236, 72, 153, 0.35);
       border-radius: 16px;
       padding: 24px 28px;
       margin-bottom: 24px;
@@ -96,13 +96,13 @@
     }
 
     .barrier-open-btn {
-      background: #059669;
+      background: #ec4899;
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
     }
 
     .barrier-open-btn:hover {
-      background: #047857;
+      background: #db2777;
       transform: translateY(-1px);
     }
 
@@ -142,7 +142,7 @@
     }
 
     .veh-pill {
-      background: #1e293b;
+      background: #200d26;
       border: 1px solid #334155;
       color: #cbd5e1;
       padding: 8px 16px;
@@ -154,8 +154,8 @@
     }
 
     .veh-pill.active {
-      background: #059669;
-      border-color: #10b981;
+      background: #ec4899;
+      border-color: #f472b6;
       color: #ffffff;
     }
 
@@ -166,7 +166,7 @@
     }
 
     .dur-pill {
-      background: #1e293b;
+      background: #200d26;
       border: 1px solid #334155;
       color: #cbd5e1;
       padding: 7px 14px;
@@ -178,8 +178,8 @@
     }
 
     .dur-pill.active {
-      background: #2563eb;
-      border-color: #3b82f6;
+      background: #ec4899;
+      border-color: #f472b6;
       color: #ffffff;
     }
 
@@ -189,19 +189,19 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      background: #091222 !important;
-      border: 2px solid #2563eb !important;
-      color: #38bdf8 !important;
+      background: #190920 !important;
+      border: 2px solid #ec4899 !important;
+      color: #f472b6 !important;
     }
 
     .plate-badge-mono {
       font-family: var(--font-mono);
       font-weight: 700;
-      background: #0b1526;
-      border: 1px solid #1e3a63;
+      background: #2b0e35;
+      border: 1px solid #4a1b59;
       padding: 4px 8px;
       border-radius: 6px;
-      color: #38bdf8;
+      color: #f472b6;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -227,7 +227,7 @@
     }
 
     .btn-action-edit {
-      background: #2563eb;
+      background: #ec4899;
       border: none;
       color: #ffffff;
       padding: 5px 10px;
@@ -242,7 +242,7 @@
     }
 
     .btn-action-edit:hover {
-      background: #1d4ed8;
+      background: #db2777;
     }
 
     /* Barrier gate animation modal */
@@ -314,8 +314,8 @@
     .table-search-input {
       width: 100% !important;
       padding: 11px 16px 11px 42px !important;
-      background: #091322 !important;
-      border: 1px solid #1e2e48 !important;
+      background: #190920 !important;
+      border: 1px solid #4a1b59 !important;
       border-radius: 10px !important;
       color: #ffffff !important;
       font-size: 13.5px !important;
@@ -331,9 +331,9 @@
     }
 
     .table-search-input:focus {
-      border-color: #38bdf8 !important;
-      background: #0d1c33 !important;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+      border-color: #ec4899 !important;
+      background: #210d28 !important;
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25) !important;
     }
 
     .filter-dropdowns {
@@ -347,8 +347,8 @@
       width: auto !important;
       min-width: 180px !important;
       padding: 10px 14px !important;
-      background: #091322 !important;
-      border: 1px solid #1e2e48 !important;
+      background: #190920 !important;
+      border: 1px solid #4a1b59 !important;
       border-radius: 10px !important;
       color: #ffffff !important;
       font-size: 13px !important;
@@ -359,15 +359,15 @@
     }
 
     .table-filter-select:focus {
-      border-color: #38bdf8 !important;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+      border-color: #ec4899 !important;
+      box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25) !important;
     }
 
     /* Dropdown Options High-Contrast Dark Styling */
     select option,
     .admin-form-select option,
     .table-filter-select option {
-      background-color: #0f172a !important;
+      background-color: #190920 !important;
       color: #ffffff !important;
       font-size: 13.5px !important;
       padding: 8px 12px !important;
@@ -381,7 +381,7 @@
     <!-- TOPBAR -->
     <header class="security-topbar">
       <div style="display: flex; align-items: center; gap: 16px;">
-        <div style="width: 40px; height: 40px; background: #059669; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+        <div style="width: 40px; height: 40px; background: #ec4899; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
           <i class="fas fa-shield-halved"></i>
         </div>
         <div>
@@ -418,7 +418,7 @@
       <!-- 4 TELEMETRY KPI CARDS -->
       <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 28px;">
         <!-- Currently Parked -->
-        <div class="kpi-card" style="--kpi-color: #3b82f6;">
+        <div class="kpi-card" style="--kpi-color: #ec4899;">
           <div class="kpi-data">
             <span class="kpi-label">CURRENTLY PARKED VEHICLES</span>
             <span class="kpi-value" id="kpiCurrentlyParked">0</span>
@@ -428,7 +428,7 @@
         </div>
 
         <!-- Available Vacant Slots -->
-        <div class="kpi-card" style="--kpi-color: #10b981;">
+        <div class="kpi-card" style="--kpi-color: #ec4899;">
           <div class="kpi-data">
             <span class="kpi-label">VACANT SLOTS AVAILABLE</span>
             <span class="kpi-value" id="kpiVacantSlots">0</span>
@@ -479,7 +479,7 @@
 
             <!-- Column 1: Vehicle License Plate -->
             <div class="admin-form-group">
-              <label class="admin-form-label" style="color: #38bdf8; font-weight: 800;">
+              <label class="admin-form-label" style="color: #f472b6; font-weight: 800;">
                 <i class="fas fa-id-card"></i> VEHICLE LICENSE PLATE *
               </label>
               <input 
@@ -560,9 +560,9 @@
               <div style="margin-top: 14px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
                   <span style="color: #94a3b8;">Est. Total (Paid at Gate):</span>
-                  <strong style="color: #10b981; font-size: 16px;" id="spotTotalEstimate">₹80.00</strong>
+                  <strong style="color: #ec4899; font-size: 16px;" id="spotTotalEstimate">₹80.00</strong>
                 </div>
-                <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; background: #059669; border-color: #059669; padding: 12px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 14px rgba(5,150,105,0.4);">
+                <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; background: #db2777; border-color: #db2777; padding: 12px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 14px rgba(5,150,105,0.4);">
                   <i class="fas fa-check-circle"></i> REGISTER & OPEN BARRIER &rarr;
                 </button>
               </div>
@@ -576,7 +576,7 @@
       <section class="admin-card">
         <div class="admin-card-header">
           <div>
-            <h2><i class="fas fa-list-check" style="color: #38bdf8;"></i> Gate Booking Radar & Management</h2>
+            <h2><i class="fas fa-list-check" style="color: #f472b6;"></i> Gate Booking Radar & Management</h2>
             <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Monitor live parked vehicles, checkout departing guests, update slot allocations, and handle overstays</p>
           </div>
           <div style="display: flex; gap: 8px;">
@@ -652,7 +652,7 @@
   <div id="updateBookingModal" class="admin-modal-backdrop">
     <div class="admin-modal-content" style="max-width: 580px;">
       <div class="admin-modal-header">
-        <h3><i class="fas fa-pen-to-square" style="color: #38bdf8;"></i> Update Booking Details</h3>
+        <h3><i class="fas fa-pen-to-square" style="color: #f472b6;"></i> Update Booking Details</h3>
         <button class="admin-modal-close" onclick="closeUpdateBookingModal()">&times;</button>
       </div>
       <form id="updateBookingForm" onsubmit="submitUpdateBooking(event)">
@@ -676,7 +676,7 @@
 
           <!-- Relocate Slot -->
           <div class="admin-form-group" style="margin-top: 12px; background: rgba(59,130,246,0.06); padding: 12px; border-radius: 10px; border: 1px dashed rgba(59,130,246,0.3);">
-            <label class="admin-form-label" style="color: #60a5fa;"><i class="fas fa-arrow-right-arrow-left"></i> Relocate Slot (Optional)</label>
+            <label class="admin-form-label" style="color: #f472b6;"><i class="fas fa-arrow-right-arrow-left"></i> Relocate Slot (Optional)</label>
             <div style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">Current Slot: <strong id="modalCurrentSlotDisplay" style="color:#ffffff;"></strong></div>
             <select id="modalRelocateSlotSelect" class="admin-form-select">
               <option value="">Keep Current Slot</option>
@@ -722,26 +722,26 @@
   <div id="checkoutReceiptModal" class="admin-modal-backdrop">
     <div class="admin-modal-content" style="max-width: 500px; text-align: center;">
       <div class="admin-modal-header" style="justify-content: center; position: relative;">
-        <h3 style="color: #34d399;"><i class="fas fa-circle-check"></i> Booking Terminated & Checked Out</h3>
+        <h3 style="color: #f472b6;"><i class="fas fa-circle-check"></i> Booking Terminated & Checked Out</h3>
         <button class="admin-modal-close" style="position: absolute; right: 20px;" onclick="closeCheckoutModal()">&times;</button>
       </div>
       <div class="admin-modal-body" style="padding: 24px;">
         <div class="gate-barrier-graphic">
           <div class="barrier-pole"></div>
           <div class="barrier-arm open" id="receiptBarrierArm"></div>
-          <div style="position: absolute; bottom: 0; font-size: 13px; font-weight: 700; color: #34d399;">
+          <div style="position: absolute; bottom: 0; font-size: 13px; font-weight: 700; color: #f472b6;">
             <i class="fas fa-door-open"></i> EXIT BARRIER LIFTED
           </div>
         </div>
 
-        <div style="background: #091322; border: 1px solid var(--sec-border); border-radius: 12px; padding: 18px; margin-top: 16px; text-align: left;">
+        <div style="background: #140718; border: 1px solid var(--sec-border); border-radius: 12px; padding: 18px; margin-top: 16px; text-align: left;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
             <span style="color: #94a3b8;">Vehicle License Plate:</span>
-            <strong id="receiptPlateDisplay" style="color: #38bdf8; font-family: var(--font-mono);">—</strong>
+            <strong id="receiptPlateDisplay" style="color: #f472b6; font-family: var(--font-mono);">—</strong>
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
             <span style="color: #94a3b8;">Slot Freed:</span>
-            <strong id="receiptSlotDisplay" style="color: #34d399;">— (Available)</strong>
+            <strong id="receiptSlotDisplay" style="color: #f472b6;">— (Available)</strong>
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
             <span style="color: #94a3b8;">Total Dwell Time:</span>
@@ -753,12 +753,12 @@
           </div>
           <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px solid #1e293b; font-size: 14px;">
             <span style="font-weight: 700; color: #ffffff;">Exit Time:</span>
-            <strong id="receiptExitTimeDisplay" style="color: #34d399;">—</strong>
+            <strong id="receiptExitTimeDisplay" style="color: #f472b6;">—</strong>
           </div>
         </div>
       </div>
       <div class="admin-modal-footer" style="justify-content: center;">
-        <button type="button" class="btn-admin btn-admin-primary" style="background:#059669; border-color:#059669; min-width: 140px;" onclick="closeCheckoutModal()">
+        <button type="button" class="btn-admin btn-admin-primary" style="background:#db2777; border-color:#db2777; min-width: 140px;" onclick="closeCheckoutModal()">
           Done
         </button>
       </div>
@@ -1016,13 +1016,13 @@
 
         let statusBadge = '';
         if (isCheckedIn) {
-          statusBadge = '<span class="status-badge active" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(52,211,153,0.3);"><i class="fas fa-circle-dot"></i> PARKED</span>';
+          statusBadge = '<span class="status-badge active" style="background:rgba(16,185,129,0.15); color:#f472b6; border:1px solid rgba(52,211,153,0.3);"><i class="fas fa-circle-dot"></i> PARKED</span>';
         } else if (isOverstay) {
           statusBadge = '<span class="status-badge" style="background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(248,113,113,0.4);"><i class="fas fa-triangle-exclamation"></i> OVERSTAY</span>';
         } else if (isCompleted) {
           statusBadge = '<span class="status-badge" style="background:rgba(100,116,139,0.2); color:#94a3b8; border:1px solid rgba(148,163,184,0.3);"><i class="fas fa-check"></i> DEPARTED</span>';
         } else {
-          statusBadge = `<span class="status-badge" style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(96,165,250,0.3);"><i class="fas fa-clock"></i> ${escapeHtml(b.status ? b.status.toUpperCase() : 'CONFIRMED')}</span>`;
+          statusBadge = `<span class="status-badge" style="background:rgba(59,130,246,0.15); color:#f472b6; border:1px solid rgba(96,165,250,0.3);"><i class="fas fa-clock"></i> ${escapeHtml(b.status ? b.status.toUpperCase() : 'CONFIRMED')}</span>`;
         }
 
         const typeBadge = b.is_on_spot
@@ -1042,7 +1042,7 @@
               </div>
             </td>
             <td>
-              <div style="font-weight:800; color:#34d399; font-size:14px;">${escapeHtml(b.slot)}</div>
+              <div style="font-weight:800; color:#f472b6; font-size:14px;">${escapeHtml(b.slot)}</div>
               <div style="font-size:11px; color:#64748b;">${escapeHtml(b.floor || 'Ground Floor')}</div>
             </td>
             <td>
@@ -1050,7 +1050,7 @@
             </td>
             <td>
               <div style="font-size:12.5px; color:#ffffff;">
-                <i class="far fa-clock" style="color:#38bdf8;"></i> ${escapeHtml(b.entry_time)}
+                <i class="far fa-clock" style="color:#f472b6;"></i> ${escapeHtml(b.entry_time)}
               </div>
               <div style="font-size:11px; color:#94a3b8; margin-top:2px;">
                 Duration: ${escapeHtml(b.duration_str || b.duration_hours + 'h')} &bull; Exp: ${escapeHtml(b.end_time || '—')}

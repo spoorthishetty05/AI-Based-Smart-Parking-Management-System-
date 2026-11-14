@@ -59,7 +59,7 @@ function renderModelMetrics(edaData) {
           </div>
           <div style="background:#f8fafc; padding:8px; border-radius:8px;">
             <div style="font-size:9px; color:#64748b; font-weight:700;">MAE</div>
-            <div style="font-size:14px; font-weight:800; color:#3b82f6;">${m.mae}%</div>
+            <div style="font-size:14px; font-weight:800; color:#f472b6;">${m.mae}%</div>
           </div>
           <div style="background:#f8fafc; padding:8px; border-radius:8px;">
             <div style="font-size:9px; color:#64748b; font-weight:700;">RMSE</div>
@@ -108,7 +108,7 @@ function renderFeatureImportances(importances) {
           <span style="color:var(--primary); font-weight:800;">${weightPct}%</span>
         </div>
         <div style="background:#f1f5f9; height:8px; border-radius:99px; overflow:hidden;">
-          <div style="background:linear-gradient(90deg, #0d9488, #10b981); width:${pct}%; height:100%; border-radius:99px;"></div>
+          <div style="background:linear-gradient(90deg, #ec4899, #f472b6); width:${pct}%; height:100%; border-radius:99px;"></div>
         </div>
       </div>
     `;
@@ -246,11 +246,11 @@ async function runAiPrediction() {
     const p = data.prediction;
 
     const badgeColor = {
-      'Low': '#10b981',
-      'Moderate': '#3b82f6',
+      'Low': '#ec4899',
+      'Moderate': '#f472b6',
       'High': '#f59e0b',
       'Peak / Critical': '#ef4444'
-    }[p.traffic_level] || '#0d9488';
+    }[p.traffic_level] || '#ec4899';
 
     resultContainer.innerHTML = `
       <div style="background:#ffffff; border:1.5px solid var(--primary); border-radius:14px; padding:18px; box-shadow:var(--shadow-subtle);">
@@ -269,11 +269,11 @@ async function runAiPrediction() {
           </div>
           <div style="display:flex; justify-content:space-between;">
             <span style="color:#64748b;">Est. Occupied:</span>
-            <b style="color:#3b82f6;">~${p.est_occupied_slots} Slots</b>
+            <b style="color:#f472b6;">~${p.est_occupied_slots} Slots</b>
           </div>
           <div style="display:flex; justify-content:space-between;">
             <span style="color:#64748b;">Est. Available:</span>
-            <b style="color:#10b981;">~${p.est_available_slots} Slots</b>
+            <b style="color:#ec4899;">~${p.est_available_slots} Slots</b>
           </div>
           <div style="display:flex; justify-content:space-between;">
             <span style="color:#64748b;">95% Confidence:</span>

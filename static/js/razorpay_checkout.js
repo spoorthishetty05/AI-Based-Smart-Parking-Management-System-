@@ -66,16 +66,16 @@
                   <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="100" height="100" fill="#ffffff"/>
                     <rect x="10" y="10" width="30" height="30" rx="4" stroke="#0f172a" stroke-width="6"/>
-                    <rect x="20" y="20" width="10" height="10" fill="#2563eb"/>
+                    <rect x="20" y="20" width="10" height="10" fill="#ec4899"/>
                     <rect x="60" y="10" width="30" height="30" rx="4" stroke="#0f172a" stroke-width="6"/>
-                    <rect x="70" y="20" width="10" height="10" fill="#2563eb"/>
+                    <rect x="70" y="20" width="10" height="10" fill="#ec4899"/>
                     <rect x="10" y="60" width="30" height="30" rx="4" stroke="#0f172a" stroke-width="6"/>
-                    <rect x="20" y="70" width="10" height="10" fill="#2563eb"/>
+                    <rect x="20" y="70" width="10" height="10" fill="#ec4899"/>
                     <rect x="45" y="45" width="10" height="10" fill="#0f172a"/>
                     <rect x="60" y="60" width="12" height="12" fill="#0f172a"/>
                     <rect x="78" y="60" width="12" height="12" fill="#0f172a"/>
                     <rect x="60" y="78" width="12" height="12" fill="#0f172a"/>
-                    <rect x="78" y="78" width="12" height="12" fill="#2563eb"/>
+                    <rect x="78" y="78" width="12" height="12" fill="#ec4899"/>
                   </svg>
                 </div>
                 <div style="font-size:12.5px; font-weight:700; color:#1e293b;">Scan QR to Pay with any UPI App</div>
@@ -122,10 +122,10 @@
               <label style="font-size:12px; font-weight:600; color:#475569; margin-bottom:10px; display:block;">Select Bank</label>
               <div class="rzp-radio-grid">
                 <div class="rzp-radio-option selected" data-value="HDFC Bank">
-                  <i class="fas fa-building-columns" style="color:#0284c7;"></i> HDFC Bank
+                  <i class="fas fa-building-columns" style="color:#ec4899;"></i> HDFC Bank
                 </div>
                 <div class="rzp-radio-option" data-value="State Bank of India">
-                  <i class="fas fa-building-columns" style="color:#2563eb;"></i> SBI
+                  <i class="fas fa-building-columns" style="color:#ec4899;"></i> SBI
                 </div>
                 <div class="rzp-radio-option" data-value="ICICI Bank">
                   <i class="fas fa-building-columns" style="color:#ea580c;"></i> ICICI Bank
@@ -141,7 +141,7 @@
               <label style="font-size:12px; font-weight:600; color:#475569; margin-bottom:10px; display:block;">Select Wallet</label>
               <div class="rzp-radio-grid">
                 <div class="rzp-radio-option selected" data-value="Paytm Wallet">
-                  <i class="fas fa-wallet" style="color:#0ea5e9;"></i> Paytm
+                  <i class="fas fa-wallet" style="color:#ec4899;"></i> Paytm
                 </div>
                 <div class="rzp-radio-option" data-value="PhonePe Wallet">
                   <i class="fas fa-wallet" style="color:#6366f1;"></i> PhonePe
@@ -162,7 +162,7 @@
               <i class="fas fa-lock"></i> <span id="rzpPayBtnLabel">Pay ₹0.00</span>
             </button>
             <div class="rzp-security-note">
-              <i class="fas fa-shield-alt" style="color:#10b981;"></i> Secured by 256-bit SSL Encryption &bull; Razorpay Sandbox
+              <i class="fas fa-shield-alt" style="color:#ec4899;"></i> Secured by 256-bit SSL Encryption &bull; Razorpay Sandbox
             </div>
             <div class="rzp-fail-toggle">
               Testing error handling? <a id="rzpSimulateFailLink">Simulate Payment Failure ✗</a>

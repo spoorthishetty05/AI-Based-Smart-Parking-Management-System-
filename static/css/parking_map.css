@@ -16,7 +16,7 @@
 .map-floor-header {
   font-size: 15px;
   font-weight: 800;
-  color: #0d9488;
+  color: #ec4899;
   margin-bottom: 18px;
   display: flex;
   align-items: center;
@@ -79,39 +79,39 @@
 
 /* Slot Status Colors & Styling */
 .parking-slot-cell.available {
-  border-color: #10b981;
+  border-color: #ec4899;
   background: #f0fdf4;
 }
 .parking-slot-cell.available:hover {
-  border-color: #059669;
-  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.25);
+  border-color: #db2777;
+  box-shadow: 0 8px 18px rgba(236, 72, 153, 0.25);
 }
 
 .parking-slot-cell.occupied {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: #f43f5e;
+  background: #fff1f2;
 }
 .parking-slot-cell.occupied:hover {
-  box-shadow: 0 8px 18px rgba(59, 130, 246, 0.25);
+  box-shadow: 0 8px 18px rgba(244, 63, 94, 0.25);
 }
 
 .parking-slot-cell.reserved {
-  border-color: #f59e0b;
-  background: #fffbeb;
+  border-color: #fb7185;
+  background: #fff1f5;
 }
 .parking-slot-cell.reserved:hover {
-  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 8px 18px rgba(251, 113, 133, 0.25);
 }
 
 .parking-slot-cell.overstayed {
-  border-color: #ef4444;
-  background: #fef2f2;
+  border-color: #e11d48;
+  background: #ffe4e6;
   animation: overstayPulse 2s infinite;
 }
 @keyframes overstayPulse {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(225, 29, 72, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
 }
 
 .parking-slot-cell.disabled {
@@ -164,18 +164,18 @@
 /* Drive Lane in Center */
 .drive-lane {
   height: 48px;
-  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background: linear-gradient(90deg, #fdf2f8 0%, #fce7f3 50%, #fdf2f8 100%);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  color: #94a3b8;
+  color: #db2777;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 2px;
-  border-top: 1.5px dashed #cbd5e1;
-  border-bottom: 1.5px dashed #cbd5e1;
+  border-top: 1.5px dashed #fbcfe8;
+  border-bottom: 1.5px dashed #fbcfe8;
   position: relative;
   overflow: hidden;
 }
@@ -200,7 +200,7 @@
   gap: 2px;
   font-size: 10px;
   font-weight: 800;
-  color: #0d9488;
+  color: #ec4899;
 }
 .entry-indicator i {
   font-size: 14px;

@@ -87,7 +87,7 @@ function switchAdminTab(tabId) {
     if (tabId === 'ai') {
       titleElem.innerHTML = `
         <div style="display:flex; align-items:center; gap:14px;">
-          <i class="fas fa-shield-halved" style="font-size:24px; color:#38bdf8;"></i>
+          <i class="fas fa-shield-halved" style="font-size:24px; color:#f472b6;"></i>
           <div>
             <div style="font-size:20px; font-weight:800; color:#ffffff; line-height:1.2;">AI-Based Parking Intelligence & Forecasting</div>
             <div style="font-size:12px; font-weight:400; color:#94a3b8; margin-top:3px;">Predict demand, analyze trends and get smart parking recommendations</div>
@@ -96,7 +96,7 @@ function switchAdminTab(tabId) {
     } else if (tabId === 'reports') {
       titleElem.innerHTML = `
         <div style="display:flex; align-items:center; gap:12px;">
-          <i class="fas fa-chart-simple" style="font-size:22px; color:#38bdf8;"></i>
+          <i class="fas fa-chart-simple" style="font-size:22px; color:#f472b6;"></i>
           <span style="font-size:20px; font-weight:800; color:#ffffff;">Reports, Analytics & Financials</span>
         </div>`;
     } else {
@@ -214,7 +214,7 @@ function renderUsersTable(users) {
     
     const roleBadge = u.role === 'admin'
       ? '<span style="background:rgba(217,119,6,0.2); color:#fbbf24; border:1px solid rgba(251,191,36,0.3); padding:2px 8px; border-radius:4px; font-weight:700; font-size:11px;">ADMIN</span>'
-      : '<span style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid rgba(96,165,250,0.3); padding:2px 8px; border-radius:4px; font-weight:700; font-size:11px;">DRIVER</span>';
+      : '<span style="background:rgba(236,72,153,0.2); color:#f472b6; border:1px solid rgba(244,114,182,0.3); padding:2px 8px; border-radius:4px; font-weight:700; font-size:11px;">DRIVER</span>';
 
     return `
       <tr>
@@ -534,15 +534,15 @@ function renderGuardsTable(guards) {
   tbody.innerHTML = guards.map(g => {
     const isActive = (g.is_active === 1 || g.is_active === null || g.is_active === undefined);
     const statusBadge = isActive
-      ? '<span class="status-badge active" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);"><i class="fas fa-check-circle"></i> On Duty</span>'
+      ? '<span class="status-badge active" style="background:rgba(236,72,153,0.15); color:#ec4899; border:1px solid rgba(236,72,153,0.3);"><i class="fas fa-check-circle"></i> On Duty</span>'
       : '<span class="status-badge deactivated"><i class="fas fa-ban"></i> Off Duty</span>';
 
     return `
       <tr>
-        <td style="font-family:var(--font-mono); color:#10b981; font-weight:700;">#SG-${g.user_id}</td>
+        <td style="font-family:var(--font-mono); color:#ec4899; font-weight:700;">#SG-${g.user_id}</td>
         <td>
           <div style="font-weight:700; color:#ffffff; font-size:14px;">
-            <i class="fas fa-user-shield" style="color:#10b981; margin-right:6px;"></i>${escapeHtml(g.name)}
+            <i class="fas fa-user-shield" style="color:#ec4899; margin-right:6px;"></i>${escapeHtml(g.name)}
           </div>
           <div style="font-size:11px; color:#94a3b8; margin-top:2px;">
             <i class="far fa-clock"></i> ${escapeHtml(g.shift || 'Day Shift')}
@@ -553,7 +553,7 @@ function renderGuardsTable(guards) {
           <div style="font-size:11px; color:#64748b;">${escapeHtml(g.phone || '—')}</div>
         </td>
         <td>
-          <span style="background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(96,165,250,0.3); padding:3px 8px; border-radius:6px; font-weight:600; font-size:12px;">
+          <span style="background:rgba(236,72,153,0.15); color:#f472b6; border:1px solid rgba(244,114,182,0.3); padding:3px 8px; border-radius:6px; font-weight:600; font-size:12px;">
             <i class="fas fa-warehouse"></i> ${escapeHtml(g.assigned_lot || 'Main Facility')}
           </span>
         </td>
@@ -787,7 +787,7 @@ function renderLotsCards(lots) {
           <div>
             <div style="display:flex; align-items:center; gap:10px;">
               <h3 style="font-size:18px; font-weight:800; color:#ffffff;">${escapeHtml(l.lot_name)}</h3>
-              <span style="font-size:11px; background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 8px; border-radius:4px; font-weight:700;">LOT #${l.lot_id}</span>
+              <span style="font-size:11px; background:rgba(236,72,153,0.2); color:#f472b6; padding:2px 8px; border-radius:4px; font-weight:700;">LOT #${l.lot_id}</span>
             </div>
             <div style="color:#94a3b8; font-size:13px; margin-top:4px;">
               <i class="fas fa-map-marker-alt" style="color:#ef4444; margin-right:4px;"></i> ${escapeHtml(l.location)} &bull; <strong>${l.total_floors || 2} Floors</strong> &bull; ${escapeHtml(l.operating_hours || '24/7')}
@@ -810,7 +810,7 @@ function renderLotsCards(lots) {
             <span style="color:#94a3b8;">Total Capacity: <strong style="color:#ffffff;">${l.total_slots} Slots</strong></span>
           </div>
           <div style="height:10px; background:#334155; border-radius:6px; overflow:hidden; display:flex;">
-            <div style="width:${Math.round((l.available_count || 0) / l.total_slots * 100)}%; background:#10b981;" title="Available"></div>
+            <div style="width:${Math.round((l.available_count || 0) / l.total_slots * 100)}%; background:#ec4899;" title="Available"></div>
             <div style="width:${Math.round((l.reserved_count || 0) / l.total_slots * 100)}%; background:#f59e0b;" title="Reserved"></div>
             <div style="width:${Math.round((l.occupied_count || 0) / l.total_slots * 100)}%; background:#ef4444;" title="Occupied"></div>
           </div>
@@ -1436,9 +1436,9 @@ function renderForecastChart(forecastPoints) {
 
   const ctx = canvas.getContext('2d');
   const gradient = ctx.createLinearGradient(0, 0, 0, 280);
-  gradient.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
-  gradient.addColorStop(0.7, 'rgba(56, 189, 248, 0.08)');
-  gradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+  gradient.addColorStop(0, 'rgba(236, 72, 153, 0.45)');
+  gradient.addColorStop(0.7, 'rgba(236, 72, 153, 0.08)');
+  gradient.addColorStop(1, 'rgba(236, 72, 153, 0.0)');
 
   // Peak callout badge custom plugin dynamically positioned on real peak
   const peakCalloutPlugin = {
@@ -1459,7 +1459,7 @@ function renderForecastChart(forecastPoints) {
 
       ctx.save();
       ctx.fillStyle = 'rgba(11, 20, 37, 0.95)';
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+      ctx.strokeStyle = 'rgba(236, 72, 153, 0.5)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       if (ctx.roundRect) {
@@ -1475,7 +1475,7 @@ function renderForecastChart(forecastPoints) {
       ctx.textAlign = 'center';
       ctx.fillText(`Peak: ${peakHour}`, x, boxY + 13);
 
-      ctx.fillStyle = '#38bdf8';
+      ctx.fillStyle = '#ec4899';
       ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
       ctx.fillText(`● ${Math.round(peakVal)}%`, x, boxY + 28);
       ctx.restore();
@@ -1489,7 +1489,7 @@ function renderForecastChart(forecastPoints) {
       datasets: [{
         label: 'Occupancy (%)',
         data: values,
-        borderColor: '#38bdf8',
+        borderColor: '#ec4899',
         borderWidth: 2.5,
         backgroundColor: gradient,
         fill: true,
@@ -1509,8 +1509,8 @@ function renderForecastChart(forecastPoints) {
         tooltip: {
           backgroundColor: '#0f172a',
           titleColor: '#ffffff',
-          bodyColor: '#38bdf8',
-          borderColor: 'rgba(56, 189, 248, 0.3)',
+          bodyColor: '#f472b6',
+          borderColor: 'rgba(236, 72, 153, 0.3)',
           borderWidth: 1,
           callbacks: {
             label: (ctx) => `Occupancy: ${ctx.parsed.y}%`
@@ -1606,7 +1606,7 @@ async function runInteractivePrediction(e) {
     // Update conic gauge
     const gauge = document.getElementById('aiSimGaugeRing');
     if (gauge) {
-      gauge.style.background = `conic-gradient(#14b8a6 0% ${pct}%, rgba(255,255,255,0.08) ${pct}% 100%)`;
+      gauge.style.background = `conic-gradient(#ec4899 0% ${pct}%, rgba(255,255,255,0.08) ${pct}% 100%)`;
     }
     const valElem = document.getElementById('aiSimResultPct');
     if (valElem) valElem.textContent = `${pct}%`;
@@ -1645,7 +1645,7 @@ async function loadAIClustersOverview() {
 
     container.innerHTML = data.clusters.map(c => `
       <div style="background:#0f172a; border:1px solid #1e293b; border-radius:10px; padding:14px; flex:1; min-width:200px;">
-        <div style="font-size:11px; text-transform:uppercase; font-weight:700; color:#38bdf8;">Cluster ${c.cluster_id}: ${c.cluster_name}</div>
+        <div style="font-size:11px; text-transform:uppercase; font-weight:700; color:#f472b6;">Cluster ${c.cluster_id}: ${c.cluster_name}</div>
         <div style="font-size:18px; font-weight:800; color:#ffffff; margin:4px 0;">~${c.mean_occupancy_pct}% Occupancy</div>
         <div style="font-size:11px; color:#94a3b8;">Mean Hour: ${c.mean_hour}:00 &bull; Profile: ${c.demand_profile}</div>
       </div>
@@ -1689,7 +1689,7 @@ function renderExchangeRequests(requests) {
       <td style="font-family:var(--font-mono); color:#94a3b8;">#${r.request_id}</td>
       <td>
         <strong style="color:#ffffff;">${escapeHtml(r.requester_name)}</strong>
-        <div style="font-size:11px; color:#38bdf8;">Offers: Slot ${escapeHtml(r.requester_slot_number || '')}</div>
+        <div style="font-size:11px; color:#f472b6;">Offers: Slot ${escapeHtml(r.requester_slot_number || '')}</div>
       </td>
       <td style="text-align:center; font-size:16px; color:#94a3b8;">
         <i class="fas fa-exchange-alt"></i>
@@ -1978,10 +1978,10 @@ function renderReportsTrendChart(trendData) {
           label: 'Bookings',
           data: bookings,
           yAxisID: 'y',
-          borderColor: '#38bdf8',
+          borderColor: '#ec4899',
           backgroundColor: 'transparent',
           borderWidth: 2.2,
-          pointBackgroundColor: '#38bdf8',
+          pointBackgroundColor: '#ec4899',
           pointBorderColor: '#ffffff',
           pointBorderWidth: 1.5,
           pointRadius: 3.5,
@@ -2055,7 +2055,7 @@ function renderReportsFloorChart(floorData) {
 
   const floors = (floorData && floorData.length) ? floorData.map(f => f.floor) : ['Ground Floor', 'Upper Floor'];
   const values = (floorData && floorData.length) ? floorData.map(f => f.pct) : [0, 0];
-  const barColors = (floorData && floorData.length) ? floorData.map(f => f.color || '#38bdf8') : ['#06b6d4', '#3b82f6'];
+  const barColors = (floorData && floorData.length) ? floorData.map(f => f.color || '#ec4899') : ['#06b6d4', '#3b82f6'];
 
   if (reportsFloorChartInstance) {
     reportsFloorChartInstance.destroy();
@@ -2148,7 +2148,7 @@ function renderReportsStatusDonut(breakdownData) {
 
   const labels = ['Completed', 'Confirmed', 'Cancelled', 'Overstay'];
   let dataValues = [completed, confirmed, cancelled, overstay];
-  const bgColors = ['#10b981', '#38bdf8', '#f97316', '#ef4444'];
+  const bgColors = ['#ec4899', '#f472b6', '#f97316', '#ef4444'];
 
   // Update Legend HTML
   const legendElem = document.getElementById('repDonutLegend');
@@ -2160,12 +2160,12 @@ function renderReportsStatusDonut(breakdownData) {
 
     legendElem.innerHTML = `
       <div class="rep-donut-leg-row">
-        <span class="rep-leg-dot" style="background:#10b981;"></span>
+        <span class="rep-leg-dot" style="background:#ec4899;"></span>
         <span class="rep-leg-name">Completed</span>
         <span class="rep-leg-stat">${compPct}% (${completed})</span>
       </div>
       <div class="rep-donut-leg-row">
-        <span class="rep-leg-dot" style="background:#38bdf8;"></span>
+        <span class="rep-leg-dot" style="background:#f472b6;"></span>
         <span class="rep-leg-name">Confirmed</span>
         <span class="rep-leg-stat">${confPct}% (${confirmed})</span>
       </div>
@@ -2490,10 +2490,10 @@ function renderAdminOverstayTable(records) {
     tbody.innerHTML = `
       <tr>
         <td colspan="15" style="text-align:center; padding:32px 20px; color:#94a3b8;">
-          <i class="fas fa-filter" style="color:#38bdf8; font-size:22px; display:block; margin-bottom:8px;"></i>
+          <i class="fas fa-filter" style="color:#f472b6; font-size:22px; display:block; margin-bottom:8px;"></i>
           <span style="font-size:14px; font-weight:600; color:#e2e8f0;">No overstay records match your filters</span>
           <p style="font-size:12px; color:#64748b; margin:4px 0 12px;">Try clearing search keywords or resetting filter dropdowns.</p>
-          <button type="button" class="btn-admin btn-admin-secondary" onclick="resetOverstayFilters()" style="padding:6px 14px; font-size:12px; cursor:pointer; background:rgba(56,189,248,0.12); border:1px solid #38bdf8; color:#38bdf8; border-radius:6px; font-weight:600;">
+          <button type="button" class="btn-admin btn-admin-secondary" onclick="resetOverstayFilters()" style="padding:6px 14px; font-size:12px; cursor:pointer; background:rgba(56,189,248,0.12); border:1px solid #38bdf8; color:#f472b6; border-radius:6px; font-weight:600;">
             <i class="fas fa-undo"></i> Reset All Filters
           </button>
         </td>
@@ -2612,7 +2612,7 @@ function renderAdminOverstayTable(records) {
       <tr class="${rowClass}">
         <td style="color:#64748b; font-size:11.5px; font-weight:600;">${idx + 1}</td>
         <td>
-          <span style="font-family:var(--font-mono, monospace); font-weight:700; color:#38bdf8;">
+          <span style="font-family:var(--font-mono, monospace); font-weight:700; color:#f472b6;">
             ${escapeHtml(r.booking_id || '—')}
           </span>
         </td>

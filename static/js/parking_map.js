@@ -186,9 +186,9 @@ function createSlotCellHtml(slot) {
   if (stLower === 'vip') {
     typeBadgeHtml = '<span class="slot-mini-type vip" style="font-size:9px; font-weight:800; color:#d97706; background:#fef3c7; padding:1px 4px; border-radius:4px; margin-bottom:2px;">⭐ VIP</span>';
   } else if (['accessible', 'disabled'].includes(stLower)) {
-    typeBadgeHtml = '<span class="slot-mini-type acc" style="font-size:9px; font-weight:800; color:#2563eb; background:#eff6ff; padding:1px 4px; border-radius:4px; margin-bottom:2px;">♿ ACC</span>';
+    typeBadgeHtml = '<span class="slot-mini-type acc" style="font-size:9px; font-weight:800; color:#ec4899; background:#eff6ff; padding:1px 4px; border-radius:4px; margin-bottom:2px;">♿ ACC</span>';
   } else if (stLower === 'ev') {
-    typeBadgeHtml = '<span class="slot-mini-type ev" style="font-size:9px; font-weight:800; color:#059669; background:#ecfdf5; padding:1px 4px; border-radius:4px; margin-bottom:2px;">⚡ EV</span>';
+    typeBadgeHtml = '<span class="slot-mini-type ev" style="font-size:9px; font-weight:800; color:#db2777; background:#ecfdf5; padding:1px 4px; border-radius:4px; margin-bottom:2px;">⚡ EV</span>';
   } else if (stLower.includes('bike') || stLower.includes('scooter') || stLower.includes('two-wheeler') || isBike) {
     typeBadgeHtml = '<span class="slot-mini-type bike" style="font-size:9px; font-weight:800; color:#16a34a; background:#f0fdf4; padding:1px 4px; border-radius:4px; margin-bottom:2px;">🏍️ BIKE</span>';
   } else {
@@ -285,7 +285,7 @@ function openSlotDetailModal(slotNumber) {
       <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px; margin-bottom:16px;">
         <div style="font-size:12px; color:#1e40af; margin-bottom:4px;">Current Vehicle (${isBike ? '🏍️ Bike / Scooter' : '🚗 Car'})</div>
         <div style="font-size:16px; font-weight:800; color:#1e3a8a;">${slot.current_plate || 'Active Vehicle'}</div>
-        <div style="font-size:12px; color:#3b82f6; margin-top:4px;">Occupant: ${slot.user_name || 'Driver'}</div>
+        <div style="font-size:12px; color:#ec4899; margin-top:4px;">Occupant: ${slot.user_name || 'Driver'}</div>
       </div>
       <button class="btn-secondary" style="width:100%;" onclick="vacateSlotDirectly(${slot.slot_id})">
         <i class="fas fa-sign-out-alt"></i> Simulate Vehicle Departure

@@ -911,10 +911,10 @@
         if (isSelected) {
           statusClass += ' selected';
           visualHtml = `
-            <div class="slot-box-empty-bay" style="border-color:#38bdf8; background:rgba(56,189,248,0.2); color:#38bdf8;">
+            <div class="slot-box-empty-bay" style="border-color:#ec4899; background:rgba(236,72,153,0.2); color:#ec4899;">
               <i class="fas fa-check" style="font-size:18px;"></i>
             </div>
-            <div class="slot-exchange-tag" style="color:#38bdf8; font-weight:800; letter-spacing:0.5px;">SELECTED</div>
+            <div class="slot-exchange-tag" style="color:#ec4899; font-weight:800; letter-spacing:0.5px;">SELECTED</div>
           `;
           cell.title = `Slot ${slotNumDisp}: Selected for your booking`;
         } else {
@@ -967,21 +967,21 @@
       const bay = cellEl.querySelector('.slot-box-empty-bay');
       if (tag) {
         tag.textContent = 'SELECTED';
-        tag.style.color = '#38bdf8';
+        tag.style.color = '#ec4899';
         tag.style.fontWeight = '800';
       }
       if (bay) {
         bay.innerHTML = '<i class="fas fa-check" style="font-size:18px;"></i>';
-        bay.style.borderColor = '#38bdf8';
+        bay.style.borderColor = '#ec4899';
         bay.style.background = 'rgba(56,189,248,0.2)';
-        bay.style.color = '#38bdf8';
+        bay.style.color = '#ec4899';
       }
     }
 
     const display = document.getElementById('wizardSelectedSlotDisplay');
     if (display) {
       display.innerHTML = `
-        <span style="color:#10b981;"><i class="fas fa-check-circle"></i> Slot ${escapeHtml(slotNumDisp)} (${escapeHtml(slot.slot_number)})</span>
+        <span style="color:#ec4899;"><i class="fas fa-check-circle"></i> Slot ${escapeHtml(slotNumDisp)} (${escapeHtml(slot.slot_number)})</span>
         <span style="color:#64748b; font-size:13.5px; font-weight:600;"> &bull; ${escapeHtml(slot.slot_type || 'Standard')} Bay &bull; Floor: ${escapeHtml(slot.floor || 'Ground Floor')}</span>
       `;
     }
