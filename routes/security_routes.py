@@ -48,10 +48,13 @@ def security_dashboard():
                 'shift': guard_user.get('shift', 'Day Shift (08:00 - 20:00)')
             }
             
+    initial_stats = compute_accurate_security_stats(db, 'all') if db is not None else {}
+
     return render_template(
         'security_dashboard.html',
         current_user=session,
         guard_meta=guard_meta,
+        initial_stats=initial_stats,
         lots=lots
     )
 
@@ -60,16 +63,34 @@ def security_dashboard():
 # LIVE GATE TELEMETRY & STATS
 # ======================================================================
 
-@security_bp.route('/api/security/stats', methods=['GET'])
-@security_required
-def get_security_stats():
-    """Returns real-time gate telemetry: parked count, available slots, today's entries, overstays."""
-    db = get_mongo_db()
-    if db is None:
-        return jsonify({'status': 'error', 'message': 'Database offline'}), 503
-
+def reconcile_stale_slots(db):
+    """Reconciles slots stuck in occupied/overstayed whose bookings ended on past dates."""
     today_str = datetime.now().strftime('%Y-%m-%d')
-    lot_id_param = request.args.get('lot_id')
+    try:
+        stale_slots = list(db.parking_slots.find({'status': {'$in': ['occupied', 'overstayed']}}))
+        for s in stale_slots:
+            res_id = s.get('current_reservation_id')
+            if not res_id:
+                db.parking_slots.update_one({'_id': s['_id']}, {'$set': {'status': 'available', 'current_plate': None, 'current_reservation_id': None}})
+                continue
+            b = db.bookings.find_one({'$or': [{'booking_id': res_id}, {'reservation_id': res_id}]})
+            if not b:
+                b = db.reservations.find_one({'reservation_id': res_id})
+            if not b:
+                db.parking_slots.update_one({'_id': s['_id']}, {'$set': {'status': 'available', 'current_plate': None, 'current_reservation_id': None}})
+                continue
+            b_date = b.get('booking_date') or b.get('date') or ''
+            b_status = (b.get('status') or '').lower()
+            if b_date < today_str or b_status in ('completed', 'cancelled'):
+                db.parking_slots.update_one({'_id': s['_id']}, {'$set': {'status': 'available', 'current_plate': None, 'current_reservation_id': None}})
+    except Exception as e:
+        print(f"[Telemetry Warning] Reconcile stale slots: {e}")
+
+
+def compute_accurate_security_stats(db, lot_id_param=None):
+    """Computes physically accurate and mathematically consistent gate telemetry stats."""
+    reconcile_stale_slots(db)
+    today_str = datetime.now().strftime('%Y-%m-%d')
 
     slot_query = {}
     booking_query = {}
@@ -86,38 +107,47 @@ def get_security_stats():
     occupied_slots = db.parking_slots.count_documents({**slot_query, 'status': 'occupied'})
     overstay_slots = db.parking_slots.count_documents({**slot_query, 'status': 'overstayed'})
 
-    # Active parked bookings
-    active_bookings_count = db.bookings.count_documents({
-        **booking_query,
-        'status': {'$in': ['checked_in', 'active', 'parked', 'overstayed']}
-    })
+    # Currently parked vehicles are those actively occupying a bay right now (on-time occupied + overstayed)
+    currently_parked = occupied_slots + overstay_slots
 
-    # Today's entries
+    # Today's gate arrivals/entries
     today_entries = db.bookings.count_documents({
         **booking_query,
         '$or': [
             {'booking_date': today_str},
+            {'date': today_str},
             {'created_at': {'$regex': f"^{today_str}"}},
             {'actual_entry_time': {'$regex': f"^{today_str}"}}
         ]
     })
 
-    # Total overstay incidents
-    overstay_count = max(overstay_slots, db.bookings.count_documents({
-        **booking_query,
-        'status': 'overstayed'
-    }))
+    # Active overstays are vehicles actively exceeding grace period right now in bays
+    active_overstay_count = overstay_slots
+
+    return {
+        'total_slots': total_slots,
+        'vacant_slots': vacant_slots,
+        'occupied_slots': occupied_slots,
+        'currently_parked': currently_parked,
+        'today_entries': today_entries,
+        'active_overstays': active_overstay_count
+    }
+
+
+@security_bp.route('/api/security/stats', methods=['GET'])
+@security_required
+def get_security_stats():
+    """Returns real-time gate telemetry: parked count, available slots, today's entries, overstays."""
+    db = get_mongo_db()
+    if db is None:
+        return jsonify({'status': 'error', 'message': 'Database offline'}), 503
+
+    lot_id_param = request.args.get('lot_id')
+    stats = compute_accurate_security_stats(db, lot_id_param)
 
     return jsonify({
         'status': 'success',
-        'stats': {
-            'total_slots': total_slots,
-            'vacant_slots': vacant_slots,
-            'occupied_slots': occupied_slots,
-            'currently_parked': max(occupied_slots, active_bookings_count),
-            'today_entries': today_entries,
-            'active_overstays': overstay_count
-        }
+        'stats': stats
     })
 
 

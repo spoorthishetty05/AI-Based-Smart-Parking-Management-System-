@@ -134,7 +134,8 @@
             <div class="pulse-dot"></div>
             <span>LIVE SYSTEM ACTIVE</span>
           </div>
-          <a href="/security" target="_blank" class="btn-switch-user-view" style="background:#831843; border-color:#db2777; margin-right:8px;" title="Open Security Guard Dashboard">
+          <a href="/security" target="_blank" class="btn-switch-user-view"
+            style="background:#831843; border-color:#db2777; margin-right:8px;" title="Open Security Guard Dashboard">
             <i class="fas fa-shield-halved"></i> Guard Portal &rarr;
           </a>
           <a href="/user" class="btn-switch-user-view" title="Preview Driver/User Panel">
@@ -343,20 +344,24 @@
             <div class="admin-card-header">
               <div>
                 <h2><i class="fas fa-user-shield" style="color: #ec4899;"></i> Security Personnel & Gate Management</h2>
-                <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Assign guards to parking lots & gates, manage shift duty, and grant walk-in spot booking permissions</p>
+                <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Assign guards to parking lots & gates,
+                  manage shift duty, and grant walk-in spot booking permissions</p>
               </div>
               <div style="display:flex; gap:10px;">
-                <a href="/security" target="_blank" class="btn-admin btn-admin-secondary" style="border-color:#ec4899; color:#ec4899;">
+                <a href="/security" target="_blank" class="btn-admin btn-admin-secondary"
+                  style="border-color:#ec4899; color:#ec4899;">
                   <i class="fas fa-external-link-alt"></i> Open Guard Portal
                 </a>
-                <button class="btn-admin btn-admin-primary" onclick="openAddGuardModal()" style="background:#db2777; border-color:#db2777;">
+                <button class="btn-admin btn-admin-primary" onclick="openAddGuardModal()"
+                  style="background:#db2777; border-color:#db2777;">
                   <i class="fas fa-user-plus"></i> + Add Security Guard
                 </button>
               </div>
             </div>
 
             <!-- KPI Cards for Guards -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
               <div class="kpi-card" style="--kpi-color: #ec4899;">
                 <div class="kpi-data">
                   <span class="kpi-label">TOTAL SECURITY GUARDS</span>
@@ -387,7 +392,8 @@
             <div class="table-filter-bar">
               <div class="filter-search">
                 <i class="fas fa-search"></i>
-                <input type="text" id="guardSearchInput" class="table-search-input" placeholder="Search guards by name, email, gate or lot..." oninput="filterGuards()">
+                <input type="text" id="guardSearchInput" class="table-search-input"
+                  placeholder="Search guards by name, email, gate or lot..." oninput="filterGuards()">
               </div>
               <div class="filter-dropdowns">
                 <select id="guardLotFilter" class="admin-form-select table-filter-select" onchange="filterGuards()">
@@ -417,7 +423,8 @@
                 </thead>
                 <tbody id="adminGuardsTableBody">
                   <tr>
-                    <td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading security guards...</td>
+                    <td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">Loading security guards...
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -600,7 +607,8 @@
                 <div class="ai-kpi-content">
                   <span class="ai-kpi-label" style="color:#f59e0b;">Predicted Peak Hour</span>
                   <div class="ai-kpi-value" id="aiKpiPeakHour">--:--</div>
-                  <span class="ai-kpi-sub">Expected occupancy: <strong id="aiKpiPeakOcc" style="color:#f59e0b;">--%</strong></span>
+                  <span class="ai-kpi-sub">Expected occupancy: <strong id="aiKpiPeakOcc"
+                      style="color:#f59e0b;">--%</strong></span>
                 </div>
               </div>
               <div class="ai-kpi-bar-track">
@@ -632,10 +640,14 @@
             <div class="admin-card ai-chart-card">
               <div class="admin-card-header">
                 <h2><i class="fas fa-chart-line" style="color:#f472b6;"></i> 24-Hour Future Occupancy Forecast</h2>
-                <div class="ai-date-picker-wrap" style="position:relative; cursor:pointer;" title="Change Forecast Date">
+                <div class="ai-date-picker-wrap" style="position:relative; cursor:pointer;"
+                  title="Change Forecast Date">
                   <i class="far fa-calendar"></i>
-                  <span id="aiForecastDateLabel" style="color:#ffffff; font-weight:600; font-size:13px;">Live Today</span>
-                  <input type="date" id="aiForecastDate" value="" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;" onchange="updateAiForecastDate(this.value)">
+                  <span id="aiForecastDateLabel" style="color:#ffffff; font-weight:600; font-size:13px;">Live
+                    Today</span>
+                  <input type="date" id="aiForecastDate" value=""
+                    style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;"
+                    onchange="updateAiForecastDate(this.value)">
                 </div>
               </div>
               <div class="ai-forecast-container">
@@ -721,23 +733,35 @@
                     <i class="fas fa-wand-magic-sparkles" style="color:#f472b6;"></i>
                     <span>AI Availability Predictor Simulator</span>
                   </div>
-                  <p class="ai-sim-subtitle">Select date, time and floor to predict parking availability using AI model.</p>
+                  <p class="ai-sim-subtitle">Select date, time and floor to predict parking availability using AI model.
+                  </p>
                 </div>
-                <form id="aiSimulatorForm" onsubmit="runInteractivePrediction(event); return false;" novalidate class="ai-sim-form">
+                <form id="aiSimulatorForm" onsubmit="runInteractivePrediction(event); return false;" novalidate
+                  class="ai-sim-form">
                   <div class="ai-sim-input-group">
                     <label class="ai-sim-label">Target Date</label>
-                    <div class="ai-input-icon-wrap" style="position:relative; cursor:pointer;" onclick="const el = document.getElementById('predFormDate'); if(el.showPicker) el.showPicker(); else el.click();" title="Change Target Date">
+                    <div class="ai-input-icon-wrap" style="position:relative; cursor:pointer;"
+                      onclick="const el = document.getElementById('predFormDate'); if(el.showPicker) el.showPicker(); else el.click();"
+                      title="Change Target Date">
                       <i class="far fa-calendar"></i>
-                      <input type="text" id="predFormDateDisplay" class="ai-sim-input" value="Today" readonly style="cursor:pointer;">
-                      <input type="date" id="predFormDate" value="" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;" onchange="updatePredFormDate(this.value)">
+                      <input type="text" id="predFormDateDisplay" class="ai-sim-input" value="Today" readonly
+                        style="cursor:pointer;">
+                      <input type="date" id="predFormDate" value=""
+                        style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;"
+                        onchange="updatePredFormDate(this.value)">
                     </div>
                   </div>
                   <div class="ai-sim-input-group">
                     <label class="ai-sim-label">Target Time</label>
-                    <div class="ai-input-icon-wrap" style="position:relative; cursor:pointer;" onclick="const el = document.getElementById('predFormTime'); if(el.showPicker) el.showPicker(); else el.click();" title="Change Target Time">
+                    <div class="ai-input-icon-wrap" style="position:relative; cursor:pointer;"
+                      onclick="const el = document.getElementById('predFormTime'); if(el.showPicker) el.showPicker(); else el.click();"
+                      title="Change Target Time">
                       <i class="far fa-clock"></i>
-                      <input type="text" id="predFormTimeDisplay" class="ai-sim-input" value="05:00 PM" readonly style="cursor:pointer;">
-                      <input type="time" id="predFormTime" value="17:00" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;" onchange="updatePredFormTime(this.value)">
+                      <input type="text" id="predFormTimeDisplay" class="ai-sim-input" value="05:00 PM" readonly
+                        style="cursor:pointer;">
+                      <input type="time" id="predFormTime" value="17:00"
+                        style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;"
+                        onchange="updatePredFormTime(this.value)">
                     </div>
                   </div>
                   <div class="ai-sim-input-group">
@@ -767,7 +791,8 @@
                   <div class="ai-result-content">
                     <!-- Radial Conic Gauge -->
                     <div class="ai-gauge-wrapper">
-                      <div class="ai-conic-gauge" id="aiSimGaugeRing" style="background: conic-gradient(#ec4899 0% 68%, rgba(255,255,255,0.08) 68% 100%);">
+                      <div class="ai-conic-gauge" id="aiSimGaugeRing"
+                        style="background: conic-gradient(#ec4899 0% 68%, rgba(255,255,255,0.08) 68% 100%);">
                         <div class="ai-gauge-hole">
                           <span class="ai-gauge-value" id="aiSimResultPct">68%</span>
                           <span class="ai-gauge-label">Estimated Occupancy</span>
@@ -1004,7 +1029,8 @@
                 <span class="overstay-badge-counter" id="overstayRecordsCount">0 Records</span>
               </h3>
               <div style="font-size:12px; color:#64748b;">
-                Grace: <strong>15 mins</strong> &bull; Car: <strong>₹60</strong> &bull; Bike: <strong>₹30</strong> &bull; Other: <strong>₹80</strong>
+                Grace: <strong>15 mins</strong> &bull; Car: <strong>₹60</strong> &bull; Bike: <strong>₹30</strong>
+                &bull; Other: <strong>₹80</strong>
               </div>
             </div>
 
@@ -1058,38 +1084,47 @@
           <div class="rep-header-bar">
             <div class="rep-actions-wrap">
               <div class="rep-date-range-container">
-                <div class="rep-date-range-box" id="repDateRangeBox" onclick="toggleReportDateDropdown(event)" title="Click to filter by date range">
+                <div class="rep-date-range-box" id="repDateRangeBox" onclick="toggleReportDateDropdown(event)"
+                  title="Click to filter by date range">
                   <i class="far fa-calendar"></i>
                   <span id="repDateRangeDisplay">Live System Analytics</span>
-                  <i class="fas fa-chevron-down" id="repDateChevron" style="font-size:10px; transition: transform 0.2s;"></i>
+                  <i class="fas fa-chevron-down" id="repDateChevron"
+                    style="font-size:10px; transition: transform 0.2s;"></i>
                 </div>
                 <!-- Interactive Date Range Dropdown Menu -->
-                <div class="rep-date-dropdown-menu" id="repDateRangeDropdown" style="display:none;" onclick="event.stopPropagation()">
+                <div class="rep-date-dropdown-menu" id="repDateRangeDropdown" style="display:none;"
+                  onclick="event.stopPropagation()">
                   <div class="rep-date-dropdown-header">
                     <i class="fas fa-calendar-alt"></i> Select Time Range
                   </div>
                   <div class="rep-date-dropdown-list">
-                    <button type="button" class="rep-date-option active" data-days="7" onclick="setReportDateRange(7, 'Last 7 Days', this)">
+                    <button type="button" class="rep-date-option active" data-days="7"
+                      onclick="setReportDateRange(7, 'Last 7 Days', this)">
                       <span><i class="fas fa-calendar-week"></i> Last 7 Days (Default)</span>
                       <i class="fas fa-check checkmark"></i>
                     </button>
-                    <button type="button" class="rep-date-option" data-days="1" onclick="setReportDateRange(1, 'Today', this)">
+                    <button type="button" class="rep-date-option" data-days="1"
+                      onclick="setReportDateRange(1, 'Today', this)">
                       <span><i class="fas fa-calendar-day"></i> Today</span>
                       <i class="fas fa-check checkmark"></i>
                     </button>
-                    <button type="button" class="rep-date-option" data-days="14" onclick="setReportDateRange(14, 'Last 14 Days', this)">
+                    <button type="button" class="rep-date-option" data-days="14"
+                      onclick="setReportDateRange(14, 'Last 14 Days', this)">
                       <span><i class="fas fa-calendar"></i> Last 14 Days</span>
                       <i class="fas fa-check checkmark"></i>
                     </button>
-                    <button type="button" class="rep-date-option" data-days="30" onclick="setReportDateRange(30, 'Last 30 Days', this)">
+                    <button type="button" class="rep-date-option" data-days="30"
+                      onclick="setReportDateRange(30, 'Last 30 Days', this)">
                       <span><i class="fas fa-calendar-alt"></i> Last 30 Days</span>
                       <i class="fas fa-check checkmark"></i>
                     </button>
-                    <button type="button" class="rep-date-option" data-days="90" onclick="setReportDateRange(90, 'Last 3 Months', this)">
+                    <button type="button" class="rep-date-option" data-days="90"
+                      onclick="setReportDateRange(90, 'Last 3 Months', this)">
                       <span><i class="fas fa-history"></i> Last 3 Months</span>
                       <i class="fas fa-check checkmark"></i>
                     </button>
-                    <button type="button" class="rep-date-option" data-days="0" onclick="setReportDateRange(0, 'All Time', this)">
+                    <button type="button" class="rep-date-option" data-days="0"
+                      onclick="setReportDateRange(0, 'All Time', this)">
                       <span><i class="fas fa-globe"></i> All Time (Full History)</span>
                       <i class="fas fa-check checkmark"></i>
                     </button>
@@ -1101,7 +1136,8 @@
                       <input type="date" id="repCustomStartDate" class="rep-custom-date-input" title="Start Date">
                       <span style="color:#64748b; font-size:12px;">to</span>
                       <input type="date" id="repCustomEndDate" class="rep-custom-date-input" title="End Date">
-                      <button type="button" class="btn-rep-apply-date" onclick="applyCustomReportDateRange()">Apply</button>
+                      <button type="button" class="btn-rep-apply-date"
+                        onclick="applyCustomReportDateRange()">Apply</button>
                     </div>
                   </div>
                 </div>
@@ -1182,8 +1218,10 @@
               <div class="admin-card-header">
                 <h2>Booking & Revenue Trend</h2>
                 <div class="rep-legend-wrap">
-                  <span class="rep-legend-item"><span class="rep-dot" style="background:#f472b6;"></span> Bookings</span>
-                  <span class="rep-legend-item"><span class="rep-dot" style="background:#a855f7;"></span> Revenue (₹)</span>
+                  <span class="rep-legend-item"><span class="rep-dot" style="background:#f472b6;"></span>
+                    Bookings</span>
+                  <span class="rep-legend-item"><span class="rep-dot" style="background:#a855f7;"></span> Revenue
+                    (₹)</span>
                 </div>
               </div>
               <div class="rep-chart-container">
@@ -1297,7 +1335,10 @@
                     </tr>
                   </thead>
                   <tbody id="repOverstayRecordsTbody">
-                    <tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:18px;">Loading overstay records...</td></tr>
+                    <tr>
+                      <td colspan="6" style="text-align:center; color:#94a3b8; padding:18px;">Loading overstay
+                        records...</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -1322,7 +1363,10 @@
                     </tr>
                   </thead>
                   <tbody id="repRecentActivityTbody">
-                    <tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:18px;">Loading recent activities...</td></tr>
+                    <tr>
+                      <td colspan="4" style="text-align:center; color:#94a3b8; padding:18px;">Loading recent
+                        activities...</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -1331,7 +1375,7 @@
 
         </div>
 
-        </div>
+      </div>
     </main>
 
   </div>
@@ -1689,12 +1733,14 @@
         <div class="admin-modal-body">
           <div class="admin-form-group">
             <label class="admin-form-label">Guard Officer Full Name *</label>
-            <input type="text" id="addGuardName" class="admin-form-input" placeholder="e.g. Guard Ramesh Kumar" pattern="^[A-Za-z\s]+$" title="Full name must contain alphabets and spaces only." required>
+            <input type="text" id="addGuardName" class="admin-form-input" placeholder="e.g. Guard Ramesh Kumar"
+              pattern="^[A-Za-z\s]+$" title="Full name must contain alphabets and spaces only." required>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="admin-form-group">
               <label class="admin-form-label">Email Address (Login ID) *</label>
-              <input type="email" id="addGuardEmail" class="admin-form-input" placeholder="e.g. guard@smartparking.ai" required>
+              <input type="email" id="addGuardEmail" class="admin-form-input" placeholder="e.g. guard@smartparking.ai"
+                required>
             </div>
             <div class="admin-form-group">
               <label class="admin-form-label">Phone Number</label>
@@ -1703,7 +1749,8 @@
           </div>
           <div class="admin-form-group">
             <label class="admin-form-label">Default Password *</label>
-            <input type="password" id="addGuardPassword" class="admin-form-input" placeholder="Initial access password (e.g. guard123)" value="guard123" required>
+            <input type="password" id="addGuardPassword" class="admin-form-input"
+              placeholder="Initial access password (e.g. guard123)" value="guard123" required>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="admin-form-group">
@@ -1714,7 +1761,8 @@
             </div>
             <div class="admin-form-group">
               <label class="admin-form-label">Assigned Gate Station *</label>
-              <input type="text" id="addGuardGate" class="admin-form-input" placeholder="e.g. Gate 1 (North Entry)" value="Gate 1 (Main Entry)" required>
+              <input type="text" id="addGuardGate" class="admin-form-input" placeholder="e.g. Gate 1 (North Entry)"
+                value="Gate 1 (Main Entry)" required>
             </div>
           </div>
           <div class="admin-form-group">
@@ -1728,7 +1776,8 @@
         </div>
         <div class="admin-modal-footer">
           <button type="button" class="btn-admin btn-admin-secondary" onclick="closeAddGuardModal()">Cancel</button>
-          <button type="submit" class="btn-admin btn-admin-primary" style="background:#db2777; border-color:#db2777;">Create Guard Account</button>
+          <button type="submit" class="btn-admin btn-admin-primary"
+            style="background:#db2777; border-color:#db2777;">Create Guard Account</button>
         </div>
       </form>
     </div>
@@ -1789,12 +1838,14 @@
           </div>
           <div class="admin-form-group">
             <label class="admin-form-label">Reset Password (Optional)</label>
-            <input type="password" id="editGuardPassword" class="admin-form-input" placeholder="Leave blank to keep current password">
+            <input type="password" id="editGuardPassword" class="admin-form-input"
+              placeholder="Leave blank to keep current password">
           </div>
         </div>
         <div class="admin-modal-footer">
           <button type="button" class="btn-admin btn-admin-secondary" onclick="closeEditGuardModal()">Cancel</button>
-          <button type="submit" class="btn-admin btn-admin-primary" style="background:#db2777; border-color:#db2777;">Save Changes</button>
+          <button type="submit" class="btn-admin btn-admin-primary"
+            style="background:#db2777; border-color:#db2777;">Save Changes</button>
         </div>
       </form>
     </div>

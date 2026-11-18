@@ -421,7 +421,7 @@
         <div class="kpi-card" style="--kpi-color: #ec4899;">
           <div class="kpi-data">
             <span class="kpi-label">CURRENTLY PARKED VEHICLES</span>
-            <span class="kpi-value" id="kpiCurrentlyParked">0</span>
+            <span class="kpi-value" id="kpiCurrentlyParked">{{ initial_stats.currently_parked if initial_stats and 'currently_parked' in initial_stats else 0 }}</span>
             <span class="kpi-sub">Active vehicles in bays</span>
           </div>
           <div class="kpi-icon"><i class="fas fa-car-side"></i></div>
@@ -431,7 +431,7 @@
         <div class="kpi-card" style="--kpi-color: #ec4899;">
           <div class="kpi-data">
             <span class="kpi-label">VACANT SLOTS AVAILABLE</span>
-            <span class="kpi-value" id="kpiVacantSlots">0</span>
+            <span class="kpi-value" id="kpiVacantSlots">{{ initial_stats.vacant_slots if initial_stats and 'vacant_slots' in initial_stats else 0 }}</span>
             <span class="kpi-sub">Ready for walk-in arrivals</span>
           </div>
           <div class="kpi-icon"><i class="fas fa-square-parking"></i></div>
@@ -441,7 +441,7 @@
         <div class="kpi-card" style="--kpi-color: #f59e0b;">
           <div class="kpi-data">
             <span class="kpi-label">TODAY'S GATE ENTRIES</span>
-            <span class="kpi-value" id="kpiTodayEntries">0</span>
+            <span class="kpi-value" id="kpiTodayEntries">{{ initial_stats.today_entries if initial_stats and 'today_entries' in initial_stats else 0 }}</span>
             <span class="kpi-sub">Spot & online arrivals</span>
           </div>
           <div class="kpi-icon"><i class="fas fa-right-to-bracket"></i></div>
@@ -451,7 +451,7 @@
         <div class="kpi-card" style="--kpi-color: #ef4444;">
           <div class="kpi-data">
             <span class="kpi-label">ACTIVE OVERSTAY ALERTS</span>
-            <span class="kpi-value" id="kpiOverstays">0</span>
+            <span class="kpi-value" id="kpiOverstays">{{ initial_stats.active_overstays if initial_stats and 'active_overstays' in initial_stats else 0 }}</span>
             <span class="kpi-sub">Exceeded reserved grace period</span>
           </div>
           <div class="kpi-icon"><i class="fas fa-triangle-exclamation"></i></div>
