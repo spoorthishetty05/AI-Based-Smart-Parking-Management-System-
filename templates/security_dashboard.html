@@ -415,8 +415,8 @@
     <!-- MAIN BODY CONTENT -->
     <main style="flex: 1; padding: 28px; max-width: 1440px; width: 100%; margin: 0 auto;">
 
-      <!-- 4 TELEMETRY KPI CARDS -->
-      <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 28px;">
+      <!-- 3 TELEMETRY KPI CARDS -->
+      <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-bottom: 28px;">
         <!-- Currently Parked -->
         <div class="kpi-card" style="--kpi-color: #ec4899;">
           <div class="kpi-data">
@@ -435,16 +435,6 @@
             <span class="kpi-sub">Ready for walk-in arrivals</span>
           </div>
           <div class="kpi-icon"><i class="fas fa-square-parking"></i></div>
-        </div>
-
-        <!-- Today's Gate Entries -->
-        <div class="kpi-card" style="--kpi-color: #f59e0b;">
-          <div class="kpi-data">
-            <span class="kpi-label">TODAY'S GATE ENTRIES</span>
-            <span class="kpi-value" id="kpiTodayEntries">{{ initial_stats.today_entries if initial_stats and 'today_entries' in initial_stats else 0 }}</span>
-            <span class="kpi-sub">Spot & online arrivals</span>
-          </div>
-          <div class="kpi-icon"><i class="fas fa-right-to-bracket"></i></div>
         </div>
 
         <!-- Active Overstay Alerts -->
@@ -854,7 +844,8 @@
           const s = data.stats;
           document.getElementById('kpiCurrentlyParked').textContent = s.currently_parked;
           document.getElementById('kpiVacantSlots').textContent = s.vacant_slots;
-          document.getElementById('kpiTodayEntries').textContent = s.today_entries;
+          const elToday = document.getElementById('kpiTodayEntries');
+          if (elToday) elToday.textContent = s.today_entries;
           document.getElementById('kpiOverstays').textContent = s.active_overstays;
         }
       } catch (err) {
